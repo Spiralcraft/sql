@@ -1,0 +1,24 @@
+<project name="spiralcraft-sql" default="build" basedir=".">
+
+
+  <target name="build">
+    <javac 
+      srcdir="source" 
+      classpath="${spiralcraft-core.jar}:${spiralcraft-data.jar}"
+      debug="true"
+      />
+  </target>
+
+  <target name="jar" depends="build">
+    <jar 
+      destfile="../../lib/spiralcraft-sql.jar" 
+      basedir="source"
+      includes="spiralcraft/**/*.class,spiralcraft/**/*.assembly.xml"
+      >
+      <Manifest>
+        <attribute name="Class-Path" value="spiralcraft-core.jar spiralcraft-data.jar"/>
+      </Manifest>
+    </jar>
+  </target>
+
+</project>
