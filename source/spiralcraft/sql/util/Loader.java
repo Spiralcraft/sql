@@ -1,6 +1,7 @@
 package spiralcraft.sql.util;
 
 import spiralcraft.data.Key;
+import spiralcraft.data.DataException;
 
 import spiralcraft.data.tabfile.DataHandler;
 import spiralcraft.data.tabfile.Parser;
@@ -337,6 +338,9 @@ public class Loader
     catch (SQLException x)
     { x.printStackTrace();
     }
+    catch (DataException x)
+    { x.printStackTrace();
+    }
     finally
     {
       if (_discardWriter!=null)
@@ -350,7 +354,7 @@ public class Loader
   }
 
   private void load(Resource resource)
-    throws IOException,ParseException,SQLException
+    throws IOException,ParseException,SQLException,DataException
   {
     
     if (parser==null)

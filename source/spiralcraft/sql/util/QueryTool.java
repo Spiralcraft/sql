@@ -5,6 +5,8 @@ import spiralcraft.exec.ExecutionContext;
 
 import spiralcraft.sql.DriverAgent;
 import spiralcraft.sql.ResourceConnectionInfo;
+import spiralcraft.sql.ResourceConnectionManager;
+import spiralcraft.sql.ConnectionManager;
 
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.Resource;
@@ -34,9 +36,9 @@ import java.io.InputStream;
 public class QueryTool
   implements Executable
 {
-  private URI databaseResourceURI;
   private ExecutionContext executionContext;
   private Connection connection;
+  private ConnectionManager connectionManager;
   private List<String> sqlList=new ArrayList<String>();
   private int fetchSize=1000;
   private boolean update=false;
@@ -50,8 +52,15 @@ public class QueryTool
       { 
         if (option=="database")
         { 
-          databaseResourceURI
-            =executionContext.canonicalize(URI.create(nextArgument()));
+          String uri=nextArgument();
+          try
+          {
+            connectionManager
+              =new ResourceConnectionManager(URI.create(uri));
+          }
+          catch (Exception x)
+          { throw new IllegalArgumentException("database="+uri,x);
+          }
         }
         else if (option=="script")
         { 
@@ -107,11 +116,15 @@ public class QueryTool
   { sqlList.add(sql);
   }
   
+  public void setConnectionManager(ConnectionManager manager)
+  { connectionManager=manager;
+  }
+  
   public void run()
   {
-    if (databaseResourceURI==null)
+    if (connectionManager==null)
     { 
-      error("No database specified",null);
+      error("No ConnectionManager configured",null);
       return;
     }
     
@@ -127,6 +140,16 @@ public class QueryTool
     for (String sql : sqlList)
     { executeQuery(sql);
     }
+    
+    try
+    { closeConnection();
+    }
+    catch (SQLException x)
+    { 
+      error("Error closing database connection",x);
+      return;
+    }
+    
   }
 
   public void setFetchSize(int val)
@@ -180,13 +203,17 @@ public class QueryTool
   
   private void openConnection()
     throws IOException,SQLException,UnresolvableURIException
-  {
-    connection
-      =new DriverAgent
-        (new ResourceConnectionInfo(databaseResourceURI))
-        .connect();
+  { 
+    connection=connectionManager.openConnection();
     connection.setAutoCommit(false);
 
+  }
+
+  private void closeConnection()
+    throws SQLException
+  { 
+    connectionManager.closeConnection(connection);
+    connection=null;
   }
   
   private void executeQuery(String sql)

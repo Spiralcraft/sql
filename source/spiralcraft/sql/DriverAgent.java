@@ -35,6 +35,12 @@ public class DriverAgent
     { properties.put("password",connectionInfo.getPassword());
     }
     
+    if (connectionInfo.getDriverClass()==null)
+    { 
+      throw new SQLException
+        ("Driver class not specified for "+connectionInfo.getDatabaseURL()
+        );
+    }
     try
     { driver=(Driver) connectionInfo.getDriverClass().newInstance();
     }
@@ -56,7 +62,7 @@ public class DriverAgent
   { 
     return driver.connect
       (connectionInfo.getDatabaseURL().toString()
-      ,connectionInfo.getProperties()
+      ,properties
       );
   }
   
