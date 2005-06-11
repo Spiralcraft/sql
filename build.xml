@@ -1,6 +1,7 @@
 <project name="spiralcraft-sql" default="build" basedir=".">
 
   <property name="classpath" value="${spiralcraft-core.jar}:${spiralcraft-data.jar}"/>
+  <property name="module" value="sql"/>
   
   <target name="build">
     <javac 
@@ -43,4 +44,15 @@
       <link offline="true" href="../../spiralcraft-data/api"  packagelistLoc="${spiralcraft-data}/docs/api"/>
 		</javadoc>
   </target>
+  
+  <target name="source" depends="build">
+    <jar 
+      destfile="../../distrib/spiralcraft-${module}-source.jar" 
+      basedir="../../.."
+      includes="spiralcraft/modules/${module}/*.xml,spiralcraft/modules/${module}/source/spiralcraft/**/*.java,spiralcraft/modules/${module}/source/spiralcraft/**/*.xml"
+      >
+    </jar>
+
+  </target>
+
 </project>
