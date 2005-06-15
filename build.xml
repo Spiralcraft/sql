@@ -1,58 +1,10 @@
 <project name="spiralcraft-sql" default="build" basedir=".">
 
-  <property name="classpath" value="${spiralcraft-core.jar}:${spiralcraft-data.jar}"/>
   <property name="module" value="sql"/>
-  
-  <target name="build">
-    <javac 
-      srcdir="source" 
-      classpath="${spiralcraft-core.jar}:${spiralcraft-data.jar}"
-      debug="true"
-      />
-  </target>
+  <property name="version" value="1.0"/>
+  <property name="classpath" value="${spiralcraft-core.jar}:${spiralcraft-data.jar}"/>
+  <property name="manifest.class.path" value="spiralcraft-core.jar spiralcraft-data.jar"/>
 
-  <target name="jar" depends="build">
-    <jar 
-      destfile="../../lib/spiralcraft-sql.jar" 
-      basedir="source"
-      includes="spiralcraft/**/*.class,spiralcraft/**/*.assembly.xml"
-      >
-      <Manifest>
-        <attribute name="Class-Path" value="spiralcraft-core.jar spiralcraft-data.jar"/>
-      </Manifest>
-    </jar>
-  </target>
-
-  <target name="doc" depends="build">
-		<javadoc 
-      classpath="source:${classpath}"
-			sourcepath="source"
-      packagenames="spiralcraft.**.**"
-        
-			header="spiralcraft-sql API"
-			destdir="docs/api"
-			author="Spiralcraft, Inc."
-			version="v1.0-dev0"
-			use="true"
-			windowtitle="spiralcraft-sql API"
-			doctitle="&lt;h1&gt;spiralcraft-sql API&lt;/h1&gt;"
-			maxmemory="90M"
-			failonerror="true"
-      >
-			<bottom>Copyright 2000,2004 Michael Toth and Spiralcraft, Inc.</bottom>
-      <link offline="true" href="../../spiralcraft-core/api"  packagelistLoc="${spiralcraft-core}/docs/api"/>
-      <link offline="true" href="../../spiralcraft-data/api"  packagelistLoc="${spiralcraft-data}/docs/api"/>
-		</javadoc>
-  </target>
-  
-  <target name="source" depends="build">
-    <jar 
-      destfile="../../distrib/spiralcraft-${module}-source.jar" 
-      basedir="../../.."
-      includes="spiralcraft/modules/${module}/*.xml,spiralcraft/modules/${module}/source/spiralcraft/**/*.java,spiralcraft/modules/${module}/source/spiralcraft/**/*.xml"
-      >
-    </jar>
-
-  </target>
-
+  <import file="build-common.xml"/>
 </project>
+
