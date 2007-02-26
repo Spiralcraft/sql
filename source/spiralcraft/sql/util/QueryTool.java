@@ -17,10 +17,9 @@ package spiralcraft.sql.util;
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 
-import spiralcraft.sql.DriverAgent;
-import spiralcraft.sql.ResourceConnectionInfo;
 import spiralcraft.sql.ResourceConnectionManager;
 import spiralcraft.sql.ConnectionManager;
+import spiralcraft.sql.types.TypeMap;
 
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.Resource;
@@ -29,8 +28,16 @@ import spiralcraft.stream.StreamUtil;
 
 import spiralcraft.util.Arguments;
 
-import spiralcraft.data.tabfile.FieldInfo;
-import spiralcraft.data.tabfile.Writer;
+import spiralcraft.data.flatfile.Writer;
+import spiralcraft.data.TypeResolver;
+import spiralcraft.data.DataException;
+
+import spiralcraft.data.spi.EditableArrayTuple;
+
+import spiralcraft.data.pipeline.DataConsumer;
+
+import spiralcraft.data.core.SchemeImpl;
+import spiralcraft.data.core.FieldImpl;
 
 import java.net.URI;
 
@@ -150,9 +157,15 @@ public class QueryTool
       error("Error opening database connection",x);
       return;
     }
-      
-    for (String sql : sqlList)
-    { executeQuery(sql);
+    
+    try
+    {
+      for (String sql : sqlList)
+      { executeQuery(sql);
+      }
+    }
+    catch (Exception x)
+    { error("Caught exception executing sql",x);
     }
     
     try
@@ -172,28 +185,37 @@ public class QueryTool
    
  
   public void outputToTab(ResultSet rs)
-    throws SQLException,IOException
+    throws SQLException,IOException,DataException
   { 
     ResultSetMetaData md=rs.getMetaData();
     int count=md.getColumnCount();
-    FieldInfo[] fields=new FieldInfo[count];
+    SchemeImpl fields=new SchemeImpl();
     for (int i=1;i<count+1;i++)
     { 
-      fields[i-1]
-        =new FieldInfo
-          (md.getColumnName(i)
-          ,md.getColumnTypeName(i)
-          );
+      FieldImpl field=new FieldImpl();
+      field.setName(md.getColumnName(i));
+      
+      Class typeClass=TypeMap.getJavaClassFromSqlType(md.getColumnType(i));
+      if (typeClass==null)
+      { typeClass=Object.class;
+      }
+      
+      field.setType
+        (TypeResolver.getTypeResolver()
+              .resolveFromClass(typeClass)
+        );
+      fields.addField(field);
     }
-    Writer writer=new Writer(executionContext.out());
-    writer.handleFieldInfo(fields);
-    Object[] data=new Object[count];
+    
+    DataConsumer writer=new Writer(executionContext.out());
+    writer.dataInitialize(fields);
     while (rs.next())
     { 
+      EditableArrayTuple data=new EditableArrayTuple(fields);
       for (int i=1;i<count+1;i++)
       { 
         try
-        { data[i-1]=rs.getObject(i);
+        { data.set(i-1,rs.getObject(i));
         }
         catch (SQLException x)
         {
@@ -203,16 +225,16 @@ public class QueryTool
           {
             case Types.VARCHAR:
             case Types.LONGVARCHAR:
-              data[i-1]=new String(rs.getBytes(i));
+              data.set(i-1,new String(rs.getBytes(i)));
               break;
             default:
               throw x;
           }
         }
       }
-      writer.handleData(data);
+      writer.dataAvailable(data);
     }
-    writer.flush();
+    writer.dataFinalize();
   }
   
   private void openConnection()
@@ -231,6 +253,7 @@ public class QueryTool
   }
   
   private void executeQuery(String sql)
+    throws DataException
   { 
     Statement st=null;
     ResultSet rs=null;

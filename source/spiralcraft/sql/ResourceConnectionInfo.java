@@ -47,6 +47,7 @@ public class ResourceConnectionInfo
   { this(Resolver.getInstance().resolve(resourceURI));
   }
   
+  @SuppressWarnings("unused") // user and password, for now
   public ResourceConnectionInfo(Resource resource)
     throws IOException,SQLException
   { 

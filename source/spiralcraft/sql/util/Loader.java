@@ -14,20 +14,25 @@
 //
 package spiralcraft.sql.util;
 
-import spiralcraft.data.Key;
-import spiralcraft.data.DataException;
 
-import spiralcraft.data.tabfile.DataHandler;
-import spiralcraft.data.tabfile.Parser;
-import spiralcraft.data.tabfile.ParseException;
-import spiralcraft.data.tabfile.FieldInfo;
+import spiralcraft.data.Field;
+import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
+import spiralcraft.data.FieldSet;
+import spiralcraft.data.Cursor;
+
+import spiralcraft.data.pipeline.DataConsumer; 
+
+import spiralcraft.data.flatfile.Parser;
+import spiralcraft.data.flatfile.ParseException;
+
+import spiralcraft.data.core.KeyImpl;
 
 import spiralcraft.stream.Resource;
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.StreamUtil;
 import spiralcraft.stream.UnresolvableURIException;
 
-import spiralcraft.util.ArrayUtil;
 
 
 import spiralcraft.sql.Constants;
@@ -39,7 +44,6 @@ import spiralcraft.sql.types.TypeMap;
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 
-import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.File;
@@ -54,10 +58,6 @@ import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.ResultSet;
 
-import java.util.StringTokenizer;
-
-import java.util.List;
-import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -82,7 +82,6 @@ public class Loader
 
   private Resource _schemaResource;
   private Resource _connectionResource;
-  private File _logFile;
   private PrintWriter _logWriter=new PrintWriter(new OutputStreamWriter(System.out),true);
   private String _tableName;
   private Connection _connection;
@@ -91,11 +90,10 @@ public class Loader
   private int _transactionSize=1000;
   private int _statusInterval=100;
   private int _skipCount=0;
-  private List _updateKey=null;
-  private List _insertKey=null;
+  private String _updateKeyFields=null;
+  private String _insertKeyFields=null;
   private int[] _paramMap=null;
   private int[] _typeMap=null;
-  private int[] _insertKeyMapping=null;
   private boolean _checkKey=false;
   private File _discardFile=null;
   private PrintWriter _discardWriter;
@@ -103,12 +101,12 @@ public class Loader
   private char _delimiter=',';
   private boolean _delete=false;
   private boolean _gzip=false;
-  private ArrayList _inputResources=new ArrayList();
+  private ArrayList<Resource> _inputResources=new ArrayList<Resource>();
   private boolean _truncate=false;
   private boolean _autoCommit=false;
   private String _connectionSetupSql;
   private Parser parser;
-  private HashMap<Key,Key> _keyMap=new HashMap<Key,Key>();
+  private HashMap<Tuple,Tuple> _keyMap=new HashMap<Tuple,Tuple>();
   private DateFormat _dateFormat
     =new SimpleDateFormat(Constants.JDBC_TIMESTAMP_ESCAPE_FORMAT);
   { _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -182,22 +180,10 @@ public class Loader
           { setGzip(true);
           }
           else if (option.equals("updatekey"))
-          { 
-            List list=new LinkedList();
-            StringTokenizer tok=new StringTokenizer(args[++i],",");
-            while (tok.hasMoreTokens())
-            { list.add(tok.nextToken());
-            }
-            setUpdateKey(list);
+          { setUpdateKeyFields(args[++i]);
           }
           else if (option.equals("insertkey"))
-          { 
-            List list=new LinkedList();
-            StringTokenizer tok=new StringTokenizer(args[++i],",");
-            while (tok.hasMoreTokens())
-            { list.add(tok.nextToken());
-            }
-            setInsertKey(list);
+          { setInsertKeyFields(args[++i]);
           }
           else if (option.equals("checkkey"))
           { setCheckKey(true);
@@ -417,7 +403,7 @@ public class Loader
 
     
     // Load data
-    DataHandler handler=new SqlDataHandler();
+    DataConsumer handler=new SqlDataHandler();
 
     if (_gzip)
     { 
@@ -479,12 +465,12 @@ public class Loader
   { _skipCount=skipCount;
   }
   
-  public void setUpdateKey(List updateKey)
-  { _updateKey=updateKey;
+  public void setUpdateKeyFields(String updateKeyFields)
+  { _updateKeyFields=updateKeyFields;
   }
 
-  public void setInsertKey(List insertKey)
-  { _insertKey=insertKey;
+  public void setInsertKeyFields(String insertKeyFields)
+  { _insertKeyFields=insertKeyFields;
   }
 
   public void setCheckKey(boolean checkKey)
@@ -504,107 +490,123 @@ public class Loader
   }
 
   class VerifyDataHandler
-    implements DataHandler
+    implements DataConsumer,Cursor<Tuple>
   {
-    public void handleFieldInfo(FieldInfo[] fields)
+    private int count=0;
+    private Tuple data;
+    private FieldSet fieldSet;
+    private Cursor insertKeyCursor;
+    private Cursor updateKeyCursor;
+
+    public void dataInitialize(FieldSet fieldSet)
+      throws DataException
     {
-      System.err.println(ArrayUtil.format(fields,",","\""));
-      _schema=fields;
+      System.err.println(fieldSet.toString());
+      this.fieldSet=fieldSet;
+      // We ask 
       
-      if (_insertKey!=null)
-      { 
-        _insertKeyMapping=new int[_insertKey.size()];
-        for (int i=0;i<_insertKey.size();i++)
-        { 
-          String fieldName=(String) _insertKey.get(i);
-          boolean found=false;
-          for (int j=0;j<fields.length && !found;j++)
-          {
-            if (fields[j].getName().equals(fieldName))
-            { 
-              _insertKeyMapping[i]=j;
-              found=true;
-            }
-          }
-          if (!found)
-          { throw new RuntimeException("Key field '"+fieldName+"' not found");
-          }
-          
-        }
-        
+      // Check keys
+      if (_insertKeyFields!=null)
+      { insertKeyCursor=new KeyImpl(fieldSet,_insertKeyFields).bind(this);
       }
+      if (_updateKeyFields!=null)
+      { updateKeyCursor=new KeyImpl(fieldSet,_updateKeyFields).bind(this);
+      }
+      
+        
     }
 
-    public void handleData(Object[] data)
+    public FieldSet dataGetFieldSet()
+    { return this.fieldSet;
+    }
+    
+    public Tuple dataGetTuple()
+    { return this.data;
+    }
+    
+    public void dataAvailable(Tuple data)
+      throws DataException
     { 
-      if (data.length>_schema.length)
-      { 
-        throw new RuntimeException
-          ("Too many values: "+ArrayUtil.format(data,",",null));
+      count++;
+      this.data=data;
+      if (insertKeyCursor!=null)
+      { insertKeyCursor.dataGetTuple();
       }
-      _count++;
+      if (updateKeyCursor!=null)
+      { updateKeyCursor.dataGetTuple();
+      }
+    }
+    
+    public void dataFinalize()
+    { 
     }
     
     public int getCount()
-    { return _count;
+    { return count;
     }
 
-    private int _count=0;
-    private FieldInfo[] _schema=null;
   }
 
 
 	class SqlDataHandler
-		implements DataHandler
+		implements DataConsumer,Cursor<Tuple>
 	{
+    private Tuple data;
+    private FieldSet fieldSet;
+    private Cursor insertKeyCursor;
+    private Cursor updateKeyCursor;
 
-    private void assertUpdateKey(FieldInfo[] fields)
+    public void dataInitialize(FieldSet fieldSet)
+      throws DataException
     {
-          Iterator it=_updateKey.iterator();
-          while (it.hasNext())
-          {
-            String keyField=(String) it.next();
-            boolean found=false;
-
-            for (int i=0;i<fields.length;i++)
-            {
-              if (fields[i].getName().equals(keyField))
-              { 
-                found=true;
-                break;
-              }
-            }
-            if (!found)
-            { 
-              throw new RuntimeException
-                ("Update key '"
-                +keyField
-                +"' not contained in "
-                +ArrayUtil.format(fields,",",null)
-                );
-            }
-          }
+      System.err.println(fieldSet.toString());
+      this.fieldSet=fieldSet;
+      // We ask 
+      
+      // Check keys
+      if (_insertKeyFields!=null)
+      { insertKeyCursor=new KeyImpl(fieldSet,_insertKeyFields).bind(this);
+      }
+      if (_updateKeyFields!=null)
+      { updateKeyCursor=new KeyImpl(fieldSet,_updateKeyFields).bind(this);
+      }
+      
+      initializeSql();
+      
     }
-		
 
-    private int translateType(FieldInfo fieldInfo)
+    public FieldSet dataGetFieldSet()
+    { return this.fieldSet;
+    }
+    
+    public Tuple dataGetTuple()
+    { return this.data;
+    }
+    
+    public void dataAvailable(Tuple data)
+      throws DataException
+    { 
+      this.data=data;
+      performSql();
+    }
+    
+    public void dataFinalize()
+    { 
+    }
+
+    private int translateType(Field field)
     {
-      if (fieldInfo.getType()!=null)
+      if (field.getType().getNativeClass()!=null)
       { 
-        Integer sqlType=TypeMap.getSqlTypeFromSqlName(fieldInfo.getType());
-        if (sqlType!=null)
-        { return sqlType.intValue();
-        }
-        else
-        { return TypeMap.getSqlTypeFromJavaType(fieldInfo.getType(),fieldInfo.getLength());
-        }
+        return TypeMap.getSqlTypeFromJavaType
+          (field.getType().getNativeClass());
       }
       else
       { return Types.VARCHAR;
       }
     }	
 			
-		public void handleFieldInfo(FieldInfo[] fields)
+		public void initializeSql()
 		{ 
       try
       {
@@ -622,29 +624,29 @@ public class Loader
             
         _connection.setAutoCommit(_autoCommit);
 
-        _paramMap=new int[fields.length];
-        _typeMap=new int[fields.length];
+        int numFields=fieldSet.getFieldCount();
+        
+        _paramMap=new int[numFields];
+        _typeMap=new int[numFields];
         
 
-        if (_updateKey!=null && _checkKey)
+        if (updateKeyCursor!=null && _checkKey)
         {
-          assertUpdateKey(fields);
           //
           // Prepare a SELECT
           //
           StringBuffer sql=new StringBuffer();
           sql.append("SELECT count(*) FROM "+_tableName+" WHERE ");
-          int count=0;
-          int fieldCount=0;
-          int keyCount=0;
-          for (int i=0;i<fields.length;i++)
-          { 
-            FieldInfo fieldInfo=fields[i];
-            _typeMap[count]=translateType(fieldInfo);
-            String fieldName=fieldInfo.getName();
-            int keyPos=_updateKey.indexOf(fieldName);
 
-            if (keyPos>=0)
+          int count=0;
+          int keyCount=0;
+          for (int i=0;i<numFields;i++)
+          { 
+            Field field=fieldSet.getFieldByIndex(i);
+            _typeMap[count]=translateType(field);
+            String fieldName=field.getName();
+            
+            if (updateKeyCursor.dataGetFieldSet().getFieldByName(fieldName)!=null)
             {
               // Note the index of the key fields
               _paramMap[count]=(keyCount+1);
@@ -664,9 +666,8 @@ public class Loader
           _statement=_connection.prepareStatement(sql.toString());
           
         }
-        else if (_updateKey!=null && !_checkKey)
+        else if (updateKeyCursor!=null && !_checkKey)
         {
-          assertUpdateKey(fields);
 
           //
           // Prepare an UPDATE
@@ -678,17 +679,18 @@ public class Loader
           int count=0;
           int fieldCount=0;
           int keyCount=0;
-          for (int i=0;i<fields.length;i++)
+          for (int i=0;i<numFields;i++)
           { 
-            FieldInfo fieldInfo=fields[i];
-            _typeMap[count]=translateType(fieldInfo);
-            String fieldName=fieldInfo.getName();
-            int keyPos=_updateKey.indexOf(fieldName);
-
-            if (keyPos>=0)
+            Field field=fieldSet.getFieldByIndex(i);
+            _typeMap[count]=translateType(field);
+            String fieldName=field.getName();
+            
+            if (updateKeyCursor.dataGetFieldSet().getFieldByName(fieldName)!=null)
             {
+              int updateFieldCount=updateKeyCursor.dataGetFieldSet().getFieldCount();
+              
               // Note the index of the key fields
-              _paramMap[count]=( (_paramMap.length-_updateKey.size())+keyCount+1);
+              _paramMap[count]=( (_paramMap.length-updateFieldCount)+keyCount+1);
               if (keyCount>0)
               { sql2.append(" AND ");
               }
@@ -719,15 +721,14 @@ public class Loader
           // Prepare a DELETE
           //
           StringBuffer sql1=new StringBuffer();
-          StringBuffer sql2=new StringBuffer();
           sql1.append("DELETE FROM "+_tableName+" WHERE ");
 
           int count=0;
-          for (int i=0;i<fields.length;i++)
+          for (int i=0;i<numFields;i++)
           { 
-            FieldInfo fieldInfo=fields[i];
-            _typeMap[count]=translateType(fieldInfo);
-            String fieldName=fieldInfo.getName();
+            Field field=fieldSet.getFieldByIndex(i);
+            _typeMap[count]=translateType(field);
+            String fieldName=field.getName();
 
             // Note the index of the key fields
             _paramMap[count]=count+1;
@@ -753,17 +754,17 @@ public class Loader
           sql2.append(" VALUES (");
     
           int count=0;
-          for (int i=0;i<fields.length;i++)
+          for (int i=0;i<numFields;i++)
           { 
-            FieldInfo fieldInfo=fields[i];
-            _typeMap[count]=translateType(fieldInfo);
+            Field field=fieldSet.getFieldByIndex(i);
+            _typeMap[count]=translateType(field);
             
             if (count>0)
             { 
               sql1.append(",");
               sql2.append(",");
             }
-            sql1.append(fieldInfo.getName());
+            sql1.append(field.getName());
             sql2.append("?");
             _paramMap[count]=count+1;
             count++;
@@ -784,23 +785,20 @@ public class Loader
 
 
    
-		public void handleData(Object[] data)
+		public void performSql()
+      throws DataException
 		{
       boolean notAllNull=false;
-      if (_insertKeyMapping!=null)
+      if (insertKeyCursor!=null)
       {
-        Object[] keyData=new Object[_insertKeyMapping.length];
-        for (int i=0;i<_insertKeyMapping.length;i++)
-        { keyData[i]=data[_insertKeyMapping[i]];
-        }
-        Key key=new Key(keyData);
-        if (_keyMap.get(key)!=null)
+        Tuple keyData=insertKeyCursor.dataGetTuple();
+        if (_keyMap.get(keyData)!=null)
         { 
-          System.err.println("DUPLICATE KEY: "+ArrayUtil.format(data,",","\""));
+          System.err.println("DUPLICATE KEY: "+keyData.toString());
           return;
         }
         else
-        { _keyMap.put(key,key);
+        { _keyMap.put(keyData,keyData);
         }
       }
       
@@ -809,9 +807,9 @@ public class Loader
         if (_count>=_skipCount)
         {
           int fieldCount=0;
-          for (int i=0;i<data.length;i++)
-          { 
-            Object dataObject=data[i];
+          for (Field field: fieldSet.fieldIterable())
+          {
+            Object dataObject=field.getValue(data);
             if (_paramMap[fieldCount]==-1)
             { 
               fieldCount++;
@@ -945,7 +943,16 @@ public class Loader
       { 
         _logWriter.println
           ("Caught SqlException processing "
-            +ArrayUtil.formatWithClassNames(data,",")
+            +data.toString()
+          );
+        _logWriter.println(x.toString());
+        throw new RuntimeException(x.toString());
+      }
+      catch (DataException x)
+      { 
+        _logWriter.println
+          ("Caught DataException processing "
+            +data.toString()
           );
         _logWriter.println(x.toString());
         throw new RuntimeException(x.toString());

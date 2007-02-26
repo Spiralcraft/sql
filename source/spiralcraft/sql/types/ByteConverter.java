@@ -15,9 +15,6 @@
 package spiralcraft.sql.types;
 
 
-import java.io.InputStream;
-import java.io.IOException;
-
 import java.sql.SQLException;
 
 /**
@@ -43,4 +40,8 @@ public class ByteConverter
 		}
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Byte.");
 	}
+  
+  public Class getTargetClass()
+  { return Byte.class;
+  }  
 }

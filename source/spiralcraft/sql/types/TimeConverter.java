@@ -15,14 +15,10 @@
 package spiralcraft.sql.types;
 
 
-import java.io.InputStream;
-import java.io.IOException;
 
 import java.sql.SQLException;
 
-import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -59,4 +55,8 @@ public class TimeConverter
     }
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Time.");
 	}
+  
+  public Class getTargetClass()
+  { return Time.class;
+  }  
 }

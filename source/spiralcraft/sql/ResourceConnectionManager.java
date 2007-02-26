@@ -16,7 +16,6 @@ package spiralcraft.sql;
 
 import java.net.URI;
 
-import java.util.Properties;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,12 +33,6 @@ public class ResourceConnectionManager
   private DriverAgent agent;
   private URI databaseResourceURI;
   
-  private Class driverClass;
-  private Class vendorAdviceClass;
-  private URI databaseURL;
-  private String user;
-  private String password;
-  private Properties properties;
 
   public ResourceConnectionManager(URI resource)
     throws IOException,SQLException

@@ -15,7 +15,6 @@
 package spiralcraft.sql.types;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import java.lang.reflect.Field;
 
@@ -34,9 +33,15 @@ import spiralcraft.util.StringConverter;
 public class TypeMap
 {
 
-	private static HashMap _javaMap=new HashMap();
-	private static HashMap _sqlMap=new HashMap();
-  private static HashMap _sqlNameMap=new HashMap();
+	private static HashMap<Class,SqlTypeInfo> _javaMap
+    =new HashMap<Class,SqlTypeInfo>();
+
+  private static HashMap<Integer,SqlTypeInfo> _sqlMap
+    =new HashMap<Integer,SqlTypeInfo>();
+  
+  private static HashMap<String,SqlTypeInfo> _sqlNameMap
+    =new HashMap<String,SqlTypeInfo>();
+  
 	private static StringConverter _classConverter
     =StringConverter.getInstance(Class.class);
 	
@@ -53,33 +58,34 @@ public class TypeMap
 		catch (Exception x)
 		{ x.printStackTrace();
 		}	
-		putJavaMap(String.class,Types.VARCHAR);
+    
+		mapJavaType(String.class,Types.VARCHAR);
 		
-		putJavaMap(Boolean.class,Types.BIT);
-		putJavaMap(Character.class,Types.SMALLINT);
-		putJavaMap(Byte.class,Types.TINYINT);
-		putJavaMap(Short.class,Types.SMALLINT);
-		putJavaMap(Integer.class,Types.INTEGER);
-		putJavaMap(Long.class,Types.BIGINT);
-		putJavaMap(Float.class,Types.REAL);
-		putJavaMap(Double.class,Types.DOUBLE);
+		mapJavaType(Boolean.class,Types.BIT);
+		mapJavaType(Character.class,Types.SMALLINT);
+		mapJavaType(Byte.class,Types.TINYINT);
+		mapJavaType(Short.class,Types.SMALLINT);
+		mapJavaType(Integer.class,Types.INTEGER);
+		mapJavaType(Long.class,Types.BIGINT);
+		mapJavaType(Float.class,Types.REAL);
+		mapJavaType(Double.class,Types.DOUBLE);
 
-		putJavaMap(java.math.BigDecimal.class,Types.NUMERIC);
+		mapJavaType(java.math.BigDecimal.class,Types.NUMERIC);
 		
-		putJavaMap(java.util.Date.class,Types.TIMESTAMP);
-		putJavaMap(java.sql.Date.class,Types.DATE);
-		putJavaMap(java.sql.Time.class,Types.TIME);
-		putJavaMap(java.sql.Timestamp.class,Types.TIMESTAMP);
+		mapJavaType(java.util.Date.class,Types.TIMESTAMP);
+		mapJavaType(java.sql.Date.class,Types.DATE);
+		mapJavaType(java.sql.Time.class,Types.TIME);
+		mapJavaType(java.sql.Timestamp.class,Types.TIMESTAMP);
 
-		putJavaMap(boolean.class,Types.BIT);
-		putJavaMap(char.class,Types.CHAR);
-		putJavaMap(byte.class,Types.TINYINT);
-		putJavaMap(short.class,Types.SMALLINT);
-		putJavaMap(int.class,Types.INTEGER);
-		putJavaMap(long.class,Types.BIGINT);
-		putJavaMap(float.class,Types.REAL);
-		putJavaMap(double.class,Types.DOUBLE);
-		putJavaMap(byte[].class,Types.VARBINARY);
+		mapJavaType(boolean.class,Types.BIT);
+		mapJavaType(char.class,Types.CHAR);
+		mapJavaType(byte.class,Types.TINYINT);
+		mapJavaType(short.class,Types.SMALLINT);
+		mapJavaType(int.class,Types.INTEGER);
+		mapJavaType(long.class,Types.BIGINT);
+		mapJavaType(float.class,Types.REAL);
+		mapJavaType(double.class,Types.DOUBLE);
+		mapJavaType(byte[].class,Types.VARBINARY);
 		
 		setConverter(Types.VARCHAR,new VarcharConverter());
 		setConverter(Types.CHAR,new VarcharConverter());
@@ -91,6 +97,40 @@ public class TypeMap
     setConverter(Types.SMALLINT,new ShortConverter());
     setConverter(Types.REAL,new FloatConverter());
     setConverter(Types.NUMERIC,new BigDecimalConverter());
+    
+    // Suggested standard mappings from JDBC docs
+    
+    setClass(Types.CHAR,String.class);
+    setClass(Types.VARCHAR,String.class);
+    setClass(Types.LONGVARCHAR,String.class);
+    
+    setClass(Types.BINARY,byte[].class);
+    setClass(Types.VARBINARY,byte[].class);
+    setClass(Types.LONGVARBINARY,byte[].class);
+    
+    setClass(Types.BIT,Boolean.class);
+    
+    setClass(Types.TINYINT,Integer.class); // Bigger than Byte
+    setClass(Types.SMALLINT,Integer.class); 
+    setClass(Types.INTEGER,Integer.class);
+    setClass(Types.BIGINT,Long.class);
+    setClass(Types.REAL,Float.class);
+    setClass(Types.DOUBLE,Double.class);
+    setClass(Types.FLOAT,Double.class); // Bigger than Float
+    
+    setClass(Types.DECIMAL,java.math.BigDecimal.class);
+    setClass(Types.NUMERIC,java.math.BigDecimal.class);
+    
+    setClass(Types.DATE,java.sql.Date.class);
+    setClass(Types.TIME,java.sql.Time.class);
+    setClass(Types.TIMESTAMP,java.sql.Timestamp.class);
+
+    setClass(Types.BLOB,java.sql.Blob.class);
+    setClass(Types.CLOB,java.sql.Clob.class);
+    setClass(Types.ARRAY,java.sql.Array.class);
+    setClass(Types.STRUCT,java.sql.Struct.class);
+    setClass(Types.REF,java.sql.Ref.class);
+    
 	}
 
 	static class SqlTypeInfo
@@ -98,6 +138,7 @@ public class TypeMap
 		int _type;
 		String _DDL;
 		Converter _converter;
+    Class _class;
 
 		public SqlTypeInfo(int type,String DDL)
 		{
@@ -106,12 +147,24 @@ public class TypeMap
 		}	
 	}
 
+  /**
+   * Specify a standard Java class for a specific JDBC target type.
+   */ 
+  public static void setClass(int sqlType,Class clazz)
+  {
+    SqlTypeInfo info=_sqlMap.get(sqlType);
+    if (info!=null)
+    { info._class=clazz;
+    }
+    
+  }
+
 	/**
 	 * Specify a converter for a specific JDBC target type.
 	 */	
 	public static void setConverter(int sqlType,Converter converter)
 	{
-		SqlTypeInfo info=(SqlTypeInfo) _sqlMap.get(new Integer(sqlType));
+		SqlTypeInfo info=_sqlMap.get(sqlType);
 		if (info!=null)
 		{ info._converter=converter;
 		}
@@ -121,16 +174,27 @@ public class TypeMap
 	public static void putSqlMap(int code,String name)
 	{
 		SqlTypeInfo info=new SqlTypeInfo(code,name);
-		_sqlMap.put(new Integer(code),info);
+		_sqlMap.put(code,info);
     _sqlNameMap.put(name,info);
 	}
 
 
-	public static void putJavaMap(Class clazz,int sqlType)
+	public static void mapJavaType(Class clazz,int sqlType)
 	{
-		_javaMap.put(clazz,_sqlMap.get(new Integer(sqlType)));
+		_javaMap.put(clazz,_sqlMap.get(sqlType));
 	}
 	
+  public static Class getJavaClassFromSqlType(int sqlType)
+  {
+    SqlTypeInfo info=_sqlMap.get(sqlType);
+    if (info!=null)
+    { return info._class;
+    }
+    else
+    { return null;
+    }
+  }
+  
 	public static String getSqlNameFromSqlType(int sqlType)
 	{
 		SqlTypeInfo info=(SqlTypeInfo) _sqlMap.get(new Integer(sqlType));

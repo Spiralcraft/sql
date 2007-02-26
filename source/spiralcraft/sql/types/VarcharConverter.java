@@ -56,4 +56,8 @@ public class VarcharConverter
 		}
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a String.");
 	}
+  
+  public Class getTargetClass()
+  { return String.class;
+  }
 }

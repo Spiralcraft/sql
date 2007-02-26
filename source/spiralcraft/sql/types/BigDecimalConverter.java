@@ -14,9 +14,6 @@
 //
 package spiralcraft.sql.types;
 
-import java.io.InputStream;
-import java.io.IOException;
-
 import java.sql.SQLException;
 
 import java.math.BigDecimal;
@@ -44,4 +41,8 @@ public class BigDecimalConverter
 		}
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a BigDecimal.");
 	}
+  
+  public Class getTargetClass()
+  { return BigDecimal.class;
+  }
 }

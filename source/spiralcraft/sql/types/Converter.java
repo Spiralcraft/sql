@@ -18,10 +18,12 @@ import java.sql.SQLException;
 
 /**
  * Represents a type conversion to a SQL "friendly" type from another 
- *   representation. 
+ *   type.
  */
 public interface Converter
 {
 	public Object convert(Object value)
 		throws SQLException;
+  
+  public Class getTargetClass();
 }
