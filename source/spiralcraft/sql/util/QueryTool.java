@@ -17,9 +17,7 @@ package spiralcraft.sql.util;
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 
-import spiralcraft.sql.ResourceConnectionManager;
-import spiralcraft.sql.ConnectionManager;
-import spiralcraft.sql.types.TypeMap;
+import spiralcraft.sql.meta.ResultSetScheme;
 
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.Resource;
@@ -28,16 +26,14 @@ import spiralcraft.stream.StreamUtil;
 
 import spiralcraft.util.Arguments;
 
-import spiralcraft.data.flatfile.Writer;
-import spiralcraft.data.TypeResolver;
 import spiralcraft.data.DataException;
+
+import spiralcraft.data.flatfile.Writer;
 
 import spiralcraft.data.spi.EditableArrayTuple;
 
 import spiralcraft.data.pipeline.DataConsumer;
 
-import spiralcraft.data.core.SchemeImpl;
-import spiralcraft.data.core.FieldImpl;
 
 import java.net.URI;
 
@@ -45,8 +41,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Types;
+
+import javax.sql.DataSource;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -59,12 +55,13 @@ public class QueryTool
 {
   private ExecutionContext executionContext;
   private Connection connection;
-  private ConnectionManager connectionManager;
+  private DataSource dataSource;
+  private URI dataSourceURI;
   private List<String> sqlList=new ArrayList<String>();
   private int fetchSize=1000;
   private boolean update=false;
   
-  public void execute(ExecutionContext context,String[] args)
+  public void execute(final ExecutionContext context,String[] args)
   {
     executionContext=context;
     new Arguments()
@@ -75,12 +72,15 @@ public class QueryTool
         { 
           String uri=nextArgument();
           try
-          {
-            connectionManager
-              =new ResourceConnectionManager(URI.create(uri));
+          { setDataSource
+              (new ResourceDataSource
+                 (context.canonicalize
+                   (URI.create(uri))
+                 )
+               );
           }
           catch (Exception x)
-          { throw new IllegalArgumentException("database="+uri,x);
+          { throw new IllegalArgumentException(uri+":"+x,x);
           }
         }
         else if (option=="script")
@@ -120,6 +120,11 @@ public class QueryTool
     run();
   }
   
+  
+  public void setDataSource(DataSource ds)
+  { dataSource=ds;
+  }
+  
   public void setUpdate(boolean val)
   { update=val;
   }
@@ -136,16 +141,18 @@ public class QueryTool
   public void addSql(String sql)
   { sqlList.add(sql);
   }
-  
-  public void setConnectionManager(ConnectionManager manager)
-  { connectionManager=manager;
-  }
-  
+    
   public void run()
   {
-    if (connectionManager==null)
+    if (dataSourceURI==null && dataSource==null)
     { 
-      error("No ConnectionManager configured",null);
+      error("No database specified and no dataSource configured",null);
+      return;
+    }
+
+    if (dataSource==null)
+    { 
+      error("No DataSource configured",null);
       return;
     }
     
@@ -184,54 +191,19 @@ public class QueryTool
   }
    
  
-  public void outputToTab(ResultSet rs)
+  public void output(ResultSet rs)
     throws SQLException,IOException,DataException
   { 
-    ResultSetMetaData md=rs.getMetaData();
-    int count=md.getColumnCount();
-    SchemeImpl fields=new SchemeImpl();
-    for (int i=1;i<count+1;i++)
-    { 
-      FieldImpl field=new FieldImpl();
-      field.setName(md.getColumnName(i));
-      
-      Class typeClass=TypeMap.getJavaClassFromSqlType(md.getColumnType(i));
-      if (typeClass==null)
-      { typeClass=Object.class;
-      }
-      
-      field.setType
-        (TypeResolver.getTypeResolver()
-              .resolveFromClass(typeClass)
-        );
-      fields.addField(field);
-    }
+    ResultSetScheme fields=new ResultSetScheme(rs.getMetaData());
+    fields.resolve();
     
     DataConsumer writer=new Writer(executionContext.out());
     writer.dataInitialize(fields);
+    
+    EditableArrayTuple data=new EditableArrayTuple(fields);
     while (rs.next())
     { 
-      EditableArrayTuple data=new EditableArrayTuple(fields);
-      for (int i=1;i<count+1;i++)
-      { 
-        try
-        { data.set(i-1,rs.getObject(i));
-        }
-        catch (SQLException x)
-        {
-          // Deal with known corner cases
-          int type=md.getColumnType(i);
-          switch (type)
-          {
-            case Types.VARCHAR:
-            case Types.LONGVARCHAR:
-              data.set(i-1,new String(rs.getBytes(i)));
-              break;
-            default:
-              throw x;
-          }
-        }
-      }
+      fields.readResultSet(rs,data);
       writer.dataAvailable(data);
     }
     writer.dataFinalize();
@@ -240,16 +212,14 @@ public class QueryTool
   private void openConnection()
     throws IOException,SQLException,UnresolvableURIException
   { 
-    connection=connectionManager.openConnection();
+    connection=dataSource.getConnection();
     connection.setAutoCommit(false);
 
   }
 
   private void closeConnection()
     throws SQLException
-  { 
-    connectionManager.closeConnection(connection);
-    connection=null;
+  { connection.close();
   }
   
   private void executeQuery(String sql)
@@ -269,7 +239,7 @@ public class QueryTool
         rs=st.executeQuery(sql);
         rs.setFetchSize(fetchSize);
         try
-        { outputToTab(rs);
+        { output(rs);
         }
         catch (IOException x)
         { error("Error writing output for '"+sql+"'",x);

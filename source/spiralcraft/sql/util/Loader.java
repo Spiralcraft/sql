@@ -28,6 +28,8 @@ import spiralcraft.data.flatfile.ParseException;
 
 import spiralcraft.data.core.KeyImpl;
 
+import spiralcraft.data.persist.PersistenceException;
+
 import spiralcraft.stream.Resource;
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.StreamUtil;
@@ -36,8 +38,6 @@ import spiralcraft.stream.UnresolvableURIException;
 
 
 import spiralcraft.sql.Constants;
-import spiralcraft.sql.DriverAgent;
-import spiralcraft.sql.ResourceConnectionInfo;
 
 import spiralcraft.sql.types.TypeMap;
 
@@ -57,6 +57,8 @@ import java.sql.Connection;
 import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.ResultSet;
+
+import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,7 +83,7 @@ public class Loader
 {
 
   private Resource _schemaResource;
-  private Resource _connectionResource;
+  private DataSource dataSource;
   private PrintWriter _logWriter=new PrintWriter(new OutputStreamWriter(System.out),true);
   private String _tableName;
   private Connection _connection;
@@ -135,13 +137,15 @@ public class Loader
           { 
             try
             {
-              setConnectionResource
-                (Resolver.getInstance().resolve
-                  (context.canonicalize(URI.create(args[++i])))
+              setDataSource
+                (new ResourceDataSource
+                    (context.canonicalize
+                      (URI.create(args[++i]))
+                    )
                 );
             }
-            catch (UnresolvableURIException x)
-            { throw new RuntimeException("Error resolving "+args[i],x);
+            catch (PersistenceException x)
+            { throw new IllegalArgumentException(args[i]+" : "+x,x);
             }
           }
           else if (option.equals("input"))
@@ -294,7 +298,7 @@ public class Loader
     if (_tableName==null)
     { throw new RuntimeException("No table name specified");
     }
-    if (_connectionResource==null)
+    if (dataSource==null)
     { throw new RuntimeException("No database specified");
     }
     if (_inputResources.size()==0)
@@ -439,8 +443,8 @@ public class Loader
   }
   
   
-  public void setConnectionResource(Resource resource)
-  { _connectionResource=resource;
+  public void setDataSource(DataSource dataSource)
+  { this.dataSource=dataSource;
   }
 
   public void setTableName(String tableName)
@@ -610,10 +614,7 @@ public class Loader
 		{ 
       try
       {
-        _connection
-          =new DriverAgent
-            (new ResourceConnectionInfo(_connectionResource))
-              .connect();
+        _connection=dataSource.getConnection();
         if (_connectionSetupSql!=null)
         { _connection.createStatement().execute(_connectionSetupSql);
         }
@@ -776,9 +777,6 @@ public class Loader
 
       }
       catch (SQLException x)
-      { throw new RuntimeException(x.toString());
-      }
-      catch (IOException x)
       { throw new RuntimeException(x.toString());
       }
 		}
