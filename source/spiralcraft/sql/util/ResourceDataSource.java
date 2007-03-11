@@ -30,13 +30,16 @@ public class ResourceDataSource
   implements DataSource
 {
 
+  private static final URI DATA_SOURCE_TYPE_URI
+    =URI.create("java:/javax/sql/DataSource");
+    
   private final DataSource delegate;
   
   public ResourceDataSource(URI resourceUri)
     throws PersistenceException
   {
     XmlBean<DataSource> ref
-      =new XmlBean<DataSource>(null,resourceUri);
+      =new XmlBean<DataSource>(DATA_SOURCE_TYPE_URI,resourceUri);
     delegate=ref.get();
   }
   

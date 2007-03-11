@@ -1,5 +1,5 @@
 //
-// Copyright (c) 1998,2005 Michael Toth
+// Copyright (c) 1998,2007 Michael Toth
 // Spiralcraft Inc., All Rights Reserved
 //
 // This package is part of the Spiralcraft project and is licensed under
@@ -17,7 +17,7 @@ package spiralcraft.sql.util;
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 
-import spiralcraft.sql.meta.ResultSetScheme;
+import spiralcraft.sql.transport.SerialResultSetCursor;
 
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.Resource;
@@ -30,9 +30,7 @@ import spiralcraft.data.DataException;
 
 import spiralcraft.data.flatfile.Writer;
 
-import spiralcraft.data.spi.EditableArrayTuple;
-
-import spiralcraft.data.pipeline.DataConsumer;
+import spiralcraft.data.transport.DataConsumer;
 
 
 import java.net.URI;
@@ -194,17 +192,13 @@ public class QueryTool
   public void output(ResultSet rs)
     throws SQLException,IOException,DataException
   { 
-    ResultSetScheme fields=new ResultSetScheme(rs.getMetaData());
-    fields.resolve();
+    SerialResultSetCursor cursor=new SerialResultSetCursor(rs);
     
     DataConsumer writer=new Writer(executionContext.out());
-    writer.dataInitialize(fields);
+    writer.dataInitialize(cursor.dataGetFieldSet());
     
-    EditableArrayTuple data=new EditableArrayTuple(fields);
-    while (rs.next())
-    { 
-      fields.readResultSet(rs,data);
-      writer.dataAvailable(data);
+    while (cursor.dataNext())
+    { writer.dataAvailable(cursor.dataGetTuple());
     }
     writer.dataFinalize();
   }

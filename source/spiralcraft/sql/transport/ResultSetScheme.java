@@ -12,7 +12,7 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-package spiralcraft.sql.meta;
+package spiralcraft.sql.transport;
 
 import spiralcraft.data.TypeResolver;
 import spiralcraft.data.DataException;
@@ -45,17 +45,32 @@ public class ResultSetScheme
       for (int i=1;i<count+1;i++)
       { 
         FieldImpl field=new FieldImpl();
-        field.setName(metadata.getColumnName(i));
+        String mdName=metadata.getColumnName(i);
+        
+        // TODO: Screen for illegal characters
+        String goodName=mdName;
+        
+        int suffix=0;
+        while (localFieldMap.get(goodName)!=null)
+        { goodName=mdName+Integer.toString(++suffix);
+        } 
+        field.setName(goodName);
 
         Class typeClass=TypeMap.getJavaClassFromSqlType(metadata.getColumnType(i));
         if (typeClass==null)
-        { typeClass=Object.class;
+        { 
+          System.err.println
+            ("ResultSetScheme: No mapped type for "
+                +TypeMap.getSqlNameFromSqlType(metadata.getColumnType(i))
+            );
+          typeClass=Object.class;
         }
 
         field.setType
         (TypeResolver.getTypeResolver()
             .resolveFromClass(typeClass)
         );
+        
         addField(field);
       }
     }

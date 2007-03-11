@@ -19,9 +19,9 @@ import spiralcraft.data.Field;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.FieldSet;
-import spiralcraft.data.Cursor;
 
-import spiralcraft.data.pipeline.DataConsumer; 
+import spiralcraft.data.transport.Cursor;
+import spiralcraft.data.transport.DataConsumer; 
 
 import spiralcraft.data.flatfile.Parser;
 import spiralcraft.data.flatfile.ParseException;

@@ -131,6 +131,8 @@ public class TypeMap
     setClass(Types.STRUCT,java.sql.Struct.class);
     setClass(Types.REF,java.sql.Ref.class);
     
+    setClass(Types.OTHER,Object.class); 
+    
 	}
 
 	static class SqlTypeInfo
