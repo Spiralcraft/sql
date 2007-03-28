@@ -1,0 +1,23 @@
+show();
+typeResolver=spiralcraft.data.TypeResolver.getTypeResolver();
+
+new spiralcraft.data.sax.DataReader().readFromURI
+	(URI.create("java:/spiralcraft/sql/test/Test.space.xml")
+	,typeResolver.resolve(URI.create("java:/spiralcraft/sql/test/TestSpace"))
+  ).toText(" ");
+  
+  
+
+space=new spiralcraft.data.persist.XmlAssembly
+  (URI.create("java:/spiralcraft/sql/test/TestSpace")
+  ,URI.create("java:/spiralcraft/sql/test/Test.space.xml")
+  ).get();
+ 
+space.register(spiralcraft.registry.Registry.getLocalRoot());
+space.initialize();
+
+
+bq=space.getAll(typeResolver.resolve(URI.create("java:/spiralcraft/data/test/example/Customer")));
+bq.execute();
+
+

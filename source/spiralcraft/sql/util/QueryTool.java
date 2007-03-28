@@ -17,7 +17,7 @@ package spiralcraft.sql.util;
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 
-import spiralcraft.sql.transport.SerialResultSetCursor;
+import spiralcraft.sql.data.SerialResultSetCursor;
 
 import spiralcraft.stream.Resolver;
 import spiralcraft.stream.Resource;

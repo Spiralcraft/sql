@@ -1,0 +1,18 @@
+<test:TestSpace
+	xmlns:test="java:/spiralcraft/sql/test/"
+  xmlns:store="java:/spiralcraft/sql/data/store/"
+  xmlns:example="java:/spiralcraft/data/test/example/"
+  >
+  <store>
+  
+		<store:SqlStore>
+		  
+			<dataSource ref="dataSource.xml"/>
+		
+		  <typeManager ref="typeManager.xml"/>
+		  
+			
+		</store:SqlStore>
+
+	</store>
+</test:TestSpace>

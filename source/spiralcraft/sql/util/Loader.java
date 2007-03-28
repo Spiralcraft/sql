@@ -39,7 +39,7 @@ import spiralcraft.stream.UnresolvableURIException;
 
 import spiralcraft.sql.Constants;
 
-import spiralcraft.sql.types.TypeMap;
+import spiralcraft.sql.SqlType;
 
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
@@ -601,9 +601,7 @@ public class Loader
     private int translateType(Field field)
     {
       if (field.getType().getNativeClass()!=null)
-      { 
-        return TypeMap.getSqlTypeFromJavaType
-          (field.getType().getNativeClass());
+      { return SqlType.getStandardSqlType(field.getType().getNativeClass()).getTypeId();
       }
       else
       { return Types.VARCHAR;
