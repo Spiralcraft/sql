@@ -15,13 +15,27 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
 public class BooleanPrimary
-  extends SqlFragment
+  extends BooleanCondition
 {
   private Predicate predicate;
-  private SearchCondition searchCondition;
+  private BooleanCondition booleanCondition;
+  
+  public BooleanPrimary(Predicate predicate)
+  { 
+    this.predicate=predicate;
+    add(predicate);
+  }
+  
+  public BooleanPrimary(BooleanCondition booleanCondition)
+  { 
+    this.booleanCondition=booleanCondition;
+    add(booleanCondition);
+  }
+  
+  public int getPrecedence()
+  { return 5;
+  }
   
   public void write(StringBuilder buffer,String indent)
   {
@@ -32,8 +46,10 @@ public class BooleanPrimary
     }
     else
     { 
-      buffer.append("\r\n").append(indent);
-      searchCondition.write(buffer,indent);
+      buffer.append("\r\n").append(indent).append("(");
+      indent=indent+"  ";
+      booleanCondition.write(buffer,indent);
+      buffer.append("\r\n").append(indent).append(")");
     }
    
   }

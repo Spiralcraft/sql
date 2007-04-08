@@ -31,6 +31,7 @@ public class SelectList
     { items=new ArrayList<SelectListItem>();
     }
     items.add(item);
+    add(item);
   }
   
   public void write(StringBuilder buffer,String indent)

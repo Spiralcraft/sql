@@ -22,6 +22,19 @@ public class TruthValue
 {
   private Boolean value;
   
+  public TruthValue()
+  { }
+  
+  public TruthValue(boolean val)
+  {
+    if (val)
+    { value=Boolean.TRUE;
+    }
+    else
+    { value=Boolean.FALSE;
+    }
+  }
+  
   public void write(StringBuilder buffer,String indent)
   {
     if (value==null)

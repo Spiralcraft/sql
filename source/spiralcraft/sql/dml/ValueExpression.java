@@ -22,4 +22,27 @@ public abstract class ValueExpression
   extends SqlFragment
 {
 
+  public ComparisonPredicate isEqual(ValueExpression expr)
+  { return new ComparisonPredicate(this,"=",expr);
+  }
+
+  public ComparisonPredicate isNotEqual(ValueExpression expr)
+  { return new ComparisonPredicate(this,"<>",expr);
+  }
+
+  public ComparisonPredicate isLessThanOrEqual(ValueExpression expr)
+  { return new ComparisonPredicate(this,"<=",expr);
+  }
+
+  public ComparisonPredicate isLessThan(ValueExpression expr)
+  { return new ComparisonPredicate(this,"<",expr);
+  }
+
+  public ComparisonPredicate isGreaterThanOrEqual(ValueExpression expr)
+  { return new ComparisonPredicate(this,">=",expr);
+  }
+
+  public ComparisonPredicate isGreaterThan(ValueExpression expr)
+  { return new ComparisonPredicate(this,">",expr);
+  }
 }

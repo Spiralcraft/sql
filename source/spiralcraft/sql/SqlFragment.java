@@ -26,12 +26,12 @@ public abstract class SqlFragment
   private SqlFragment parent;
   private List parameterCollector;
   
-  public void setParent(SqlFragment parent)
-  { this.parent=parent;
+  protected void add(SqlFragment child)
+  { child.setParent(this);
   }
   
-  public SqlFragment getParent()
-  { return parent;
+  void setParent(SqlFragment parent)
+  { this.parent=parent;
   }
   
   /**
@@ -39,6 +39,13 @@ public abstract class SqlFragment
    */
   public abstract void write(StringBuilder buffer,String indent);
 
+  public String generateSQL()
+  {
+    StringBuilder buffer=new StringBuilder();
+    write(buffer,"");
+    return buffer.toString();
+  }
+  
   /**
    * When parameters are encountered as the Statement is serially written to text,
    *   the tag value supplied for each parameter will be added to the list so that
@@ -49,15 +56,29 @@ public abstract class SqlFragment
   }
   
   /**
+   * Propogate a parameter up to the root statement of this SqlFragment tree.
+   */
+  @SuppressWarnings("unchecked") // Not using generics here
+  void collectParameter(Object tag)
+  {
+    if (parameterCollector!=null)
+    { parameterCollector.add(tag);
+    }
+    else if (parent!=null)
+    { parent.collectParameter(tag);
+    }
+    else
+    { throw new UnsupportedOperationException("SqlFragment: No way to collect parameter");
+    }
+  }
+  
+  /**
    * Called when a parameter is encountered as the Statement is serially written to
    *   text. The tag is a marker that can be used by the caller to associate this parameter
    *   with a value when the statement is executed.
    */
   @SuppressWarnings("unchecked") // tag is opaque
   protected void parameterAssigned(Object tag)
-  {
-    if (parameterCollector!=null)
-    { parameterCollector.add(tag);
-    }
+  { collectParameter(tag);
   }
 }

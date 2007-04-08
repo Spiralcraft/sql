@@ -18,7 +18,7 @@ import spiralcraft.data.Type;
 import spiralcraft.data.Field;
 import spiralcraft.data.Key;
 
-import spiralcraft.data.query.TypeAccess;
+import spiralcraft.data.query.Scan;
 
 import spiralcraft.sql.dml.DerivedColumn;
 import spiralcraft.sql.dml.IdentifierChain;
@@ -46,7 +46,7 @@ public class TableMapping
   private String schemaName;
   private ArrayList<ColumnMapping> columnMappings
     =new ArrayList<ColumnMapping>();
-  private TypeAccess typeAccess;
+  private Scan Scan;
   private RegistryNode registryNode;
   private Table tableModel;
 
@@ -123,15 +123,15 @@ public class TableMapping
   { return columnNameMap.get(columnName);
   }
 
-  public synchronized TypeAccess getTypeAccess()
+  public synchronized Scan getScan()
   { 
-    if (typeAccess==null && type!=null)
+    if (Scan==null && type!=null)
     { 
-      TypeAccess query=new TypeAccess();
+      Scan query=new Scan();
       query.setType(type);
-      this.typeAccess=query;
+      this.Scan=query;
     }
-    return this.typeAccess;
+    return this.Scan;
   }
   
   public SelectListItem[] createSelectListItems(Field field)

@@ -1,0 +1,10 @@
+<query:Scan
+	xmlns:query="java:/spiralcraft/data/query"
+	>
+	<type>
+		<example:Customer.type
+			xmlns:example="java:/spiralcraft/data/test/example"
+	  />
+	</type>
+	
+</query:Scan>

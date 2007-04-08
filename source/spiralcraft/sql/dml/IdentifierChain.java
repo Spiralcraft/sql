@@ -36,6 +36,7 @@ public class IdentifierChain
       this.rest=new IdentifierChain
         (rest[0],(String[]) ArrayUtil.truncateBefore(rest,1));
     }
+    add(this.rest);
   }
   
   

@@ -24,6 +24,19 @@ public class ComparisonPredicate
   private ValueExpression rightExpression;
   private String operator;
   
+  public ComparisonPredicate
+    (ValueExpression leftExpression
+    ,String operator
+    ,ValueExpression rightExpression
+    )
+  {
+    this.leftExpression=leftExpression;
+    this.rightExpression=rightExpression;
+    this.operator=operator;
+    add(leftExpression);
+    add(rightExpression);
+  }
+  
   public void write(StringBuilder buffer,String indent)
   {
     

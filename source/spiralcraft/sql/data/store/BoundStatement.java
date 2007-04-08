@@ -23,8 +23,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.FieldSet;
+import spiralcraft.data.Field;
 
 import spiralcraft.sql.SqlFragment;
+
+import spiralcraft.sql.dml.ValueExpression;
+import spiralcraft.sql.dml.IdentifierChain;
+
 
 import java.util.ArrayList;
 
@@ -39,32 +45,58 @@ public abstract class BoundStatement
     =new ArrayList<Optic>();
   
   protected String statementText;
-  protected SqlFragment statement;
+  protected SqlFragment sqlFragment;
   protected final SqlStore store;
+  protected SqlBinding statementBinding;
+  protected FieldSet dataFields;
+  protected TableMapping primaryTableMapping;
   
-  protected BoundStatement(SqlStore store)
-  { this.store=store;
+  /**
+   * Create a new BoundStatement
+   * 
+   * @param store The SqlStore that provide the JDBC interfaces and
+   *   Type/Column mappings
+   *
+   * @param dataFields The FieldSet, if any, which represents the data that
+   *   will be read or written to the database (as opposed to other 
+   *   parameters)
+   */
+  protected BoundStatement(SqlStore store,FieldSet dataFields)
+  { 
+    this.store=store;
+    this.dataFields=dataFields;
+  }
+  
+  public SqlFragment getSqlFragment()
+  { return sqlFragment;
   }
   
   /**
-   * Generate the statement text and set up the parameter bindings
+   * Generate the statement text and determine the parameter expressions
    */
-  public void setStatement(SqlFragment statement)
+  public void setSqlFragment(SqlFragment sqlFragment)
   { 
     parameterExpressions.clear();
-    this.statement=statement;
-    statement.collectParameters(parameterExpressions);
-    StringBuilder buffer=new StringBuilder();
-    statement.write(buffer,"");
-    statementText=buffer.toString();
+    this.sqlFragment=sqlFragment;
+    sqlFragment.collectParameters(parameterExpressions);
+    statementText=sqlFragment.generateSQL();
   }
   
+  /**
+   * <P>Bind the set of parameter Expressions to a new Focus (application data
+   *   context)
+   *   
+   * <P>Called once when the caller has established the application context in
+   *    which this statement will be executed, or when a different application
+   *    context is to be used.
+   */
   @SuppressWarnings("unchecked") // Use of Focus is not specifically typed
   public void bindParameters(Focus focus)
     throws DataException
   { 
     try
     {
+      
       parameterBindings.clear();
       for (Expression expression: parameterExpressions)
       { parameterBindings.add(focus.bind(expression));
@@ -78,6 +110,51 @@ public abstract class BoundStatement
     
   }
   
+  /**
+   * Get the Primary (unaliased) TableMapping associated with the
+   *   FieldSet of this statement
+   */
+  public void setPrimaryTableMapping(TableMapping mapping)
+  { primaryTableMapping=mapping;
+  }
+  
+  /**
+   * Map a Field name to a SQL ValueExpression in terms of the SQL objects this
+   *   query is accessing.
+   */
+  public ValueExpression createColumnValueExpression(String fieldName)
+  { 
+    if (primaryTableMapping!=null)
+    {
+      ColumnMapping columnMapping=primaryTableMapping.getMappingForField(fieldName);
+      if (columnMapping!=null && columnMapping.getColumnModel()!=null)
+      { return columnMapping.getColumnModel().createValueExpression();
+      }
+      else
+      { return null;
+      }
+    }
+    else if (dataFields!=null)
+    { 
+      Field field=dataFields.getFieldByName(fieldName);
+      if (field!=null)
+      { return new IdentifierChain(field.getName());
+      }
+      else
+      { return null;
+      }
+    }
+    else
+    { return new IdentifierChain(fieldName);
+    }
+  }
+  
+  /**
+   * <P>Applies a new set of parameter values to a JDBC PreparedStatement.
+   * 
+   * <P>Called each time the statement is executed, immediately before
+   *   execution
+   */
   protected void applyParameters(PreparedStatement jdbcStatement)
     throws SQLException
   {
@@ -85,7 +162,10 @@ public abstract class BoundStatement
     
     int i=1;
     for (Optic optic: parameterBindings)
-    { jdbcStatement.setObject(i++,optic.get());
+    { 
+      Object paramValue=optic.get();
+      System.err.println("Apply parameter "+i+" = "+paramValue);
+      jdbcStatement.setObject(i++,paramValue);
     }
   }
   

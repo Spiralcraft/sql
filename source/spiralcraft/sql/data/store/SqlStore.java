@@ -26,11 +26,11 @@ import spiralcraft.data.Type;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Selection;
-import spiralcraft.data.query.TypeAccess;
+import spiralcraft.data.query.Scan;
 
 
 import spiralcraft.sql.data.query.BoundSelection;
-import spiralcraft.sql.data.query.BoundTypeAccess;
+import spiralcraft.sql.data.query.BoundScan;
 
 import spiralcraft.sql.ddl.DDLStatement;
 
@@ -96,7 +96,7 @@ public class SqlStore
     if (mapping==null)
     { throw new DataException("SqlStore: Unknown Type "+type.getURI());
     }
-    return new BoundTypeAccess(mapping.getTypeAccess(),null,this);
+    return new BoundScan(mapping.getScan(),null,this);
   }
 
   public void executeDDL(List<DDLStatement> statements)
@@ -157,17 +157,12 @@ public class SqlStore
   { 
     if (query instanceof Selection)
     { 
-      if (((Selection) query).getConstraints()!=null)
-      { 
-        // We can't deal with constraints just yet
-        return query.solve(focus,getSpace());
-      }
-      else
-      { return new BoundSelection((Selection) query,focus,this);
-      }
+      BoundSelection boundSelection=new BoundSelection((Selection) query,focus,this);
+      System.err.println(boundSelection.getRemainderCriteria());
+      return boundSelection;
     }
-    else if (query instanceof TypeAccess)
-    { return new BoundTypeAccess((TypeAccess) query,focus,this);
+    else if (query instanceof Scan)
+    { return new BoundScan((Scan) query,focus,this);
     }
     else
     { 

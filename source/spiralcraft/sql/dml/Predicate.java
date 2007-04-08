@@ -15,10 +15,11 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
 public abstract class Predicate
-  extends SqlFragment
+  extends BooleanCondition
 {
   
+  public int getPrecedence()
+  { return 6;
+  }
 }

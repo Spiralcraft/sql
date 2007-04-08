@@ -21,29 +21,36 @@ import spiralcraft.data.query.Query;
 
 import spiralcraft.data.transport.SerialCursor;
 
-import spiralcraft.sql.SqlFragment;
-
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.SqlStore;
 
 import spiralcraft.lang.Focus;
+import spiralcraft.lang.DefaultFocus;
 
 public abstract class BoundSqlQuery<Tq extends Query>
   extends BoundQuery<Tq>
 {
-  protected BoundQueryStatement statement;
-  protected Focus parentFocus;
-  protected SqlStore store;
+  protected final Focus parentFocus;
+  protected final SqlStore store;
+  
   protected boolean resolved;
+  protected BoundQueryStatement statement;
   
   public BoundSqlQuery(Tq query,Focus parentFocus,SqlStore store)
   { 
-    this.parentFocus=parentFocus;
+    if (parentFocus==null)
+    { 
+      // XXX The default Focus should be something standard to Data 
+      this.parentFocus=new DefaultFocus();
+    }
+    else
+    { this.parentFocus=parentFocus;
+    }
     this.store=store;
     setQuery(query);
   }
   
-  public abstract SqlFragment composeStatement()
+  public abstract BoundQueryStatement composeStatement()
     throws DataException;
 
   public void resolve()
@@ -53,8 +60,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
     { throw new IllegalStateException("Already resolved");
     }
     resolved=true;
-    statement=new BoundQueryStatement(store,getQuery().getFieldSet());
-    statement.setStatement(composeStatement());
+    statement=composeStatement();
     statement.bindParameters(parentFocus);
   }
   

@@ -19,40 +19,50 @@ import spiralcraft.lang.Focus;
 import spiralcraft.data.Field;
 import spiralcraft.data.DataException;
 
-import spiralcraft.data.query.TypeAccess;
+import spiralcraft.data.query.Scan;
 
 
 import spiralcraft.sql.data.store.SqlStore;
 import spiralcraft.sql.data.store.TableMapping;
+import spiralcraft.sql.data.store.BoundQueryStatement;
+
 import spiralcraft.sql.dml.SelectStatement;
 import spiralcraft.sql.dml.FromClause;
 import spiralcraft.sql.dml.SelectList;
 import spiralcraft.sql.dml.SelectListItem;
 
 /**
- * A SQL implementatin of the basic TypeAccess Query. 
+ * A SQL implementatin of the basic Scan Query. 
  */
-public class BoundTypeAccess
-  extends BoundSqlQuery<TypeAccess>
+public class BoundScan
+  extends BoundSqlQuery<Scan>
 {
     
-  public BoundTypeAccess(TypeAccess query,Focus parentFocus,SqlStore store)
+  public BoundScan(Scan query,Focus parentFocus,SqlStore store)
   { super(query,parentFocus,store);
   }
   
-  public SelectStatement composeStatement()
+  public BoundQueryStatement composeStatement()
     throws DataException
   {
-    TypeAccess typeAccess=getQuery();
+    BoundQueryStatement statement
+      =new BoundQueryStatement(store,getQuery().getFieldSet());
+    
+    Scan scan=getQuery();
     
     SelectStatement select=new SelectStatement();
     
-    TableMapping tableMapping=store.getTypeManager().getTableMapping(typeAccess.getType());
+    if (scan.getType()==null)
+    { throw new DataException("Scan Query must specify a Type when executed against a SqlStore");
+    }
+    
+    TableMapping tableMapping=store.getTypeManager().getTableMapping(scan.getType());
     if (tableMapping==null)
     { 
       throw new DataException
-        ("This store does not handle data for Type "+typeAccess.getType().getURI());
+        ("This store does not handle data for Type "+scan.getType().getURI());
     }
+    statement.setPrimaryTableMapping(tableMapping);
 
     select.setFromClause
       (new FromClause
@@ -62,7 +72,7 @@ public class BoundTypeAccess
       );
     
     SelectList selectList=new SelectList();
-    for (Field field : typeAccess.getFieldSet().fieldIterable())
+    for (Field field : scan.getFieldSet().fieldIterable())
     { 
       SelectListItem[] items=tableMapping.createSelectListItems(field);
       
@@ -74,7 +84,9 @@ public class BoundTypeAccess
     }
     
     select.setSelectList(selectList);
-    return select;
+    
+    statement.setSqlFragment(select);
+    return statement;
   }
   
 }

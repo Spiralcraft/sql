@@ -15,22 +15,33 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
+/**
+ * A SQL "Search Condition" or "OR" expression
+ */
 public class SearchCondition
-  extends SqlFragment
+  extends BooleanCondition
 {
-  private SearchCondition searchCondition;
-  private BooleanTerm booleanTerm;
+  private final BooleanCondition searchCondition;
+  private final BooleanCondition booleanTerm;
+  
+  
+  public SearchCondition(BooleanCondition searchCondition,BooleanCondition booleanTerm)
+  { 
+    this.searchCondition=searchCondition;
+    this.booleanTerm=booleanTerm;
+    add(searchCondition);
+    add(booleanTerm);
+  }
+  
+  public int getPrecedence()
+  { return 1;
+  }
   
   public void write(StringBuilder buffer,String indent)
   {
-    if (searchCondition!=null)
-    { 
-      searchCondition.write(buffer,indent);
-      buffer.append("\r\n").append(indent).append("OR ");
-      indent=indent+"  ";
-    }
+    searchCondition.write(buffer,indent);
+    buffer.append("\r\n").append(indent).append("OR ");
+    indent=indent+"  ";
     booleanTerm.write(buffer,indent);
   }
 }

@@ -1,0 +1,5 @@
+<query:Selection
+  xmlns:query="java:/spiralcraft/data/query"
+  >
+  <source ref="1.query.xml"/>
+</query:Selection>

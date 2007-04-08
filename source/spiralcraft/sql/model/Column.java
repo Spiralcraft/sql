@@ -23,6 +23,8 @@ import spiralcraft.sql.ddl.AlterTableStatement;
 import spiralcraft.sql.ddl.AddColumnDefinition;
 import spiralcraft.sql.ddl.DDLStatement;
 
+import spiralcraft.sql.dml.ValueExpression;
+import spiralcraft.sql.dml.IdentifierChain;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +41,7 @@ public class Column
   private boolean nullable;
   private Integer decimalDigits;
   private int position;
+  
   
   public Column()
   { 
@@ -153,6 +156,10 @@ public class Column
   
   public ColumnDefinition generateColumnDefinition(Dialect dialect)
   { return new ColumnDefinition(name,type.createDDL(length,decimalDigits));
+  }
+  
+  public ValueExpression createValueExpression()
+  { return new IdentifierChain(name);
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,Column storeVersion)

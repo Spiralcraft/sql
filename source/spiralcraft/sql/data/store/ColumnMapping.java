@@ -18,7 +18,6 @@ import spiralcraft.data.Field;
 
 import spiralcraft.sql.data.mappers.TypeMapper;
 import spiralcraft.sql.dml.DerivedColumn;
-import spiralcraft.sql.dml.IdentifierChain;
 import spiralcraft.sql.dml.SelectListItem;
 
 import spiralcraft.sql.model.Column;
@@ -119,6 +118,15 @@ public class ColumnMapping
 
   }
   
+  /**
+   * 
+   * @return The Column model associated with this mapping, if this mapping
+   *   is directly associated with a column.
+   */
+  public Column getColumnModel()
+  { return column;
+  }
+   
   @SuppressWarnings("unchecked") // Not using typeMapper in a generics way
   public Column[] getColumnModels()
   { 
@@ -165,7 +173,12 @@ public class ColumnMapping
     }
     
   }
+
   
+  /**
+   * Create the set of SelectListItem SqlFragments that return the
+   *   one or many values that make up this mapping.
+   */
   public SelectListItem[] createSelectListItems()
   {
     if (flattenedChildren!=null)
@@ -184,7 +197,7 @@ public class ColumnMapping
     { 
       return new SelectListItem[]
         {new DerivedColumn
-          (new IdentifierChain(columnName)
+          (column.createValueExpression()
           )
         };
       

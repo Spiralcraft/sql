@@ -30,6 +30,7 @@ public class DerivedColumn
   { 
     this.valueExpression=valueExpression;
     this.columnName=columnName;
+    add(valueExpression);
   }
 
   public void write(StringBuilder buffer,String indent)

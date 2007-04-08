@@ -20,7 +20,13 @@ import spiralcraft.sql.SqlFragment;
 public class WhereClause
   extends SqlFragment
 {
-  private SearchCondition searchCondition;
+  private BooleanCondition searchCondition;
+  
+  public WhereClause(BooleanCondition searchCondition)
+  { 
+    this.searchCondition=searchCondition;
+    add(searchCondition);
+  }
   
   public void write(StringBuilder buffer,String indent)
   {

@@ -15,19 +15,32 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
+/**
+ * A SQL "Boolean Term" or "AND" expression
+ */
 public class BooleanTerm
-  extends SqlFragment
+  extends BooleanCondition
 {
-  private boolean not;
-  private BooleanTest booleanTest;
+  private BooleanCondition booleanTerm;
+  private BooleanCondition booleanFactor;
+  
+  public BooleanTerm(BooleanCondition booleanTerm,BooleanCondition booleanFactor)
+  { 
+    this.booleanTerm=booleanTerm;
+    this.booleanFactor=booleanFactor;
+    add(booleanTerm);
+    add(booleanFactor);
+  }
   
   public void write(StringBuilder buffer,String indent)
   {
-    if (not)
-    { buffer.append(" NOT ");
-    }
-    booleanTest.write(buffer,indent);
+    booleanTerm.write(buffer,indent);
+    buffer.append("\r\n").append(indent).append(" AND ");
+    indent=indent+"  ";
+    booleanFactor.write(buffer,indent);
+  }
+  
+  public int getPrecedence()
+  { return 2;
   }
 }

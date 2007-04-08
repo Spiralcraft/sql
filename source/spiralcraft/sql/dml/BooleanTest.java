@@ -15,25 +15,37 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
+/**
+ * A SQL boolean test or "IS" expression
+ *
+ */
 public class BooleanTest
-  extends SqlFragment
+  extends BooleanCondition
 {
-  private BooleanPrimary booleanPrimary;
+  private BooleanCondition booleanPrimary;
   private boolean not;
   private TruthValue truthValue;
+  
+  public BooleanTest(BooleanCondition booleanPrimary,boolean not,TruthValue truthValue)
+  { 
+    this.booleanPrimary=booleanPrimary;
+    this.not=not;
+    this.truthValue=truthValue;
+    add(booleanPrimary);
+    add(truthValue);
+  }
   
   public void write(StringBuilder buffer,String indent)
   {
     booleanPrimary.write(buffer,indent);
-    if (truthValue!=null)
-    { 
-      buffer.append(" IS ");
-      if (not)
-      { buffer.append(" NOT ");
-      }
-      truthValue.write(buffer,indent);
+    buffer.append(" IS ");
+    if (not)
+    { buffer.append(" NOT ");
     }
+    truthValue.write(buffer,indent);
+  }
+  
+  public int getPrecedence()
+  { return 4;
   }
 }

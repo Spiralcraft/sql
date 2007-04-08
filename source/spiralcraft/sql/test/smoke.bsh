@@ -21,3 +21,23 @@ bq=space.getAll(typeResolver.resolve(URI.create("java:/spiralcraft/data/test/exa
 bq.execute();
 
 
+query=new spiralcraft.data.persist.XmlBean
+  (URI.create("java:/spiralcraft/data/query/Query")
+  ,URI.create("java:/spiralcraft/sql/test/1.query.xml")
+  ).get();
+bq=space.query(query,null);
+bq.execute();
+
+query=new spiralcraft.data.persist.XmlBean
+  (URI.create("java:/spiralcraft/data/query/Query")
+  ,URI.create("java:/spiralcraft/sql/test/2.query.xml")
+  ).get();
+bq=space.query(query,null);
+bq.execute();
+
+query=new spiralcraft.data.persist.XmlBean
+  (URI.create("java:/spiralcraft/data/query/Query")
+  ,URI.create("java:/spiralcraft/sql/test/3.query.xml")
+  ).get();
+bq=space.query(query,null);
+bq.execute();

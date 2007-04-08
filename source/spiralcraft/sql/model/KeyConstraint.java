@@ -27,9 +27,6 @@ import spiralcraft.sql.ddl.PrimaryKeyConstraint;
 import spiralcraft.sql.ddl.UniqueConstraint;
 import spiralcraft.sql.ddl.TableConstraintDefinition;
 
-
-import spiralcraft.util.ArrayUtil;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

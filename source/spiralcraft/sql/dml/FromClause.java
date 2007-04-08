@@ -23,11 +23,15 @@ public class FromClause
   private TableReference tableReference;
   
   public FromClause(String schemaName,String tableName)
-  { tableReference=new TableReference(schemaName,tableName);
+  { 
+    tableReference=new TableReference(schemaName,tableName);
+    add(tableReference);
   }
   
   public FromClause(String schemaName,String tableName,String correlation)
-  { tableReference=new TableReference(schemaName,tableName);
+  { 
+    tableReference=new TableReference(schemaName,tableName,correlation);
+    add(tableReference);
   }
 
   public void write(StringBuilder buffer,String indent)

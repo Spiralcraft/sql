@@ -25,15 +25,21 @@ public class SelectStatement
   private WhereClause whereClause;
   
   public void setSelectList(SelectList selectList)
-  { this.selectList=selectList;
+  { 
+    this.selectList=selectList;
+    add(selectList);
   }
   
   public void setFromClause(FromClause fromClause)
-  { this.fromClause=fromClause;
+  { 
+    this.fromClause=fromClause;
+    add(fromClause);
   }
 
-  public void setWhereClasue(WhereClause whereClause)
-  { this.whereClause=whereClause;
+  public void setWhereClause(WhereClause whereClause)
+  { 
+    this.whereClause=whereClause;
+    add(whereClause);
   }
   
   public void write(StringBuilder buffer,String indent)

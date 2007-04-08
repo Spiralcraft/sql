@@ -15,26 +15,24 @@
 package spiralcraft.sql.data.store;
 
 
-import spiralcraft.data.transport.SerialCursor;
 
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
-import spiralcraft.sql.data.SerialResultSetCursor;
 
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * A Query PreparedStatement bound to a parameter context
  */
-public class BoundQueryStatement
+public class BoundUpdateStatement
   extends BoundStatement
 {
+  protected String from;
   
-  public BoundQueryStatement(SqlStore store,FieldSet resultFields)
-  { super(store,resultFields);
+  public BoundUpdateStatement(SqlStore store,FieldSet dataFields)
+  { super(store,dataFields);
   }
   
 
@@ -42,23 +40,18 @@ public class BoundQueryStatement
   
   /**
    * Execute the Query by allocating a PreparedStatement from the SqlStore,
-   *   applying parameters, and delivering the result via a SerialCursor.
+   *   applying parameters, and returning the number of rows updated.
    */
-  public SerialCursor execute()
+  public int execute()
     throws DataException
   {
-    System.err.println("BoundQueryStatement: Preparing "+statementText);
     PreparedStatement statement=store.allocateStatement(statementText);
     try
     {
       applyParameters(statement);
-      ResultSet rs=statement.executeQuery();
-      if (dataFields!=null)
-      { return new SerialResultSetCursor(dataFields,rs);
-      }
-      else
-      { return new SerialResultSetCursor(rs);
-      }
+      int results=statement.executeUpdate();
+      statement.close();
+      return results;
     }
     catch (SQLException x)
     { throw new DataException("Error executing "+statementText+": "+x,x);
