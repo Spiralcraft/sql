@@ -12,47 +12,48 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-
 package spiralcraft.sql.dml;
-
-import spiralcraft.sql.SqlFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectList
-  extends SqlFragment
+public class TableValueConstructor
+  extends SimpleTable
 {
+  private ArrayList<RowValueConstructor> items
+    =new ArrayList<RowValueConstructor>();
   
-  ArrayList<SelectListItem> items;
   
-  public void addItem(SelectListItem item)
-  { 
-    if (items==null)
-    { items=new ArrayList<SelectListItem>();
-    }
-    items.add(item);
+  public TableValueConstructor()
+  { }
+  
+  /**
+   * Construct a TableValueConstructor with a single item
+   */
+  public TableValueConstructor(RowValueConstructor item)
+  { addItem(item);
+  }
+  
+  public void addItem(RowValueConstructor item)
+  { items.add(item);
   }
   
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    if (items==null)
-    { buffer.append("* ");
-    }
-    else
+    buffer.append("\r\n").append(indent);
+    buffer.append("VALUES");
+    
+    boolean first=true;
+    for (RowValueConstructor item: items)
     {
-      boolean first=true;
-      for (SelectListItem item: items)
-      {
-        buffer.append("\r\n"+indent);
-        if (first)
-        { first=false;
-        }
-        else
-        { buffer.append(",");
-        }
-        item.write(buffer,indent, parameterCollector);
+      buffer.append("\r\n"+indent);
+      if (first)
+      { first=false;
       }
+      else
+      { buffer.append(",");
+      }
+      item.write(buffer,indent, parameterCollector);
     }
   }
 }

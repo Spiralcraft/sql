@@ -21,7 +21,9 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
 import spiralcraft.sql.data.SerialResultSetCursor;
 
+import spiralcraft.util.tree.LinkedTree;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,11 +35,19 @@ public class BoundQueryStatement
   extends BoundStatement
 {
   
+  private LinkedTree<Integer> foldTree;
+  
   public BoundQueryStatement(SqlStore store,FieldSet resultFields)
   { super(store,resultFields);
   }
   
 
+  /**
+   * Specify how the nested Tuple structure of the result maps to the flat resultSet
+   */
+  public void setFoldTree(LinkedTree<Integer> foldTree)
+  { this.foldTree=foldTree;
+  }
 
   
   /**
@@ -47,14 +57,19 @@ public class BoundQueryStatement
   public SerialCursor execute()
     throws DataException
   {
+    // XXX: Presents problems re. returning with an open result set and connection.
+    // XXX: This might want to take a DataConsumer instead for call-back.
+    
     System.err.println("BoundQueryStatement: Preparing "+statementText);
-    PreparedStatement statement=store.allocateStatement(statementText);
+    
+    Connection connection=store.allocateConnection();
     try
     {
+      PreparedStatement statement=connection.prepareStatement(statementText);
       applyParameters(statement);
       ResultSet rs=statement.executeQuery();
       if (dataFields!=null)
-      { return new SerialResultSetCursor(dataFields,rs);
+      { return new SerialResultSetCursor(dataFields,rs,foldTree);
       }
       else
       { return new SerialResultSetCursor(rs);

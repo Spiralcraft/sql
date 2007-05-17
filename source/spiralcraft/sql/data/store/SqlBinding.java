@@ -19,11 +19,12 @@ import spiralcraft.data.lang.CursorBinding;
 import spiralcraft.lang.BindException;
 
 import spiralcraft.data.transport.Cursor;
+import spiralcraft.data.Tuple;
 
-public class SqlBinding
-  extends CursorBinding
+public class SqlBinding<T extends Tuple>
+  extends CursorBinding<T>
 {
-  public SqlBinding(Cursor cursor)
+  public SqlBinding(Cursor<T> cursor)
     throws BindException
   { super(cursor);
   }

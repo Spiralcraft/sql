@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class CreateTableStatement
     extends DDLStatement
@@ -34,7 +36,7 @@ public class CreateTableStatement
     this.elements=elements;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     
@@ -46,7 +48,7 @@ public class CreateTableStatement
     
     indent=indent+"  ";
     
-    elements.write(buffer,indent);
+    elements.write(buffer,indent, parameterCollector);
     
   }
 }

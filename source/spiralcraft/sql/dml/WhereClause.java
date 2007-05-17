@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class WhereClause
@@ -23,15 +25,13 @@ public class WhereClause
   private BooleanCondition searchCondition;
   
   public WhereClause(BooleanCondition searchCondition)
-  { 
-    this.searchCondition=searchCondition;
-    add(searchCondition);
+  { this.searchCondition=searchCondition;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\r\n").append(indent).append("WHERE ");
     indent=indent+"  ";
-    searchCondition.write(buffer,indent);
+    searchCondition.write(buffer,indent, parameterCollector);
   }
 }

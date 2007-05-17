@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class TableConstraintDefinition
     extends TableElement
@@ -25,7 +27,7 @@ public class TableConstraintDefinition
   { this.constraint=constraint;
   }
   
-  public void write(StringBuilder buffer,String indent)
-  { constraint.write(buffer,indent);
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  { constraint.write(buffer,indent, parameterCollector);
   }
 }

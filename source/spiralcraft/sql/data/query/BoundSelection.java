@@ -80,6 +80,7 @@ public class BoundSelection
       
       if (criteria!=null)
       {
+        System.err.println("BoundSelection: Criteria = "+criteria);
         CriteriaTranslator translator
           =new CriteriaTranslator(criteria,statement);
 

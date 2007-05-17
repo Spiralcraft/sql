@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class CreateSchemaStatement
   extends DDLStatement
@@ -25,7 +27,7 @@ public class CreateSchemaStatement
   { this.schemaName=schemaName;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("CREATE SCHEMA ");
     buffer.append(schemaName).append(" ");    

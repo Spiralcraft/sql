@@ -12,47 +12,46 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-
 package spiralcraft.sql.dml;
+
+import java.util.List;
 
 import spiralcraft.sql.SqlFragment;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class SelectList
+public class DeleteStatement
   extends SqlFragment
 {
+
+
+  private TableName tableName;
+  private WhereClause whereClause;
   
-  ArrayList<SelectListItem> items;
   
-  public void addItem(SelectListItem item)
+  public void setWhereClause(WhereClause whereClause)
   { 
-    if (items==null)
-    { items=new ArrayList<SelectListItem>();
-    }
-    items.add(item);
+    this.whereClause=whereClause;
   }
+
+  public void setTableName(TableName tableName)
+  { 
+    this.tableName=tableName;
+  }
+
   
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    if (items==null)
-    { buffer.append("* ");
+    buffer.append("\r\n").append(indent);
+    
+    buffer.append("DELETE FROM ");
+    tableName.write(buffer, indent, parameterCollector);
+    buffer.append(" ");
+        
+    if (whereClause!=null)
+    { 
+      buffer.append("WHERE ");
+      whereClause.write(buffer,indent, parameterCollector);
     }
-    else
-    {
-      boolean first=true;
-      for (SelectListItem item: items)
-      {
-        buffer.append("\r\n"+indent);
-        if (first)
-        { first=false;
-        }
-        else
-        { buffer.append(",");
-        }
-        item.write(buffer,indent, parameterCollector);
-      }
-    }
+
   }
 }

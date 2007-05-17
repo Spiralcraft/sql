@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class TruthValue
@@ -35,7 +37,7 @@ public class TruthValue
     }
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     if (value==null)
     { buffer.append(" NULL ");

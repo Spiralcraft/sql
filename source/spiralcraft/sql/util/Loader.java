@@ -19,8 +19,8 @@ import spiralcraft.data.Field;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.FieldSet;
+import spiralcraft.data.BoundProjection;
 
-import spiralcraft.data.transport.Cursor;
 import spiralcraft.data.transport.DataConsumer; 
 
 import spiralcraft.data.flatfile.Parser;
@@ -407,7 +407,7 @@ public class Loader
 
     
     // Load data
-    DataConsumer handler=new SqlDataHandler();
+    DataConsumer<Tuple> handler=new SqlDataHandler();
 
     if (_gzip)
     { 
@@ -494,13 +494,13 @@ public class Loader
   }
 
   class VerifyDataHandler
-    implements DataConsumer,Cursor<Tuple>
+    implements DataConsumer<Tuple>
   {
     private int count=0;
     private Tuple data;
     private FieldSet fieldSet;
-    private Cursor insertKeyCursor;
-    private Cursor updateKeyCursor;
+    private BoundProjection insertKeyBinding;
+    private BoundProjection updateKeyBinding;
 
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
@@ -511,10 +511,10 @@ public class Loader
       
       // Check keys
       if (_insertKeyFields!=null)
-      { insertKeyCursor=new KeyImpl(fieldSet,_insertKeyFields).bind(this);
+      { insertKeyBinding=new KeyImpl(fieldSet,_insertKeyFields).createBinding();
       }
       if (_updateKeyFields!=null)
-      { updateKeyCursor=new KeyImpl(fieldSet,_updateKeyFields).bind(this);
+      { updateKeyBinding=new KeyImpl(fieldSet,_updateKeyFields).createBinding();
       }
       
         
@@ -533,11 +533,11 @@ public class Loader
     { 
       count++;
       this.data=data;
-      if (insertKeyCursor!=null)
-      { insertKeyCursor.dataGetTuple();
+      if (insertKeyBinding!=null)
+      { insertKeyBinding.project(data);
       }
-      if (updateKeyCursor!=null)
-      { updateKeyCursor.dataGetTuple();
+      if (updateKeyBinding!=null)
+      { updateKeyBinding.project(data);
       }
     }
     
@@ -553,12 +553,12 @@ public class Loader
 
 
 	class SqlDataHandler
-		implements DataConsumer,Cursor<Tuple>
+		implements DataConsumer<Tuple>
 	{
     private Tuple data;
     private FieldSet fieldSet;
-    private Cursor insertKeyCursor;
-    private Cursor updateKeyCursor;
+    private BoundProjection insertKeyBinding;
+    private BoundProjection updateKeyBinding;
 
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
@@ -569,10 +569,10 @@ public class Loader
       
       // Check keys
       if (_insertKeyFields!=null)
-      { insertKeyCursor=new KeyImpl(fieldSet,_insertKeyFields).bind(this);
+      { insertKeyBinding=new KeyImpl(fieldSet,_insertKeyFields).createBinding();
       }
       if (_updateKeyFields!=null)
-      { updateKeyCursor=new KeyImpl(fieldSet,_updateKeyFields).bind(this);
+      { updateKeyBinding=new KeyImpl(fieldSet,_updateKeyFields).createBinding();
       }
       
       initializeSql();
@@ -629,7 +629,7 @@ public class Loader
         _typeMap=new int[numFields];
         
 
-        if (updateKeyCursor!=null && _checkKey)
+        if (updateKeyBinding!=null && _checkKey)
         {
           //
           // Prepare a SELECT
@@ -645,7 +645,7 @@ public class Loader
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
-            if (updateKeyCursor.dataGetFieldSet().getFieldByName(fieldName)!=null)
+            if (updateKeyBinding.getProjection().getFieldByName(fieldName)!=null)
             {
               // Note the index of the key fields
               _paramMap[count]=(keyCount+1);
@@ -665,7 +665,7 @@ public class Loader
           _statement=_connection.prepareStatement(sql.toString());
           
         }
-        else if (updateKeyCursor!=null && !_checkKey)
+        else if (updateKeyBinding!=null && !_checkKey)
         {
 
           //
@@ -684,9 +684,9 @@ public class Loader
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
-            if (updateKeyCursor.dataGetFieldSet().getFieldByName(fieldName)!=null)
+            if (updateKeyBinding.getProjection().getFieldByName(fieldName)!=null)
             {
-              int updateFieldCount=updateKeyCursor.dataGetFieldSet().getFieldCount();
+              int updateFieldCount=updateKeyBinding.getProjection().getFieldCount();
               
               // Note the index of the key fields
               _paramMap[count]=( (_paramMap.length-updateFieldCount)+keyCount+1);
@@ -785,9 +785,9 @@ public class Loader
       throws DataException
 		{
       boolean notAllNull=false;
-      if (insertKeyCursor!=null)
+      if (insertKeyBinding!=null)
       {
-        Tuple keyData=insertKeyCursor.dataGetTuple();
+        Tuple keyData=insertKeyBinding.project(data);
         if (_keyMap.get(keyData)!=null)
         { 
           System.err.println("DUPLICATE KEY: "+keyData.toString());

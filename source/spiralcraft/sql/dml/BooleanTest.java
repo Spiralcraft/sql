@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 /**
  * A SQL boolean test or "IS" expression
  *
@@ -31,18 +33,16 @@ public class BooleanTest
     this.booleanPrimary=booleanPrimary;
     this.not=not;
     this.truthValue=truthValue;
-    add(booleanPrimary);
-    add(truthValue);
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    booleanPrimary.write(buffer,indent);
+    booleanPrimary.write(buffer,indent, parameterCollector);
     buffer.append(" IS ");
     if (not)
     { buffer.append(" NOT ");
     }
-    truthValue.write(buffer,indent);
+    truthValue.write(buffer,indent, parameterCollector);
   }
   
   public int getPrecedence()

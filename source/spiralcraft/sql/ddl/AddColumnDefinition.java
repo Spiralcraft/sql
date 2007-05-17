@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class AddColumnDefinition
     extends AlterTableAction
@@ -25,9 +27,9 @@ public class AddColumnDefinition
   { this.columnDefinition=columnDefinition;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("ADD COLUMN ");
-    columnDefinition.write(buffer,indent);
+    columnDefinition.write(buffer,indent, parameterCollector);
   }
 }

@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class ColumnDefinition
     extends TableElement
@@ -30,10 +32,10 @@ public class ColumnDefinition
   
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     
     buffer.append("\"").append(columnName).append("\"").append(" ");
-    dataType.write(buffer,indent);    
+    dataType.write(buffer,indent, parameterCollector);    
   }
 }

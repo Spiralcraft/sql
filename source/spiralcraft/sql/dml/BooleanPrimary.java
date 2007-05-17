@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 public class BooleanPrimary
   extends BooleanCondition
 {
@@ -22,33 +24,29 @@ public class BooleanPrimary
   private BooleanCondition booleanCondition;
   
   public BooleanPrimary(Predicate predicate)
-  { 
-    this.predicate=predicate;
-    add(predicate);
+  { this.predicate=predicate;
   }
   
   public BooleanPrimary(BooleanCondition booleanCondition)
-  { 
-    this.booleanCondition=booleanCondition;
-    add(booleanCondition);
+  { this.booleanCondition=booleanCondition;
   }
   
   public int getPrecedence()
   { return 5;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     if (predicate!=null)
     { 
       buffer.append("\r\n").append(indent);
-      predicate.write(buffer,indent);
+      predicate.write(buffer,indent, parameterCollector);
     }
     else
     { 
       buffer.append("\r\n").append(indent).append("(");
       indent=indent+"  ";
-      booleanCondition.write(buffer,indent);
+      booleanCondition.write(buffer,indent, parameterCollector);
       buffer.append("\r\n").append(indent).append(")");
     }
    

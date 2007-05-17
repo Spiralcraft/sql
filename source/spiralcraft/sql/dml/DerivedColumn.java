@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 
 public class DerivedColumn
   extends SelectListItem
@@ -30,12 +32,11 @@ public class DerivedColumn
   { 
     this.valueExpression=valueExpression;
     this.columnName=columnName;
-    add(valueExpression);
   }
 
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   { 
-    valueExpression.write(buffer, indent);
+    valueExpression.write(buffer, indent, parameterCollector);
     if (columnName!=null)
     { buffer.append("AS ").append(columnName).append(" ");
     }

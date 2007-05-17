@@ -20,6 +20,10 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.transport.SerialCursor;
 
+import spiralcraft.data.spi.ArrayTuple;
+
+import spiralcraft.util.tree.LinkedTree;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -30,7 +34,17 @@ public class SerialResultSetCursor
   protected final ResultSetTuple tuple;
   protected ResultSet resultSet;
   protected boolean autoClose=true;
+  protected boolean noCopy=false;
   
+  /**
+   * 
+   * @param resultSet The JDBC ResultSet to scan
+   * @param noCopy Whether a single Tuple should be reused as a buffer. If
+   *   true, data in the Tuple will change as the cursor is advanced and
+   *   limited garbage will be created. If false, data will be copied into
+   *   an immutable Tuple every time the cursor is advanced.
+   * @throws DataException
+   */
   public SerialResultSetCursor(ResultSet resultSet)
     throws DataException
   { 
@@ -56,12 +70,45 @@ public class SerialResultSetCursor
     tuple.setResultSet(resultSet);
   }
   
+  public SerialResultSetCursor
+    (FieldSet fieldSet
+    ,ResultSet resultSet
+    ,LinkedTree<Integer> foldTree
+    )
+  { 
+    this.resultSet=resultSet;
+    this.fieldSet=fieldSet;
+    tuple=new ResultSetTuple(fieldSet,foldTree);
+    tuple.setResultSet(resultSet);
+  }
+
   public FieldSet dataGetFieldSet()
   { return fieldSet;
   }
 
+  /**
+   * <P>Specify whether to avoid creating a new Tuple for every result row.
+   * 
+   * <P> If true, the same mutable Tuple object will be returned by 
+   *   dataGetTuple(), but it will contain different data for each row of
+   *   the resultSet.
+   * 
+   * <P> If false, a new, immutable Tuple object will be returned for each
+   *   row of the resultSet.
+   */
+  public void setVolatileTuple(boolean volatileTuple)
+  { this.noCopy=volatileTuple;
+  }
+  
   public Tuple dataGetTuple() throws DataException
-  { return tuple;
+  { 
+    // XXX: Optimize by creating one new Tuple per row
+    if (noCopy)
+    { return tuple;
+    }
+    else
+    { return new ArrayTuple(tuple);
+    }
   }
 
   public boolean dataNext() throws DataException

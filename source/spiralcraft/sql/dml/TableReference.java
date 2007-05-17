@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class TableReference
@@ -39,7 +41,7 @@ public class TableReference
     this.correlation=correlation;
   }
 
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     if (tableName!=null)
     { 
@@ -54,7 +56,7 @@ public class TableReference
     else if (derivedTable!=null)
     { 
       indent=indent+"  ";
-      derivedTable.write(buffer,indent);
+      derivedTable.write(buffer,indent, parameterCollector);
       if (correlation!=null)
       { 
         buffer.append("\r\n").append(indent);
@@ -62,7 +64,7 @@ public class TableReference
       }
     }
     else if (joinedTable!=null)
-    { joinedTable.write(buffer,indent);
+    { joinedTable.write(buffer,indent, parameterCollector);
     }
   }
 }

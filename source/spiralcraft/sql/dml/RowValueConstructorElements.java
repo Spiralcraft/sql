@@ -12,39 +12,36 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-
 package spiralcraft.sql.dml;
-
-import spiralcraft.sql.SqlFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectList
-  extends SqlFragment
+public class RowValueConstructorElements
+  extends RowValueConstructor
 {
+  private ArrayList<ValueExpression> items
+    =new ArrayList<ValueExpression>();
   
-  ArrayList<SelectListItem> items;
-  
-  public void addItem(SelectListItem item)
-  { 
-    if (items==null)
-    { items=new ArrayList<SelectListItem>();
-    }
-    items.add(item);
+  public void addItem(ValueExpression item)
+  { items.add(item);
   }
   
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    if (items==null)
-    { buffer.append("* ");
+    if (items.size()==0)
+    { return;
+    }
+    else if (items.size()==1)
+    { items.get(0).write(buffer,indent, parameterCollector);
     }
     else
     {
       boolean first=true;
-      for (SelectListItem item: items)
+      buffer.append("\r\n"+indent);
+      buffer.append("(");
+      for (ValueExpression item: items)
       {
-        buffer.append("\r\n"+indent);
         if (first)
         { first=false;
         }
@@ -52,7 +49,9 @@ public class SelectList
         { buffer.append(",");
         }
         item.write(buffer,indent, parameterCollector);
+        buffer.append("\r\n"+indent);
       }
+      buffer.append(")");
     }
   }
 }

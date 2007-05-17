@@ -17,6 +17,7 @@ package spiralcraft.sql.ddl;
 import spiralcraft.sql.SqlFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TableElementList
     extends SqlFragment
@@ -28,7 +29,7 @@ public class TableElementList
   { elements.add(element);
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     buffer.append("(");
@@ -41,7 +42,7 @@ public class TableElementList
       else
       { buffer.append("\r\n").append(indent).append(",");
       }
-      element.write(buffer,indent);
+      element.write(buffer,indent, parameterCollector);
     }
     buffer.append("\r\n").append(indent).append(")");
   }

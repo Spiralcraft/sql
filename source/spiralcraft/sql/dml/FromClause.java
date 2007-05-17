@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class FromClause
@@ -23,20 +25,16 @@ public class FromClause
   private TableReference tableReference;
   
   public FromClause(String schemaName,String tableName)
-  { 
-    tableReference=new TableReference(schemaName,tableName);
-    add(tableReference);
+  { tableReference=new TableReference(schemaName,tableName);
   }
   
   public FromClause(String schemaName,String tableName,String correlation)
-  { 
-    tableReference=new TableReference(schemaName,tableName,correlation);
-    add(tableReference);
+  { tableReference=new TableReference(schemaName,tableName,correlation);
   }
 
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\r\n").append(indent).append("FROM ");
-    tableReference.write(buffer,indent);
+    tableReference.write(buffer,indent, parameterCollector);
   }
 }

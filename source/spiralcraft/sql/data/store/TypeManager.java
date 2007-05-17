@@ -251,7 +251,7 @@ public class TypeManager
       for (DDLStatement statement: upgrades)
       { 
         StringBuilder buff=new StringBuilder();
-        statement.write(buff,"");
+        statement.write(buff,"", null);
         System.err.println(buff.toString());
       }
       if (!autoUpgrade)

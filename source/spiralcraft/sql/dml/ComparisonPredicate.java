@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 
 
 public class ComparisonPredicate
@@ -33,15 +35,13 @@ public class ComparisonPredicate
     this.leftExpression=leftExpression;
     this.rightExpression=rightExpression;
     this.operator=operator;
-    add(leftExpression);
-    add(rightExpression);
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     
-    leftExpression.write(buffer,indent);
+    leftExpression.write(buffer,indent, parameterCollector);
     buffer.append(" ").append(operator).append(" ");
-    rightExpression.write(buffer,indent);
+    rightExpression.write(buffer,indent, parameterCollector);
   }
 }

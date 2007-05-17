@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 
 public class SqlParameterReference
   extends SimpleValueSpecification
@@ -25,9 +27,17 @@ public class SqlParameterReference
   { this.tag=tag;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  @SuppressWarnings("unchecked") // Tag is heterogeneous
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   { 
     buffer.append("? ");
-    parameterAssigned(tag);
+    if (parameterCollector!=null)
+    { parameterCollector.add(tag);
+    }
+    else
+    { 
+      throw new IllegalArgumentException
+        ("parameterCollector List cannot be null writing SqlParameterReference");
+    }
   }
 }

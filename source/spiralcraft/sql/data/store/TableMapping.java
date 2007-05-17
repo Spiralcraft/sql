@@ -20,9 +20,9 @@ import spiralcraft.data.Key;
 
 import spiralcraft.data.query.Scan;
 
-import spiralcraft.sql.dml.DerivedColumn;
-import spiralcraft.sql.dml.IdentifierChain;
-import spiralcraft.sql.dml.SelectListItem;
+import spiralcraft.sql.dml.TableName;
+import spiralcraft.sql.dml.WhereClause;
+import spiralcraft.sql.dml.BooleanCondition;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -33,6 +33,9 @@ import spiralcraft.registry.Registrant;
 import spiralcraft.sql.model.Table;
 import spiralcraft.sql.model.Column;
 import spiralcraft.sql.model.KeyConstraint;
+
+import spiralcraft.util.Path;
+import spiralcraft.util.tree.LinkedTree;
 
 
 /**
@@ -46,9 +49,11 @@ public class TableMapping
   private String schemaName;
   private ArrayList<ColumnMapping> columnMappings
     =new ArrayList<ColumnMapping>();
-  private Scan Scan;
+  private Scan scan;
   private RegistryNode registryNode;
   private Table tableModel;
+  private Updater updater;
+  private LinkedTree<ColumnMapping> columnMappingTree;
 
 
   private HashMap<String,ColumnMapping> columnFieldMap
@@ -56,7 +61,13 @@ public class TableMapping
   
   private HashMap<String,ColumnMapping> columnNameMap
     =new HashMap<String,ColumnMapping>();
+  
+  private HashMap<Path,ColumnMapping> columnPathMap
+    =new HashMap<Path,ColumnMapping>();
 
+  private WhereClause primaryKeyWhereClause;
+  private TableName tableNameSqlFragment;
+  
   public Type getType()
   { return type;
   }
@@ -105,6 +116,27 @@ public class TableMapping
     
   }
 
+  public WhereClause getPrimaryKeyWhereClause()
+  {
+    if (primaryKeyWhereClause==null)
+    {
+      BooleanCondition condition=null;
+      for (Field field:type.getScheme().getPrimaryKey().fieldIterable())
+      {
+        ColumnMapping mapping=getMappingForField(field.getName());
+        if (condition==null)
+        { condition=mapping.getParameterizedKeyCondition();
+        }
+        else
+        { condition=condition.and(mapping.getParameterizedKeyCondition());
+        }
+      }
+      primaryKeyWhereClause=new WhereClause(condition);
+      
+    }
+    return primaryKeyWhereClause;
+  }
+  
   public ColumnMapping[] getColumnMappings()
   { 
     if (columnMappings!=null)
@@ -112,6 +144,30 @@ public class TableMapping
     }
     else
     { return null;
+    }
+  }
+
+  public ColumnMapping getMappingForPath(Path path)
+  { return columnPathMap.get(path);
+  }
+  
+  private void generateFlatPerspective(Path path,ArrayList<ColumnMapping> columns)
+  {
+    for (ColumnMapping columnMapping: columns)
+    {
+      Path subPath=path.append(columnMapping.getFieldName());
+      columnPathMap.put(subPath, columnMapping);
+//      System.err.println
+//        ("TableMapping: mapping flattened column '"
+//        +columnMapping.getColumnName()+"' for "+subPath
+//        );
+      if (columnMapping.isFlattened())
+      { generateFlatPerspective(subPath,columnMapping.getChildMappings());
+      }
+
+      if (columnMapping.getColumnName()!=null)
+      { columnNameMap.put(columnMapping.getColumnName(), columnMapping);
+      }
     }
   }
   
@@ -125,24 +181,50 @@ public class TableMapping
 
   public synchronized Scan getScan()
   { 
-    if (Scan==null && type!=null)
-    { 
-      Scan query=new Scan();
-      query.setType(type);
-      this.Scan=query;
+    if (scan==null && type!=null)
+    { this.scan=new Scan(type);
     }
-    return this.Scan;
+    return this.scan;
   }
   
-  public SelectListItem[] createSelectListItems(Field field)
+  /**
+   * @return The Updater which handles SQL update logic for this table
+   */
+  public Updater getUpdater()
+  { return updater;
+  }
+  
+  public TableName getTableNameSqlFragment()
+  { return tableNameSqlFragment;
+  }
+  
+  /**
+   * 
+   * @return The tree of ColumnMappings that maps this Scheme to a SQL Table
+   * 
+   */
+  public LinkedTree<ColumnMapping> getColumnMappingTree()
+  { 
+    if (columnMappingTree==null)
+    {
+      columnMappingTree=new LinkedTree<ColumnMapping>();
+      for (ColumnMapping mapping: columnMappings)
+      { columnMappingTree.addChild(mapping.getColumnMappings());
+      }
+    }
+    return columnMappingTree;
+  }
+  
+  public LinkedTree<ColumnMapping> getColumnMappings(Field field)
   {
+    
     ColumnMapping columnMapping
       =getMappingForField(field.getName());
     if (columnMapping!=null)
-    { return columnMapping.createSelectListItems();
+    { return columnMapping.getColumnMappings();
     }
     else
-    { return new SelectListItem[] {new DerivedColumn(new IdentifierChain(field.getName()))};
+    { return null;
     }
 
   }
@@ -163,15 +245,15 @@ public class TableMapping
     if (schemaName==null)
     { schemaName=defaultMapping.getSchemaName();
     }
+
   }
   
   /**
-   * 
+   * Add a ColumnMapping for a Field
    */
   private void addColumnMapping(ColumnMapping mapping)
   { 
     columnMappings.add(mapping);
-    columnNameMap.put(mapping.getColumnName(),mapping);
     columnFieldMap.put(mapping.getFieldName(),mapping);
   }
   
@@ -199,12 +281,14 @@ public class TableMapping
       else
       { columnMapping.setField(field);
       }
+      columnMapping.setPath(new Path().append(field.getName()));
       orderedColumns.add(columnMapping);
       columnMapping.register(node);
     }
     columnMappings.clear();
     columnMappings.addAll(orderedColumns);
     
+    generateFlatPerspective(new Path(),columnMappings);
     
     tableModel=new Table();
     tableModel.setName(tableName);
@@ -249,6 +333,8 @@ public class TableMapping
       tableModel.addKeyConstraint(constraint);
       
     }
-    
+    tableNameSqlFragment=new TableName(schemaName,tableName);
+
+    updater=new Updater((SqlStore) node.findInstance(SqlStore.class),this);
   }
 }

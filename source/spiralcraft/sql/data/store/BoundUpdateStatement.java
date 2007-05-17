@@ -22,6 +22,7 @@ import spiralcraft.data.DataException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Connection;
 
 /**
  * A Query PreparedStatement bound to a parameter context
@@ -35,9 +36,6 @@ public class BoundUpdateStatement
   { super(store,dataFields);
   }
   
-
-
-  
   /**
    * Execute the Query by allocating a PreparedStatement from the SqlStore,
    *   applying parameters, and returning the number of rows updated.
@@ -45,9 +43,11 @@ public class BoundUpdateStatement
   public int execute()
     throws DataException
   {
-    PreparedStatement statement=store.allocateStatement(statementText);
+    Connection connection=store.allocateConnection();
+    
     try
     {
+      PreparedStatement statement=connection.prepareStatement(statementText);
       applyParameters(statement);
       int results=statement.executeUpdate();
       statement.close();
@@ -55,6 +55,15 @@ public class BoundUpdateStatement
     }
     catch (SQLException x)
     { throw new DataException("Error executing "+statementText+": "+x,x);
+    }
+    finally
+    { 
+      try
+      { connection.close();
+      }
+      catch (SQLException x)
+      { throw new DataException("Error closing connection: "+x,x);
+      }
     }
   }
   

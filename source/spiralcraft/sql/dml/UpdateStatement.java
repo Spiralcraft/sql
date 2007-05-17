@@ -14,47 +14,69 @@
 //
 package spiralcraft.sql.dml;
 
+import spiralcraft.sql.SqlFragment;
+
+import java.util.ArrayList;
 import java.util.List;
 
-
-public class SelectStatement
-    extends SimpleTable
+public class UpdateStatement
+  extends SqlFragment
 {
 
-  private SelectList selectList;
-  private FromClause fromClause;
+
+  private TableName tableName;
+  private ArrayList<SetClause> setClauseList;
   private WhereClause whereClause;
   
-  public void setSelectList(SelectList selectList)
-  { this.selectList=selectList;
+  public void addSetClause(SetClause setClause)
+  { 
+    if (setClauseList==null)
+    { setClauseList=new ArrayList<SetClause>();
+    }
+    setClauseList.add(setClause);
   }
   
-  public void setFromClause(FromClause fromClause)
-  { this.fromClause=fromClause;
-  }
-
   public void setWhereClause(WhereClause whereClause)
   { this.whereClause=whereClause;
   }
+
+  public void setTableName(TableName tableName)
+  { this.tableName=tableName;
+  }
+
   
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     
-    buffer.append("SELECT ");
+    buffer.append("UPDATE ");
+    tableName.write(buffer, indent, null);
     
     indent=indent+"  ";
 
-    if (selectList!=null)
-    { selectList.write(buffer,indent+"  ", parameterCollector);
+    if (setClauseList!=null)
+    {
+      buffer.append("\r\n").append(indent);
+      buffer.append("SET");
+      buffer.append("\r\n").append(indent);
+      
+      boolean first=true;
+      for (SetClause setClause: setClauseList)
+      { 
+        if (first)
+        { first=false;
+        }
+        else
+        { buffer.append(",");
+        }
+        setClause.write(buffer,indent, parameterCollector);
+        buffer.append("\r\n").append(indent);
+      }
     }
-    
-    if (fromClause!=null)
-    { fromClause.write(buffer,indent, parameterCollector);
-    }
-    
+        
     if (whereClause!=null)
     { whereClause.write(buffer,indent, parameterCollector);
     }
+
   }
 }

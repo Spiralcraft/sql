@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 /**
  * A SQL "Boolean Term" or "AND" expression
  */
@@ -28,16 +30,14 @@ public class BooleanTerm
   { 
     this.booleanTerm=booleanTerm;
     this.booleanFactor=booleanFactor;
-    add(booleanTerm);
-    add(booleanFactor);
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    booleanTerm.write(buffer,indent);
+    booleanTerm.write(buffer,indent, parameterCollector);
     buffer.append("\r\n").append(indent).append(" AND ");
     indent=indent+"  ";
-    booleanFactor.write(buffer,indent);
+    booleanFactor.write(buffer,indent, parameterCollector);
   }
   
   public int getPrecedence()

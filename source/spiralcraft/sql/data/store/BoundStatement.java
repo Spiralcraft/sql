@@ -31,6 +31,7 @@ import spiralcraft.sql.SqlFragment;
 import spiralcraft.sql.dml.ValueExpression;
 import spiralcraft.sql.dml.IdentifierChain;
 
+import spiralcraft.util.Path;
 
 import java.util.ArrayList;
 
@@ -78,8 +79,7 @@ public abstract class BoundStatement
   { 
     parameterExpressions.clear();
     this.sqlFragment=sqlFragment;
-    sqlFragment.collectParameters(parameterExpressions);
-    statementText=sqlFragment.generateSQL();
+    statementText=sqlFragment.generateSQL(parameterExpressions);
   }
   
   /**
@@ -99,7 +99,15 @@ public abstract class BoundStatement
       
       parameterBindings.clear();
       for (Expression expression: parameterExpressions)
-      { parameterBindings.add(focus.bind(expression));
+      { 
+        System.err.println
+          ("BindParameters "+parameterBindings.size()+"= "
+          +expression.getText()
+          );
+        
+        expression.getRootNode().debugTree(System.err);
+        
+        parameterBindings.add(focus.bind(expression));
       }
     }
     catch (BindException x)
@@ -122,21 +130,24 @@ public abstract class BoundStatement
    * Map a Field name to a SQL ValueExpression in terms of the SQL objects this
    *   query is accessing.
    */
-  public ValueExpression createColumnValueExpression(String fieldName)
+  public ValueExpression createColumnValueExpression(Path fieldPath)
   { 
+//    System.err.println("BoundStatement: createColumnValueExpression: "+fieldPath);
     if (primaryTableMapping!=null)
     {
-      ColumnMapping columnMapping=primaryTableMapping.getMappingForField(fieldName);
+      ColumnMapping columnMapping=primaryTableMapping.getMappingForPath(fieldPath);
       if (columnMapping!=null && columnMapping.getColumnModel()!=null)
-      { return columnMapping.getColumnModel().createValueExpression();
+      { return columnMapping.getColumnModel().getValueExpression();
       }
       else
-      { return null;
+      { 
+//        System.err.println("BoundStatement: createColumnValueExpression: "+columnMapping);
+        return null;
       }
     }
-    else if (dataFields!=null)
+    else if (dataFields!=null && fieldPath.size()==1)
     { 
-      Field field=dataFields.getFieldByName(fieldName);
+      Field field=dataFields.getFieldByName(fieldPath.getElement(0));
       if (field!=null)
       { return new IdentifierChain(field.getName());
       }
@@ -144,8 +155,15 @@ public abstract class BoundStatement
       { return null;
       }
     }
+    else if (fieldPath.size()==1)
+    { return new IdentifierChain(fieldPath.getElement(0));
+    }
     else
-    { return new IdentifierChain(fieldName);
+    { 
+      throw new IllegalArgumentException
+        ("Cannot translate Field path "+fieldPath
+        +" to a SQL fragment"
+        );
     }
   }
   

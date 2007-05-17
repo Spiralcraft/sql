@@ -21,7 +21,6 @@ import spiralcraft.lang.parser.LogicalAndNode;
 import spiralcraft.lang.parser.LogicalOrNode;
 import spiralcraft.lang.parser.EqualityNode;
 import spiralcraft.lang.parser.RelationalNode;
-import spiralcraft.lang.parser.LiteralNode;
 import spiralcraft.lang.parser.PrimaryIdentifierNode;
 import spiralcraft.lang.parser.CurrentFocusNode;
 
@@ -32,6 +31,8 @@ import spiralcraft.sql.dml.WhereClause;
 import spiralcraft.sql.dml.BooleanCondition;
 import spiralcraft.sql.dml.ValueExpression;
 import spiralcraft.sql.dml.SqlParameterReference;
+
+import spiralcraft.util.Path;
 
 /**
  * <P>Translates an Expression into a SQL "WHERE" clause to the maximum
@@ -99,19 +100,18 @@ public class CriteriaTranslator
   
   private Translation<ValueExpression> translateValueExpression(Node node)
   {
-    if (node instanceof LiteralNode)
-    { return translateLiteral((LiteralNode) node);
-    }
-    else if (node instanceof PrimaryIdentifierNode)
+
+    if (node instanceof PrimaryIdentifierNode)
     { return translatePrimaryIdentifier((PrimaryIdentifierNode) node);
     }
-    // TODO: There are other options- deal with ResolveNode
     else
-    {
-      Translation<ValueExpression> result=new Translation<ValueExpression>();
-      result.remainder=node;
-      return result;
+    { 
+      // Anything we don't recognize becomes a parameter
+      return translateToParameter(node);
     }
+    // TODO: There are other options- deal with ResolveNode,
+    //   especially the case where the Field Type is a Tuple that
+    //   is 'rolled up' into the parent table- ie. address.city
   }
   
   private Translation<ValueExpression>
@@ -128,7 +128,8 @@ public class CriteriaTranslator
       
 
       ValueExpression expr
-        =statementContext.createColumnValueExpression(node.getIdentifier());
+        =statementContext.createColumnValueExpression
+          (new Path(new String[] {node.getIdentifier()},false));
       if (expr!=null)
       { 
         // We are referencing a DB field
@@ -148,7 +149,7 @@ public class CriteriaTranslator
     return translation;
   }
 
-  private Translation<ValueExpression> translateLiteral(LiteralNode node)
+  private Translation<ValueExpression> translateToParameter(Node node)
   { 
     Translation<ValueExpression> translation=new Translation<ValueExpression>();
     translation.sql=new SqlParameterReference(new Expression(node,null));
@@ -166,10 +167,15 @@ public class CriteriaTranslator
     Translation<ValueExpression> ltrans=translateValueExpression(lhs);
     Translation<ValueExpression> rtrans=translateValueExpression(rhs);
     
-    // Conditional must have both sides translated, or evaluation must
-    //   take place locally
-    if (ltrans.sql!=null && rtrans.sql!=null && 
-        ltrans.remainder==null && rtrans.remainder==null
+    // Conditional must have both sides translated and at least one side not
+    //   parameterized, or evaluation must  take place locally
+    if (ltrans.sql!=null 
+        && rtrans.sql!=null 
+        && ltrans.remainder==null 
+        && rtrans.remainder==null
+        && !(ltrans.sql instanceof SqlParameterReference
+            && rtrans.sql instanceof SqlParameterReference
+            )
         )
     { 
       if (node.isGreaterThan())
@@ -209,8 +215,13 @@ public class CriteriaTranslator
     
     // Conditional must have both sides translated, or evaluation must
     //   take place locally
-    if (ltrans.sql!=null && rtrans.sql!=null &&
-        ltrans.remainder==null && rtrans.remainder==null
+    if (ltrans.sql!=null 
+        && rtrans.sql!=null 
+        && ltrans.remainder==null 
+        && rtrans.remainder==null
+        && !(ltrans.sql instanceof SqlParameterReference
+            && rtrans.sql instanceof SqlParameterReference
+            )
        )
     { 
       if (node.isNegated())

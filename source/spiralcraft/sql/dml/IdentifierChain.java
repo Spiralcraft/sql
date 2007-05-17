@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.util.ArrayUtil;
 
 
@@ -36,17 +38,16 @@ public class IdentifierChain
       this.rest=new IdentifierChain
         (rest[0],(String[]) ArrayUtil.truncateBefore(rest,1));
     }
-    add(this.rest);
   }
   
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("\"").append(identifier).append("\"");
     if (rest!=null)
     {
       buffer.append(".");
-      rest.write(buffer,indent);
+      rest.write(buffer,indent, parameterCollector);
     }
     else
     { buffer.append(" ");

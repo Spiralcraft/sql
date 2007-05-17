@@ -15,12 +15,14 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class DerivedTable
   extends SqlFragment
 {
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
   }
 }

@@ -22,63 +22,30 @@ import java.util.List;
  */
 public abstract class SqlFragment
 {
-
-  private SqlFragment parent;
-  private List parameterCollector;
-  
-  protected void add(SqlFragment child)
-  { child.setParent(this);
-  }
-  
-  void setParent(SqlFragment parent)
-  { this.parent=parent;
-  }
   
   /**
-   * Write the SqlFragment and its children to the specified buffer
+   * <P>Write the SqlFragment and its children to the specified buffer.
+   *  
+   * <P>When a parameter is  encountered, add it to the parameterCollector.
+   * @param parameterCollector TODO
    */
-  public abstract void write(StringBuilder buffer,String indent);
+  public abstract void write(StringBuilder buffer,String indent, List parameterCollector);
 
-  public String generateSQL()
+  /**
+   * <P>Generate the SQL text represented by the fragment
+   * 
+   * <P>When parameters are encountered as the Statement is serially written to text,
+   *   the tag value supplied for each parameter will be added to the parameterCollector
+   *   list so that the caller can associate a value to the appropriate parameter index.
+   * 
+   * @param parameterCollector
+   * @return the SQL text
+   */
+  public String generateSQL(List parameterCollector)
   {
     StringBuilder buffer=new StringBuilder();
-    write(buffer,"");
+    write(buffer,"",parameterCollector);
     return buffer.toString();
   }
   
-  /**
-   * When parameters are encountered as the Statement is serially written to text,
-   *   the tag value supplied for each parameter will be added to the list so that
-   *   the caller can associate a value to the appropriate parameter index.
-   */
-  public void collectParameters(List list)
-  { parameterCollector=list;
-  }
-  
-  /**
-   * Propogate a parameter up to the root statement of this SqlFragment tree.
-   */
-  @SuppressWarnings("unchecked") // Not using generics here
-  void collectParameter(Object tag)
-  {
-    if (parameterCollector!=null)
-    { parameterCollector.add(tag);
-    }
-    else if (parent!=null)
-    { parent.collectParameter(tag);
-    }
-    else
-    { throw new UnsupportedOperationException("SqlFragment: No way to collect parameter");
-    }
-  }
-  
-  /**
-   * Called when a parameter is encountered as the Statement is serially written to
-   *   text. The tag is a marker that can be used by the caller to associate this parameter
-   *   with a value when the statement is executed.
-   */
-  @SuppressWarnings("unchecked") // tag is opaque
-  protected void parameterAssigned(Object tag)
-  { collectParameter(tag);
-  }
 }

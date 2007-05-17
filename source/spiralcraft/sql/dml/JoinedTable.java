@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class JoinedTable
@@ -24,11 +26,11 @@ public class JoinedTable
   private TableReference rightTableReference;
   
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   { 
-    leftTableReference.write(buffer,indent);
+    leftTableReference.write(buffer,indent, parameterCollector);
     buffer.append("\r\n").append(indent).append(" JOIN ");
-    rightTableReference.write(buffer,indent);
+    rightTableReference.write(buffer,indent, parameterCollector);
     
   }
 }

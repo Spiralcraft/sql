@@ -15,44 +15,27 @@
 
 package spiralcraft.sql.dml;
 
-import spiralcraft.sql.SqlFragment;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class SelectList
+import spiralcraft.sql.SqlFragment;
+
+public class TableName
   extends SqlFragment
 {
+  private String schemaName;
+  private String tableName;
   
-  ArrayList<SelectListItem> items;
-  
-  public void addItem(SelectListItem item)
+  public TableName(String schemaName,String tableName)
   { 
-    if (items==null)
-    { items=new ArrayList<SelectListItem>();
-    }
-    items.add(item);
+    this.tableName=tableName;
+    this.schemaName=schemaName;
   }
   
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    if (items==null)
-    { buffer.append("* ");
+    if (schemaName!=null)
+    { buffer.append("\"").append(schemaName).append("\".");
     }
-    else
-    {
-      boolean first=true;
-      for (SelectListItem item: items)
-      {
-        buffer.append("\r\n"+indent);
-        if (first)
-        { first=false;
-        }
-        else
-        { buffer.append(",");
-        }
-        item.write(buffer,indent, parameterCollector);
-      }
-    }
+    buffer.append("\"").append(tableName).append("\" ");
   }
 }

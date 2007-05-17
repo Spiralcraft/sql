@@ -12,19 +12,11 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-
 package spiralcraft.sql.dml;
 
-import java.util.List;
 
-
-public class LiteralValueSpecification
-  extends ValueSpecification
+public abstract class SimpleTable
+  extends QueryExpression
 {
-  
-  private Literal literal;
-  
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
-  { literal.write(buffer,indent, null);
-  }
+
 }

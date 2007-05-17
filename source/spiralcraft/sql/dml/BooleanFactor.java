@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 /**
  * 
  * A SQL Boolean Factor or "NOT" expression
@@ -30,15 +32,14 @@ public class BooleanFactor
   { 
     this.not=true;
     this.booleanTest=booleanTest;
-    add(booleanTest);
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     if (not)
     { buffer.append(" NOT ");
     }
-    booleanTest.write(buffer,indent);
+    booleanTest.write(buffer,indent, parameterCollector);
   }
   
   public int getPrecedence()

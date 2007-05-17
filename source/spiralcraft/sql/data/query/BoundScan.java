@@ -16,7 +16,6 @@ package spiralcraft.sql.data.query;
 
 import spiralcraft.lang.Focus;
 
-import spiralcraft.data.Field;
 import spiralcraft.data.DataException;
 
 import spiralcraft.data.query.Scan;
@@ -24,12 +23,15 @@ import spiralcraft.data.query.Scan;
 
 import spiralcraft.sql.data.store.SqlStore;
 import spiralcraft.sql.data.store.TableMapping;
+import spiralcraft.sql.data.store.ColumnMapping;
 import spiralcraft.sql.data.store.BoundQueryStatement;
 
 import spiralcraft.sql.dml.SelectStatement;
 import spiralcraft.sql.dml.FromClause;
 import spiralcraft.sql.dml.SelectList;
 import spiralcraft.sql.dml.SelectListItem;
+
+import spiralcraft.util.tree.LinkedTree;
 
 /**
  * A SQL implementatin of the basic Scan Query. 
@@ -39,6 +41,7 @@ public class BoundScan
 {
     
   public BoundScan(Scan query,Focus parentFocus,SqlStore store)
+    throws DataException
   { super(query,parentFocus,store);
   }
   
@@ -72,21 +75,59 @@ public class BoundScan
       );
     
     SelectList selectList=new SelectList();
-    for (Field field : scan.getFieldSet().fieldIterable())
-    { 
-      SelectListItem[] items=tableMapping.createSelectListItems(field);
-      
-      // Possibly multiple DB columns for a single data Field.
-      // Nested types use this, also complex primitives.
-      for (SelectListItem item: items)
-      { selectList.addItem(item);
-      }
-    }
+    LinkedTree<Integer> foldTree=new LinkedTree<Integer>();
+    LinkedTree<ColumnMapping> columnTree=tableMapping.getColumnMappingTree();
+    int columnCount=0;
+    generateSelectList(columnTree,selectList,foldTree,columnCount);
     
     select.setSelectList(selectList);
     
     statement.setSqlFragment(select);
+    statement.setFoldTree(foldTree);
     return statement;
+  }
+  
+  private int generateSelectList
+    (LinkedTree<ColumnMapping> columnTree
+    ,SelectList selectList
+    ,LinkedTree<Integer> foldTree
+    ,int columnCount
+    )
+  {
+    for (LinkedTree<ColumnMapping> mapping : columnTree)
+    { columnCount=generateSelectListItem(mapping,selectList,foldTree,columnCount);
+    }
+    return columnCount;    
+  }
+  
+  private int generateSelectListItem
+    (LinkedTree<ColumnMapping> node
+    ,SelectList selectList
+    ,LinkedTree<Integer> foldTree
+    ,int columnCount
+    )
+  {
+    if (node.isLeaf())
+    {
+      SelectListItem selectListItem=node.get().getSelectListItem();
+      // Single field
+      if (selectListItem!=null)
+      { 
+        selectList.addItem(selectListItem);
+        foldTree.addChild(new LinkedTree<Integer>(columnCount++));
+      }
+      else
+      { foldTree.addChild(new LinkedTree<Integer>());
+      }
+    }
+    else
+    { 
+      LinkedTree<Integer> child=new LinkedTree<Integer>();
+      foldTree.addChild(child);
+      columnCount=generateSelectList(node,selectList,child,columnCount);
+    }
+    
+    return columnCount;
   }
   
 }

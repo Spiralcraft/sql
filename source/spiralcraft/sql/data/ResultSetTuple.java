@@ -17,8 +17,11 @@ package spiralcraft.sql.data;
 import spiralcraft.data.spi.AbstractTuple;
 
 import spiralcraft.data.FieldSet;
+import spiralcraft.data.Field;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.DataException;
+
+import spiralcraft.util.tree.LinkedTree;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,9 +35,51 @@ public class ResultSetTuple
   implements Tuple
 {
   private ResultSet resultSet;
+  private final int[] map;
+  private final ResultSetTuple[] subs;
   
   public ResultSetTuple(FieldSet fieldSet)
-  { super(fieldSet);
+  { 
+    super(fieldSet);
+    map=new int[fieldSet.getFieldCount()];
+    subs=new ResultSetTuple[fieldSet.getFieldCount()];
+    defaultMap();
+  }
+  
+  public ResultSetTuple(FieldSet fieldSet,LinkedTree<Integer> foldTree)
+  { 
+    super(fieldSet);
+    map=new int[fieldSet.getFieldCount()];
+    subs=new ResultSetTuple[fieldSet.getFieldCount()];
+    if (foldTree!=null)
+    {
+      int i=0;
+      for (LinkedTree<Integer> node: foldTree)
+      { 
+        if (node.get()!=null)
+        { map[i]=node.get()+1;
+        }
+        if (!node.isLeaf())
+        { 
+          subs[i]
+            =new ResultSetTuple
+              (fieldSet.getFieldByIndex(i).getType().getScheme()
+              ,node
+              );
+        }
+        i++;
+      }
+    }
+    else
+    { defaultMap();
+    }
+  }
+      
+  private void defaultMap()
+  {
+    for (Field field: fieldSet.fieldIterable())
+    { map[field.getIndex()]=field.getIndex()+1;
+    }
   }
   
   /**
@@ -42,17 +87,33 @@ public class ResultSetTuple
    *   data stream from multiple SQL sources of the same type
    */
   public void setResultSet(ResultSet resultSet)
-  { this.resultSet=resultSet;
+  { 
+    this.resultSet=resultSet;
+    for (ResultSetTuple tuple : subs)
+    { 
+      if (tuple!=null)
+      { tuple.setResultSet(resultSet);
+      }
+    }
   }
   
   public Object get(int index)
     throws DataException
   {
-    try
-    { return resultSet.getObject(index+1);
+    if (subs[index]!=null)
+    { return subs[index];
     }
-    catch (SQLException x)
-    { throw new DataException("Error reading result set: "+x,x);
+    else if (map[index]>0)
+    {
+      try
+      { return resultSet.getObject(map[index]);
+      }
+      catch (SQLException x)
+      { throw new DataException("Error reading result set: "+x,x);
+      }
+    }
+    else
+    { return null;
     }
 
   }

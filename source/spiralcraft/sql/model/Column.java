@@ -41,6 +41,7 @@ public class Column
   private boolean nullable;
   private Integer decimalDigits;
   private int position;
+  private ValueExpression valueExpression;
   
   
   public Column()
@@ -158,8 +159,12 @@ public class Column
   { return new ColumnDefinition(name,type.createDDL(length,decimalDigits));
   }
   
-  public ValueExpression createValueExpression()
-  { return new IdentifierChain(name);
+  public synchronized ValueExpression getValueExpression()
+  { 
+    if (valueExpression==null)
+    { valueExpression=new IdentifierChain(name);
+    }
+    return valueExpression;
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,Column storeVersion)

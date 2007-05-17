@@ -17,10 +17,12 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.lang.Focus;
 
+import spiralcraft.data.transport.DataConsumer;
 import spiralcraft.data.transport.Space;
 import spiralcraft.data.transport.Store;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.Type;
 
 import spiralcraft.data.query.BoundQuery;
@@ -28,6 +30,7 @@ import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Selection;
 import spiralcraft.data.query.Scan;
 
+import spiralcraft.data.transaction.Transaction;
 
 import spiralcraft.sql.data.query.BoundSelection;
 import spiralcraft.sql.data.query.BoundScan;
@@ -37,7 +40,6 @@ import spiralcraft.sql.ddl.DDLStatement;
 import spiralcraft.registry.Registrant;
 import spiralcraft.registry.RegistryNode;
 
-import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -58,11 +60,32 @@ public class SqlStore
   private Space space;
   private TypeManager typeManager=new TypeManager();
   private RegistryNode registryNode;
+  private SqlResourceManager resourceManager
+    =new SqlResourceManager(this);
   
+  /**
+   * Specify the dataSource that will supply JDBC connections 
+   */
   public void setDataSource(DataSource dataSource)
   { this.dataSource=dataSource;
   }
   
+  /**
+   * Obtain a direct reference to the DataSource that supplies JDBC connections
+   */
+  public DataSource getDataSource()
+  { return dataSource;
+  }
+
+  
+  /**
+   * Obtain a direct reference to the TypeManager that maps 
+   *   metadata objects to SQL objects
+   */
+  public TypeManager getTypeManager()
+  { return typeManager;
+  }
+
   public void register(RegistryNode node)
   { 
     this.space=(Space) node.findInstance(Space.class);
@@ -91,14 +114,10 @@ public class SqlStore
 
   public BoundQuery getAll(Type type)
     throws DataException
-  { 
-    TableMapping mapping=typeManager.getTableMapping(type);
-    if (mapping==null)
-    { throw new DataException("SqlStore: Unknown Type "+type.getURI());
-    }
-    return new BoundScan(mapping.getScan(),null,this);
+  { return new BoundScan(assertTableMapping(type).getScan(),null,this);
   }
 
+  
   public void executeDDL(List<DDLStatement> statements)
     throws DataException
   {
@@ -117,7 +136,7 @@ public class SqlStore
       for (DDLStatement statement: statements)
       {
         StringBuilder buff=new StringBuilder();
-        statement.write(buff,"");
+        statement.write(buff,"", null);
         sqlStatement.execute(buff.toString());
       }
       conn.commit();
@@ -158,7 +177,7 @@ public class SqlStore
     if (query instanceof Selection)
     { 
       BoundSelection boundSelection=new BoundSelection((Selection) query,focus,this);
-      System.err.println(boundSelection.getRemainderCriteria());
+      System.err.println("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
       return boundSelection;
     }
     else if (query instanceof Scan)
@@ -171,39 +190,38 @@ public class SqlStore
     }
   }
   
-  public TypeManager getTypeManager()
-  { return typeManager;
+  
+  /**
+   * @return A DataConsumer which is used to push one or more updates into
+   *   this Store. 
+   */
+  public DataConsumer<DeltaTuple> getUpdater(Type type)
+    throws DataException
+  { return assertTableMapping(type).getUpdater().newBatch();
   }
     
   
   /**
-   * <P>Obtain a PreparedStatement that matches the specified sqlText,
-   *  using either the Connection preallocated for the current Thread, or a
-   *  newly allocated Connection owned by the returned PreparedStatement for
-   *  as long as it is open.
-   *  
-   * <P>It is the responsibility of the caller to call
-   *   PreparedStatement.close() in order to prevent a memory leak.
-   *
-   *@return a PreparedStatement instance
+   * Allocate a Connection that is coordinated with the Transaction in-context, if 
+   *   any.
    */
-  public PreparedStatement allocateStatement(String sqlText)
+  public Connection allocateConnection()
     throws DataException
   { 
-    // TODO: Interim implementation
-    // XXX: Connection allocation process must be designed
-    try
-    { return allocateConnection().prepareStatement(sqlText);
+    Transaction transaction=Transaction.getContextTransaction();
+    if (transaction!=null)
+    { return resourceManager.branch(transaction).getConnection();
     }
-    catch (SQLException x)
-    { 
-      throw new DataException
-        ("Error preparing statement ["+sqlText+"]: "+x
-        ,x
-        );
+    else
+    {
+      try
+      { return dataSource.getConnection();
+      }
+      catch (SQLException x)
+      { throw new DataException("Error allocating connection: "+x,x);
+      }
     }
   }
-  
 
   /**
    * Called after the database becomes available.
@@ -215,21 +233,16 @@ public class SqlStore
     typeManager.ensureDataVersion();
     
   }
-  
-  public Connection allocateConnection()
+
+  private TableMapping assertTableMapping(Type type)
     throws DataException
-  { 
-    // TODO: Interim implementation
-    // XXX: Connection allocation process must be designed
-    try
-    { return dataSource.getConnection();
+  {    
+    TableMapping mapping=typeManager.getTableMapping(type);
+    if (mapping==null)
+    { throw new DataException("SqlStore: Not a locally handled Type "+type.getURI());
     }
-    catch (SQLException x)
-    { throw new DataException("Error allocating connection: "+x,x);
-    }
+    return mapping;
   }
-
-
   
   
 }

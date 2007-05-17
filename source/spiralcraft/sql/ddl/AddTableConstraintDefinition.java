@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public class AddTableConstraintDefinition
     extends AlterTableAction
@@ -25,9 +27,9 @@ public class AddTableConstraintDefinition
   { this.constraintDefinition=constraintDefinition;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append("ADD ");
-    constraintDefinition.write(buffer,indent);
+    constraintDefinition.write(buffer,indent,parameterCollector);
   }
 }

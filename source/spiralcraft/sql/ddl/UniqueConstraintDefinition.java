@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 
 public abstract class UniqueConstraintDefinition
     extends TableConstraint
@@ -30,7 +32,7 @@ public abstract class UniqueConstraintDefinition
   
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append(uniqueSpecification).append(" (");
     boolean first=true;

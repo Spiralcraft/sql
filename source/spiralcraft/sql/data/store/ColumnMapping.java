@@ -17,16 +17,28 @@ package spiralcraft.sql.data.store;
 import spiralcraft.data.Field;
 
 import spiralcraft.sql.data.mappers.TypeMapper;
+
 import spiralcraft.sql.dml.DerivedColumn;
 import spiralcraft.sql.dml.SelectListItem;
+import spiralcraft.sql.dml.SetClause;
+import spiralcraft.sql.dml.SqlParameterReference;
+import spiralcraft.sql.dml.BooleanCondition;
+import spiralcraft.sql.dml.ComparisonPredicate;
 
 import spiralcraft.sql.model.Column;
-
 
 import spiralcraft.registry.Registrant;
 import spiralcraft.registry.RegistryNode;
 
+import spiralcraft.lang.Expression;
+import spiralcraft.lang.ParseException;
+
+import spiralcraft.util.Path;
+import spiralcraft.util.tree.LinkedTree;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 /**
  * An association between a Field in the Scheme of a Type and a Table column
@@ -40,9 +52,18 @@ public class ColumnMapping
   private String fieldName;
   private String columnName;
   private Column column;
+  private Path path;
 
   private boolean flatten;
   private ArrayList <ColumnMapping> flattenedChildren;
+  private HashMap<String,ColumnMapping> childMapByField
+    =new HashMap<String,ColumnMapping>();
+  
+  private SelectListItem selectListItem;
+  private LinkedTree<ColumnMapping> columnMappings;
+  private SetClause parameterizedSetClause;
+  private SqlParameterReference parameterReference;
+  private BooleanCondition parameterizedKeyCondition;
   
   public ColumnMapping()
   {
@@ -54,6 +75,10 @@ public class ColumnMapping
    */
   public void setFlatten(boolean flatten)
   { this.flatten=flatten;
+  }
+  
+  public boolean isFlattened()
+  { return flattenedChildren!=null;
   }
 
   public void setField(Field field)
@@ -71,8 +96,25 @@ public class ColumnMapping
   { return fieldName;
   }
   
+  /**
+   * Specify the name of the Field this ColumnMapping applies to.
+   *   
+   */
   public void setFieldName(String fieldName)
-  { this.fieldName=fieldName;
+  { 
+    this.fieldName=fieldName;
+    if (this.field!=null && !fieldName.equals(field.getName()))
+    { 
+      throw new IllegalArgumentException
+        ("Cannot change Field name '"+fieldName+"' for ColumnMapping");
+    }
+  }
+  
+  /**
+   * Specify the Field Path (through nested Types) mapped by this Column. 
+   */
+  public void setPath(Path path)
+  { this.path=path;
   }
   
   public String getColumnName()
@@ -92,12 +134,32 @@ public class ColumnMapping
     { 
       ColumnMapping subMapping = new ColumnMapping();
       subMapping.setField(subField);
-      subMapping.setFieldName(fieldName+"."+subMapping.getFieldName());
       subMapping.setColumnName(columnName+"_"+subMapping.getColumnName());
+      subMapping.setPath(this.path.append(subField.getName()));
       flattenedChildren.add(subMapping);
+      childMapByField.put(subMapping.getFieldName(), subMapping);
       
     }
     
+  }
+  
+  ArrayList<ColumnMapping> getChildMappings()
+  { return flattenedChildren;
+  }
+  
+  ColumnMapping getChildMappingForPath(Path path)
+  { 
+    if (path.size()>0)
+    {
+      ColumnMapping mapping=childMapByField.get(path.getElement(0));
+      if (mapping!=null && path.size()>1)
+      { return mapping.getChildMappingForPath(path.subPath(1));
+      }
+      else
+      { return mapping;
+      }
+    }
+    return null;
   }
   
   public void register(RegistryNode node)
@@ -174,39 +236,95 @@ public class ColumnMapping
     
   }
 
+  public synchronized SqlParameterReference getParameterReference()
+  {
+    if (parameterReference==null)
+    {
+      try
+      {
+        parameterReference
+          =new SqlParameterReference(Expression.parse(path.format(".")));
+        // System.err.println("ColumnMapping: "+columnName+" refs "+path.format("."));
+      }
+      catch (ParseException x)
+      { throw new RuntimeException("Cannot parse "+path.format("."));
+      }
+    }
+    return parameterReference;
+  }
+  
+
+  public synchronized BooleanCondition getParameterizedKeyCondition()
+  {
+    if (parameterizedKeyCondition==null)
+    { 
+      if (flattenedChildren!=null)
+      {
+        // For complex Fields used as keys
+        BooleanCondition condition=null;
+        for (ColumnMapping mapping: flattenedChildren)
+        {
+          if (condition==null)
+          { condition=mapping.getParameterizedKeyCondition();
+          }
+          else
+          { condition=condition.and(mapping.getParameterizedKeyCondition());
+          }
+        }
+        parameterizedKeyCondition=condition;
+      }
+      else
+      { 
+        parameterizedKeyCondition
+          =new ComparisonPredicate
+            (column.getValueExpression()
+            ,"="
+            ,getParameterReference()
+            );
+      }
+    }
+    return parameterizedKeyCondition;
+  }
+  
+  public synchronized SetClause getParameterizedSetClause()
+  { 
+    if (parameterizedSetClause==null)
+    {
+      parameterizedSetClause=new SetClause
+        (column.getName()
+        ,getParameterReference()
+        );
+    }
+    return parameterizedSetClause;
+  }
+  
+  public SelectListItem getSelectListItem()
+  { 
+    if (selectListItem==null)
+    { selectListItem=new DerivedColumn(column.getValueExpression());
+    }
+    return selectListItem;
+    
+  }
   
   /**
    * Create the set of SelectListItem SqlFragments that return the
    *   one or many values that make up this mapping.
    */
-  public SelectListItem[] createSelectListItems()
+  public synchronized LinkedTree<ColumnMapping> getColumnMappings()
   {
-    if (flattenedChildren!=null)
-    { 
-      ArrayList<SelectListItem> retList
-        =new ArrayList<SelectListItem>();
-      for (ColumnMapping mapping : flattenedChildren)
+    if (columnMappings==null)
+    {  
+      LinkedTree<ColumnMapping> node=new LinkedTree<ColumnMapping>(this);
+      if (flattenedChildren!=null)
       { 
-        for (SelectListItem item: mapping.createSelectListItems()) 
-        { retList.add(item);
+        for (ColumnMapping mapping : flattenedChildren)
+        { node.addChild(mapping.getColumnMappings()); 
         }
       }
-      return retList.toArray(new SelectListItem[retList.size()]);
+      columnMappings=node;
     }
-    else if (columnName!=null)
-    { 
-      return new SelectListItem[]
-        {new DerivedColumn
-          (column.createValueExpression()
-          )
-        };
-      
-    }
-    else
-    { 
-      // No actual field for this
-      return new SelectListItem[0];
-    }
+    return columnMappings;
   }
   
 }

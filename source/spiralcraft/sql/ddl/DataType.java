@@ -14,6 +14,8 @@
 //
 package spiralcraft.sql.ddl;
 
+import java.util.List;
+
 import spiralcraft.sql.SqlFragment;
 
 public class DataType
@@ -30,7 +32,7 @@ public class DataType
     this.decimals=decimals;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
     buffer.append(typeName);
     if (length!=null)

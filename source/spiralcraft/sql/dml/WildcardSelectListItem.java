@@ -15,13 +15,15 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 
 public class WildcardSelectListItem
   extends SelectListItem
 {
   private String qualifier;
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   { buffer.append(qualifier);
   }
 }

@@ -21,6 +21,7 @@ bq=space.getAll(typeResolver.resolve(URI.create("java:/spiralcraft/data/test/exa
 bq.execute();
 
 
+"// Query 1";
 query=new spiralcraft.data.persist.XmlBean
   (URI.create("java:/spiralcraft/data/query/Query")
   ,URI.create("java:/spiralcraft/sql/test/1.query.xml")
@@ -28,6 +29,7 @@ query=new spiralcraft.data.persist.XmlBean
 bq=space.query(query,null);
 bq.execute();
 
+"// Query 2";
 query=new spiralcraft.data.persist.XmlBean
   (URI.create("java:/spiralcraft/data/query/Query")
   ,URI.create("java:/spiralcraft/sql/test/2.query.xml")
@@ -35,9 +37,23 @@ query=new spiralcraft.data.persist.XmlBean
 bq=space.query(query,null);
 bq.execute();
 
+"// Query 3";
 query=new spiralcraft.data.persist.XmlBean
   (URI.create("java:/spiralcraft/data/query/Query")
   ,URI.create("java:/spiralcraft/sql/test/3.query.xml")
   ).get();
 bq=space.query(query,null);
 bq.execute();
+
+"// Update 1";
+customerListType=typeResolver.resolve(URI.create("java:/spiralcraft/data/test/example/Customer.list"));
+dataReader=new spiralcraft.data.sax.DataReader();
+dataConsumerChain=new spiralcraft.data.util.DebugDataConsumer();
+synchronizer=new spiralcraft.data.transport.DataSynchronizer(space,customerListType.getContentType());
+dataConsumerChain.setDataConsumer(synchronizer);
+dataReader.setDataConsumer(dataConsumerChain);
+dataReader.readFromURI
+  (URI.create("java:/spiralcraft/data/test/example/Customer.data.xml")
+  ,customerListType
+  );
+

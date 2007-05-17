@@ -15,6 +15,8 @@
 
 package spiralcraft.sql.dml;
 
+import java.util.List;
+
 /**
  * A SQL "Search Condition" or "OR" expression
  */
@@ -29,19 +31,17 @@ public class SearchCondition
   { 
     this.searchCondition=searchCondition;
     this.booleanTerm=booleanTerm;
-    add(searchCondition);
-    add(booleanTerm);
   }
   
   public int getPrecedence()
   { return 1;
   }
   
-  public void write(StringBuilder buffer,String indent)
+  public void write(StringBuilder buffer,String indent, List parameterCollector)
   {
-    searchCondition.write(buffer,indent);
+    searchCondition.write(buffer,indent, parameterCollector);
     buffer.append("\r\n").append(indent).append("OR ");
     indent=indent+"  ";
-    booleanTerm.write(buffer,indent);
+    booleanTerm.write(buffer,indent, parameterCollector);
   }
 }

@@ -27,6 +27,7 @@ import spiralcraft.stream.StreamUtil;
 import spiralcraft.util.Arguments;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
 
 import spiralcraft.data.flatfile.Writer;
 
@@ -194,7 +195,7 @@ public class QueryTool
   { 
     SerialResultSetCursor cursor=new SerialResultSetCursor(rs);
     
-    DataConsumer writer=new Writer(executionContext.out());
+    DataConsumer<Tuple> writer=new Writer(executionContext.out());
     writer.dataInitialize(cursor.dataGetFieldSet());
     
     while (cursor.dataNext())
