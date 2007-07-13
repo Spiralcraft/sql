@@ -14,7 +14,7 @@
 //
 package spiralcraft.sql.converters;
 
-import spiralcraft.stream.StreamUtil;
+import spiralcraft.vfs.StreamUtil;
 
 import java.io.InputStream;
 import java.io.IOException;

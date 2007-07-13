@@ -21,7 +21,7 @@ import spiralcraft.data.lang.TupleFocus;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 
-import spiralcraft.data.transport.SerialCursor;
+import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.SqlStore;

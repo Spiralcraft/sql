@@ -17,9 +17,9 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.lang.Focus;
 
-import spiralcraft.data.transport.DataConsumer;
-import spiralcraft.data.transport.Space;
-import spiralcraft.data.transport.Store;
+import spiralcraft.data.access.DataConsumer;
+import spiralcraft.data.access.Space;
+import spiralcraft.data.access.Store;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.DeltaTuple;
@@ -165,7 +165,7 @@ public class SqlStore
     }
   }
   
-  public List<Type> getTypes()
+  public Type[] getTypes()
   {
     // TODO Auto-generated method stub
     return null;

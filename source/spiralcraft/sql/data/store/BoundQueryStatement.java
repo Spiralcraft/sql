@@ -15,7 +15,7 @@
 package spiralcraft.sql.data.store;
 
 
-import spiralcraft.data.transport.SerialCursor;
+import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;

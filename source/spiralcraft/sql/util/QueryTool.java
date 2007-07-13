@@ -19,10 +19,10 @@ import spiralcraft.exec.ExecutionContext;
 
 import spiralcraft.sql.data.SerialResultSetCursor;
 
-import spiralcraft.stream.Resolver;
-import spiralcraft.stream.Resource;
-import spiralcraft.stream.UnresolvableURIException;
-import spiralcraft.stream.StreamUtil;
+import spiralcraft.vfs.Resolver;
+import spiralcraft.vfs.Resource;
+import spiralcraft.vfs.UnresolvableURIException;
+import spiralcraft.vfs.StreamUtil;
 
 import spiralcraft.util.Arguments;
 
@@ -31,7 +31,7 @@ import spiralcraft.data.Tuple;
 
 import spiralcraft.data.flatfile.Writer;
 
-import spiralcraft.data.transport.DataConsumer;
+import spiralcraft.data.access.DataConsumer;
 
 
 import java.net.URI;

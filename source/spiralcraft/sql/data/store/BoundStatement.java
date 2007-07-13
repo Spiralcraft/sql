@@ -14,7 +14,7 @@
 //
 package spiralcraft.sql.data.store;
 
-import spiralcraft.lang.Optic;
+import spiralcraft.lang.Channel;
 import spiralcraft.lang.Expression;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.BindException;
@@ -42,8 +42,8 @@ public abstract class BoundStatement
 {
   protected ArrayList<Expression> parameterExpressions
     =new ArrayList<Expression>();
-  protected ArrayList<Optic> parameterBindings
-    =new ArrayList<Optic>();
+  protected ArrayList<Channel> parameterBindings
+    =new ArrayList<Channel>();
   
   protected String statementText;
   protected SqlFragment sqlFragment;
@@ -179,9 +179,9 @@ public abstract class BoundStatement
     jdbcStatement.clearParameters();
     
     int i=1;
-    for (Optic optic: parameterBindings)
+    for (Channel<?> channel: parameterBindings)
     { 
-      Object paramValue=optic.get();
+      Object paramValue=channel.get();
       System.err.println("Apply parameter "+i+" = "+paramValue);
       jdbcStatement.setObject(i++,paramValue);
     }

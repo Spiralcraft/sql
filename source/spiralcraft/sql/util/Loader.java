@@ -21,7 +21,7 @@ import spiralcraft.data.Tuple;
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.BoundProjection;
 
-import spiralcraft.data.transport.DataConsumer; 
+import spiralcraft.data.access.DataConsumer; 
 
 import spiralcraft.data.flatfile.Parser;
 import spiralcraft.data.flatfile.ParseException;
@@ -30,10 +30,10 @@ import spiralcraft.data.core.KeyImpl;
 
 import spiralcraft.data.persist.PersistenceException;
 
-import spiralcraft.stream.Resource;
-import spiralcraft.stream.Resolver;
-import spiralcraft.stream.StreamUtil;
-import spiralcraft.stream.UnresolvableURIException;
+import spiralcraft.vfs.Resource;
+import spiralcraft.vfs.Resolver;
+import spiralcraft.vfs.StreamUtil;
+import spiralcraft.vfs.UnresolvableURIException;
 
 
 

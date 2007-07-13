@@ -15,7 +15,7 @@
 package spiralcraft.sql.data.store;
 
 import spiralcraft.data.Type;
-import spiralcraft.data.transport.Schema;
+import spiralcraft.data.access.Schema;
 
 import java.util.ArrayList;
 

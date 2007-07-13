@@ -18,7 +18,8 @@ import spiralcraft.data.lang.CursorBinding;
 
 import spiralcraft.lang.BindException;
 
-import spiralcraft.data.transport.Cursor;
+import spiralcraft.data.access.Cursor;
+
 import spiralcraft.data.Tuple;
 
 public class SqlBinding<T extends Tuple>

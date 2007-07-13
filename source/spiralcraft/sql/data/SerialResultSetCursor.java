@@ -18,7 +18,7 @@ package spiralcraft.sql.data;
 import spiralcraft.data.DataException;
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.Tuple;
-import spiralcraft.data.transport.SerialCursor;
+import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.spi.ArrayTuple;
 
