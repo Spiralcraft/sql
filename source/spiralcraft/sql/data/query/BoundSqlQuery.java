@@ -29,8 +29,8 @@ import spiralcraft.sql.data.store.SqlStore;
 
 import spiralcraft.lang.Focus;
 
-public abstract class BoundSqlQuery<Tq extends Query,Tt extends Tuple>
-  extends BoundQuery<Tq,Tt>
+public abstract class BoundSqlQuery<Tq extends Query>
+  extends BoundQuery<Tq,Tuple>
 {
   protected final TupleFocus<?> focus;
   protected final SqlStore store;
@@ -62,7 +62,7 @@ public abstract class BoundSqlQuery<Tq extends Query,Tt extends Tuple>
     statement.bindParameters(focus);
   }
   
-  public SerialCursor<?> execute()
+  public SerialCursor<Tuple> execute()
     throws DataException
   { 
     if (!resolved)

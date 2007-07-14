@@ -54,11 +54,11 @@ import java.util.List;
  *
  */
 public class SqlStore
-  implements Store,Registrant
+  implements Store<Tuple>,Registrant
 {
   
   private DataSource dataSource;
-  private Space space;
+  private Space<?> space;
   private TypeManager typeManager=new TypeManager();
   private RegistryNode registryNode;
   private SqlResourceManager resourceManager
@@ -89,7 +89,7 @@ public class SqlStore
 
   public void register(RegistryNode node)
   { 
-    this.space=(Space) node.findInstance(Space.class);
+    this.space=(Space<?>) node.findInstance(Space.class);
     registryNode=node.createChild(SqlStore.class,this);
     RegistryNode childNode
       =registryNode.createChild("typeManager");
@@ -103,7 +103,7 @@ public class SqlStore
     onAttach(); // XXX Waiting for auto-recovery implementation
   }
 
-  public Space getSpace()
+  public Space<?> getSpace()
   { return space;
   }
   
@@ -113,9 +113,9 @@ public class SqlStore
     return typeManager.getTableMapping(type)!=null;
   }
 
-  public BoundQuery<?,?> getAll(Type<?> type)
+  public BoundQuery<?,Tuple> getAll(Type<?> type)
     throws DataException
-  { return new BoundScan<Tuple>(assertTableMapping(type).getScan(),null,this);
+  { return new BoundScan(assertTableMapping(type).getScan(),null,this);
   }
 
   
@@ -177,13 +177,13 @@ public class SqlStore
   { 
     if (query instanceof Selection)
     { 
-      BoundSelection<?> boundSelection
-        =new BoundSelection<Tuple>((Selection) query,focus,this);
+      BoundSelection boundSelection
+        =new BoundSelection((Selection) query,focus,this);
       System.err.println("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
       return boundSelection;
     }
     else if (query instanceof Scan)
-    { return new BoundScan<Tuple>((Scan) query,focus,this);
+    { return new BoundScan((Scan) query,focus,this);
     }
     else
     { 

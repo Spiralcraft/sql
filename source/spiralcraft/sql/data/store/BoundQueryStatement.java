@@ -19,6 +19,8 @@ import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
+
 import spiralcraft.sql.data.SerialResultSetCursor;
 
 import spiralcraft.util.tree.LinkedTree;
@@ -54,7 +56,7 @@ public class BoundQueryStatement
    * Execute the Query by allocating a PreparedStatement from the SqlStore,
    *   applying parameters, and delivering the result via a SerialCursor.
    */
-  public SerialCursor<?> execute()
+  public SerialCursor<Tuple> execute()
     throws DataException
   {
     // XXX: Presents problems re. returning with an open result set and connection.
