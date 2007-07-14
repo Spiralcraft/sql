@@ -24,6 +24,7 @@ import spiralcraft.data.access.Store;
 import spiralcraft.data.DataException;
 import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.Type;
+import spiralcraft.data.Tuple;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
@@ -106,15 +107,15 @@ public class SqlStore
   { return space;
   }
   
-  public boolean containsType(Type type)
+  public boolean containsType(Type<?> type)
   {
     // TODO Auto-generated method stub
     return typeManager.getTableMapping(type)!=null;
   }
 
-  public BoundQuery getAll(Type type)
+  public BoundQuery<?,?> getAll(Type<?> type)
     throws DataException
-  { return new BoundScan(assertTableMapping(type).getScan(),null,this);
+  { return new BoundScan<Tuple>(assertTableMapping(type).getScan(),null,this);
   }
 
   
@@ -165,23 +166,24 @@ public class SqlStore
     }
   }
   
-  public Type[] getTypes()
+  public Type<?>[] getTypes()
   {
     // TODO Auto-generated method stub
     return null;
   }
   
-  public BoundQuery query(Query query,Focus focus)
+  public BoundQuery<?,?> query(Query query,Focus<?> focus)
     throws DataException
   { 
     if (query instanceof Selection)
     { 
-      BoundSelection boundSelection=new BoundSelection((Selection) query,focus,this);
+      BoundSelection<?> boundSelection
+        =new BoundSelection<Tuple>((Selection) query,focus,this);
       System.err.println("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
       return boundSelection;
     }
     else if (query instanceof Scan)
-    { return new BoundScan((Scan) query,focus,this);
+    { return new BoundScan<Tuple>((Scan) query,focus,this);
     }
     else
     { 
@@ -195,7 +197,7 @@ public class SqlStore
    * @return A DataConsumer which is used to push one or more updates into
    *   this Store. 
    */
-  public DataConsumer<DeltaTuple> getUpdater(Type type)
+  public DataConsumer<DeltaTuple> getUpdater(Type<?> type)
     throws DataException
   { return assertTableMapping(type).getUpdater().newBatch();
   }
@@ -234,7 +236,7 @@ public class SqlStore
     
   }
 
-  private TableMapping assertTableMapping(Type type)
+  private TableMapping assertTableMapping(Type<?> type)
     throws DataException
   {    
     TableMapping mapping=typeManager.getTableMapping(type);

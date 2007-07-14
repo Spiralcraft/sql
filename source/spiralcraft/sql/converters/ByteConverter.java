@@ -45,7 +45,7 @@ public class ByteConverter
   { return val;
   }
  
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Byte.class;
   }  
 }

@@ -32,7 +32,7 @@ public class BooleanTerm
     this.booleanFactor=booleanFactor;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     booleanTerm.write(buffer,indent, parameterCollector);
     buffer.append("\r\n").append(indent).append(" AND ");

@@ -35,7 +35,7 @@ public class BooleanPrimary
   { return 5;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (predicate!=null)
     { 

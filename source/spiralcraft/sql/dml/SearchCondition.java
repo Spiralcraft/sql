@@ -37,7 +37,7 @@ public class SearchCondition
   { return 1;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     searchCondition.write(buffer,indent, parameterCollector);
     buffer.append("\r\n").append(indent).append("OR ");

@@ -36,7 +36,7 @@ public class CreateTableStatement
     this.elements=elements;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     

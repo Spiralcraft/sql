@@ -32,7 +32,7 @@ public class DataType
     this.decimals=decimals;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append(typeName);
     if (length!=null)

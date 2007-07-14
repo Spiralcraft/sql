@@ -35,7 +35,7 @@ public class BooleanTest
     this.truthValue=truthValue;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     booleanPrimary.write(buffer,indent, parameterCollector);
     buffer.append(" IS ");

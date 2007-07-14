@@ -59,7 +59,7 @@ public class DateConverter
   { return date;
   }
 
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Date.class;
   }    
 }

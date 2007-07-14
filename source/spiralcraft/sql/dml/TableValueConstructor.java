@@ -38,7 +38,7 @@ public class TableValueConstructor
   { items.add(item);
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     buffer.append("VALUES");

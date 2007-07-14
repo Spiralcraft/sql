@@ -40,15 +40,15 @@ import java.util.ArrayList;
  */
 public abstract class BoundStatement
 {
-  protected ArrayList<Expression> parameterExpressions
-    =new ArrayList<Expression>();
-  protected ArrayList<Channel> parameterBindings
-    =new ArrayList<Channel>();
+  protected ArrayList<Expression<?>> parameterExpressions
+    =new ArrayList<Expression<?>>();
+  protected ArrayList<Channel<?>> parameterBindings
+    =new ArrayList<Channel<?>>();
   
   protected String statementText;
   protected SqlFragment sqlFragment;
   protected final SqlStore store;
-  protected SqlBinding statementBinding;
+  protected SqlBinding<?> statementBinding;
   protected FieldSet dataFields;
   protected TableMapping primaryTableMapping;
   

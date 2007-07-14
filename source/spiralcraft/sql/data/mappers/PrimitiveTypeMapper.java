@@ -22,7 +22,8 @@ import spiralcraft.sql.model.Column;
 import spiralcraft.sql.SqlType;
 
 
-public class PrimitiveTypeMapper
+@SuppressWarnings("unchecked") // Requires runtime reflection
+public class PrimitiveTypeMapper<T>
     extends TypeMapper<PrimitiveTypeImpl>
 {
 

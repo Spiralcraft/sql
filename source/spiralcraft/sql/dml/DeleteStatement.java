@@ -39,7 +39,7 @@ public class DeleteStatement
   }
 
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     

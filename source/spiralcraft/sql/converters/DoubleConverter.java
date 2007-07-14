@@ -45,7 +45,7 @@ public class DoubleConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Double.class;
   }    
 }

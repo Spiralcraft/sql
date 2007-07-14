@@ -45,7 +45,7 @@ public class LongConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Long.class;
   }    
 }

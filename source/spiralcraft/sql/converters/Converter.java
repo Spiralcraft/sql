@@ -28,5 +28,5 @@ public interface Converter<Ts,Tj>
   public Tj fromSql(Ts sqlValue)
     throws SQLException;
   
-  public Class getSqlClass();
+  public Class<?> getSqlClass();
 }

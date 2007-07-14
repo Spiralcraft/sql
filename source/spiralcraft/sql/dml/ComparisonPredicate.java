@@ -37,7 +37,7 @@ public class ComparisonPredicate
     this.operator=operator;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     
     leftExpression.write(buffer,indent, parameterCollector);

@@ -31,7 +31,7 @@ public class TableName
     this.schemaName=schemaName;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (schemaName!=null)
     { buffer.append("\"").append(schemaName).append("\".");

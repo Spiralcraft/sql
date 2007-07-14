@@ -31,6 +31,7 @@ import spiralcraft.sql.model.Column;
  *   according to database specific thresholds. 
  *   
  */
+@SuppressWarnings("unchecked") // XXX Complete this and genericize if possible
 public abstract class TypeMapper<T extends Type>
 {
   
@@ -41,7 +42,7 @@ public abstract class TypeMapper<T extends Type>
     , new StringTypeMapper()
     };
     
-  public static TypeMapper[] getStandardTypeMappers()
+  public static TypeMapper<?>[] getStandardTypeMappers()
   { return STANDARD_MAPPERS;
   }
   
@@ -57,7 +58,7 @@ public abstract class TypeMapper<T extends Type>
    * 
    * @return A SQL dialect specific SqlType
    */
-  public abstract SqlType getSqlType(T type);
+  public abstract SqlType<?> getSqlType(T type);
   
   /**
    * Setup the SqlType, length, decimals, and other attributes of the column

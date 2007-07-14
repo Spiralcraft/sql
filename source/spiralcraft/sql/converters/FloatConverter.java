@@ -45,7 +45,7 @@ public class FloatConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Float.class;
   }    
 }

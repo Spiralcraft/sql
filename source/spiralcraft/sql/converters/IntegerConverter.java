@@ -45,7 +45,7 @@ public class IntegerConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Integer.class;
   }    
 }

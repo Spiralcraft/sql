@@ -23,11 +23,11 @@ import java.util.HashMap;
 
 public abstract class SqlType<T>
 {
-  private static final HashMap<Integer,SqlType> CANONICAL_MAP
-    =new HashMap<Integer,SqlType>();
+  private static final HashMap<Integer,SqlType<?>> CANONICAL_MAP
+    =new HashMap<Integer,SqlType<?>>();
 
-  private static final HashMap<Class,SqlType> CONVERSION_MAP
-    =new HashMap<Class,SqlType>();
+  private static final HashMap<Class<?>,SqlType<?>> CONVERSION_MAP
+    =new HashMap<Class<?>,SqlType<?>>();
   
   static {
     mapType(new spiralcraft.sql.types.ArrayType());
@@ -86,7 +86,7 @@ public abstract class SqlType<T>
     
   }
   
-  private static void mapType(SqlType type)
+  private static void mapType(SqlType<?> type)
   { 
     CANONICAL_MAP.put
       (type.getTypeId()
@@ -94,7 +94,7 @@ public abstract class SqlType<T>
       );
   }
   
-  private static void mapConversion(Class clazz,int typeId)
+  private static void mapConversion(Class<?> clazz,int typeId)
   { 
     CONVERSION_MAP.put
       (clazz
@@ -102,12 +102,12 @@ public abstract class SqlType<T>
       );
   }
   
-  public static final SqlType getSqlType(int typeId)
+  public static final SqlType<?> getSqlType(int typeId)
   { return CANONICAL_MAP.get(typeId);
   }
 
   
-  public static final SqlType getStandardSqlType(Class clazz)
+  public static final SqlType<?> getStandardSqlType(Class<?> clazz)
   { return CONVERSION_MAP.get(clazz);
   }
   
@@ -115,7 +115,7 @@ public abstract class SqlType<T>
   protected final Class<T> sqlClass;
   protected final String name;
   protected String ddl;
-  protected Converter converter;
+  protected Converter<T,?> converter;
   
   public SqlType(int typeId,Class<T> sqlClass,String name)
   { 
@@ -141,7 +141,7 @@ public abstract class SqlType<T>
   { return sqlClass;
   }
   
-  public Converter getConverter()
+  public Converter<T,?> getConverter()
   { return converter;
   } 
   

@@ -45,7 +45,7 @@ public class ShortConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Short.class;
   }    
 }

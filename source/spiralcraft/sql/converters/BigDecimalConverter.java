@@ -46,7 +46,7 @@ public class BigDecimalConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return BigDecimal.class;
   }
 }

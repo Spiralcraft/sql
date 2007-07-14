@@ -24,7 +24,7 @@ public class LiteralValueSpecification
   
   private Literal literal;
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { literal.write(buffer,indent, null);
   }
 }

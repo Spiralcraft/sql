@@ -54,7 +54,7 @@ public class SchemaMapping
     ArrayList<TableMapping> mappings
       =new ArrayList<TableMapping>();
    
-    for (Type type: schema.getTypes())
+    for (Type<?> type: schema.getTypes())
     {
       TableMapping mapping=new TableMapping();
       mapping.setSchemaName(schemaName);

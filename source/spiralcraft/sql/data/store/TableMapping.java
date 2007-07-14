@@ -44,7 +44,7 @@ import spiralcraft.util.tree.LinkedTree;
 public class TableMapping
   implements Registrant
 {
-  private Type type;
+  private Type<?> type;
   private String tableName;
   private String schemaName;
   private ArrayList<ColumnMapping> columnMappings
@@ -68,11 +68,11 @@ public class TableMapping
   private WhereClause primaryKeyWhereClause;
   private TableName tableNameSqlFragment;
   
-  public Type getType()
+  public Type<?> getType()
   { return type;
   }
   
-  public void setType(Type type)
+  public void setType(Type<?> type)
   { this.type=type;
   }
   

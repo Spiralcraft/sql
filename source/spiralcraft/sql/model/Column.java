@@ -36,7 +36,7 @@ public class Column
 
   private Table table;
   private String name;
-  private SqlType type;
+  private SqlType<?> type;
   private Integer length;
   private boolean nullable;
   private Integer decimalDigits;
@@ -110,11 +110,11 @@ public class Column
    * 
    * @return the SQL datatype, from java.sql.Types
    */
-  public SqlType getType()
+  public SqlType<?> getType()
   { return type;
   }
 
-  public void setType(SqlType type)
+  public void setType(SqlType<?> type)
   { this.type=type;
   }
   

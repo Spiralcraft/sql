@@ -17,6 +17,7 @@ package spiralcraft.sql.data.query;
 import spiralcraft.lang.Focus;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
 
 import spiralcraft.data.query.Scan;
 
@@ -36,11 +37,11 @@ import spiralcraft.util.tree.LinkedTree;
 /**
  * A SQL implementatin of the basic Scan Query. 
  */
-public class BoundScan
-  extends BoundSqlQuery<Scan>
+public class BoundScan<Tt extends Tuple>
+  extends BoundSqlQuery<Scan,Tt>
 {
     
-  public BoundScan(Scan query,Focus parentFocus,SqlStore store)
+  public BoundScan(Scan query,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { super(query,parentFocus,store);
   }

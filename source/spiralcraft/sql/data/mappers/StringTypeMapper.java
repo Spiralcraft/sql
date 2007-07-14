@@ -31,7 +31,7 @@ public class StringTypeMapper
   { return StringType.class;
   }
   
-  public SqlType getSqlType(StringType type)
+  public SqlType<?> getSqlType(StringType type)
   {
     
     if (type.getMaxLength()==0 
@@ -48,7 +48,7 @@ public class StringTypeMapper
   public void specifyColumn(StringType type, Column col)
   {
 
-    SqlType sqlType=getSqlType(type);
+    SqlType<?> sqlType=getSqlType(type);
     col.setType(sqlType);
     if (type.getMaxLength()>0)
     { col.setLength(type.getMaxLength());

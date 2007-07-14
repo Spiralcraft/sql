@@ -31,7 +31,7 @@ public class BigDecimalTypeMapper
   { return BigDecimalType.class;
   }
   
-  public SqlType getSqlType(BigDecimalType type)
+  public SqlType<?> getSqlType(BigDecimalType type)
   { return dialect.getSqlType(Types.NUMERIC);
   }
   
@@ -39,7 +39,7 @@ public class BigDecimalTypeMapper
   public void specifyColumn(BigDecimalType type, Column col)
   {
 
-    SqlType sqlType=getSqlType(type);
+    SqlType<?> sqlType=getSqlType(type);
     col.setType(sqlType);
     if (type.getPrecision()>0)
     { col.setLength(type.getPrecision());

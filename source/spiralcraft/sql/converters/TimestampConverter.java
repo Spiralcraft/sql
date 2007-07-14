@@ -66,7 +66,7 @@ public class TimestampConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<Timestamp> getSqlClass()
   { return Timestamp.class;
   }
 }

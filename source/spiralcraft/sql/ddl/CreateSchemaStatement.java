@@ -27,7 +27,7 @@ public class CreateSchemaStatement
   { this.schemaName=schemaName;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("CREATE SCHEMA ");
     buffer.append(schemaName).append(" ");    

@@ -32,7 +32,7 @@ public class ColumnDefinition
   
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     
     buffer.append("\"").append(columnName).append("\"").append(" ");

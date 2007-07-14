@@ -34,7 +34,7 @@ public class BooleanFactor
     this.booleanTest=booleanTest;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (not)
     { buffer.append(" NOT ");

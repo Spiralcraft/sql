@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SerialResultSetCursor
-  implements SerialCursor
+  implements SerialCursor<Tuple>
 {
   protected final FieldSet fieldSet;
   protected final ResultSetTuple tuple;

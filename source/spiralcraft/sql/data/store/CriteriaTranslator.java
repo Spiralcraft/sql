@@ -47,12 +47,12 @@ import spiralcraft.util.Path;
 public class CriteriaTranslator
 {
 
-  private Expression filterExpression;
+  private Expression<Boolean> filterExpression;
   private WhereClause whereClause;
   private BoundStatement statementContext;
   
   public CriteriaTranslator
-    (Expression criteria
+    (Expression<Boolean> criteria
     ,BoundStatement statementContext
     )
   {
@@ -63,12 +63,12 @@ public class CriteriaTranslator
     { whereClause=new WhereClause(result.sql);
     }
     if (result.remainder!=null)
-    { filterExpression=new Expression(result.remainder,null);
+    { filterExpression=new Expression<Boolean>(result.remainder,null);
     }
     
   }
   
-  public Expression getFilterExpression()
+  public Expression<Boolean> getFilterExpression()
   { return filterExpression;
   }
   
@@ -76,6 +76,7 @@ public class CriteriaTranslator
   { return whereClause;
   }
   
+  @SuppressWarnings("unchecked") // Nodes genericized for internal purposes only
   private Translation<BooleanCondition> translateBooleanCondition(Node node)
   { 
     if (node instanceof LogicalAndNode)
@@ -144,7 +145,8 @@ public class CriteriaTranslator
     else
     { 
       // A source in something other than the current context. Parameterize it.
-      translation.sql=new SqlParameterReference(new Expression(node,null));
+      translation.sql=new SqlParameterReference
+        (new Expression<Object>(node,null));
     }
     return translation;
   }
@@ -152,11 +154,13 @@ public class CriteriaTranslator
   private Translation<ValueExpression> translateToParameter(Node node)
   { 
     Translation<ValueExpression> translation=new Translation<ValueExpression>();
-    translation.sql=new SqlParameterReference(new Expression(node,null));
+    translation.sql=new SqlParameterReference
+      (new Expression<Object>(node,null));
     return translation;
   }
   
   
+  @SuppressWarnings("unchecked") // RelationNode genericized for internal use
   private Translation<BooleanCondition> translateRelational(RelationalNode node)
   {
     Node lhs=node.getLeftOperand();
@@ -203,6 +207,7 @@ public class CriteriaTranslator
     return result;
   }
   
+  @SuppressWarnings("unchecked") // Genericized for internal purposes only
   private Translation<BooleanCondition> translateEquals(EqualityNode node)
   {
     Node lhs=node.getLeftOperand();

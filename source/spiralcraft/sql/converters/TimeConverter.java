@@ -60,7 +60,7 @@ public class TimeConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<?> getSqlClass()
   { return Time.class;
   }  
 }

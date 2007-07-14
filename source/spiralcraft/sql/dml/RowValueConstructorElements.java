@@ -27,7 +27,7 @@ public class RowValueConstructorElements
   { items.add(item);
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (items.size()==0)
     { return;

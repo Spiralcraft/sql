@@ -15,6 +15,7 @@
 package spiralcraft.sql.data.query;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
 
 import spiralcraft.data.lang.TupleFocus;
 
@@ -28,18 +29,18 @@ import spiralcraft.sql.data.store.SqlStore;
 
 import spiralcraft.lang.Focus;
 
-public abstract class BoundSqlQuery<Tq extends Query>
-  extends BoundQuery<Tq>
+public abstract class BoundSqlQuery<Tq extends Query,Tt extends Tuple>
+  extends BoundQuery<Tq,Tt>
 {
-  protected final TupleFocus focus;
+  protected final TupleFocus<?> focus;
   protected final SqlStore store;
   protected boolean resolved;
   protected BoundQueryStatement statement;
   
-  public BoundSqlQuery(Tq query,Focus parentFocus,SqlStore store)
+  public BoundSqlQuery(Tq query,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { 
-    focus=new TupleFocus(query.getFieldSet());
+    focus=new TupleFocus<Tuple>(query.getFieldSet());
     if (parentFocus!=null)
     { focus.setParentFocus(parentFocus);
     }
@@ -61,7 +62,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
     statement.bindParameters(focus);
   }
   
-  public SerialCursor execute()
+  public SerialCursor<?> execute()
     throws DataException
   { 
     if (!resolved)

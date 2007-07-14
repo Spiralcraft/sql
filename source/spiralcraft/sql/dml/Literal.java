@@ -24,7 +24,7 @@ public class Literal
 {
   protected String value;
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { buffer.append(value);
   }
 }

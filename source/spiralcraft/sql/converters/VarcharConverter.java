@@ -61,7 +61,7 @@ public class VarcharConverter
   { return value;
   }
   
-  public Class getSqlClass()
+  public Class<String> getSqlClass()
   { return String.class;
   }
 }

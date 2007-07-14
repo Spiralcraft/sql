@@ -34,7 +34,7 @@ public class DerivedColumn
     this.columnName=columnName;
   }
 
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     valueExpression.write(buffer, indent, parameterCollector);
     if (columnName!=null)

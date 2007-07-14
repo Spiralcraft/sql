@@ -32,7 +32,7 @@ public class SetClause
     this.sourceExpression=sourceExpression;
   }
 
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     
     buffer.append(targetColumn);

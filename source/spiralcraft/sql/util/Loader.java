@@ -326,9 +326,9 @@ public class Loader
 
       if (_inputResources.size()>0)
       {
-        Iterator it=_inputResources.iterator();
+        Iterator<Resource> it=_inputResources.iterator();
         while (it.hasNext())
-        { load((Resource) it.next());
+        { load(it.next());
         }
       }
       

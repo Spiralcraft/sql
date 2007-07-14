@@ -29,7 +29,7 @@ public abstract class SqlFragment
    * <P>When a parameter is  encountered, add it to the parameterCollector.
    * @param parameterCollector TODO
    */
-  public abstract void write(StringBuilder buffer,String indent, List parameterCollector);
+  public abstract void write(StringBuilder buffer,String indent, List<?> parameterCollector);
 
   /**
    * <P>Generate the SQL text represented by the fragment
@@ -41,7 +41,7 @@ public abstract class SqlFragment
    * @param parameterCollector
    * @return the SQL text
    */
-  public String generateSQL(List parameterCollector)
+  public String generateSQL(List<?> parameterCollector)
   {
     StringBuilder buffer=new StringBuilder();
     write(buffer,"",parameterCollector);

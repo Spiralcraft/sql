@@ -43,17 +43,17 @@ import java.util.List;
 public class TypeManager
   implements Registrant
 {
-  private TypeMapper[] typeMappers;
+  private TypeMapper<?>[] typeMappers;
   
-  private HashMap<Class,TypeMapper> typeMappersByTypeClass
-    =new HashMap<Class,TypeMapper>();
+  private HashMap<Class<?>,TypeMapper<?>> typeMappersByTypeClass
+    =new HashMap<Class<?>,TypeMapper<?>>();
 
   
   private SchemaMapping[] schemaMappings;
 
   private TableMapping[] tableMappings;
-  private HashMap<Type,TableMapping> tableMappingsByType
-    =new HashMap<Type,TableMapping>();
+  private HashMap<Type<?>,TableMapping> tableMappingsByType
+    =new HashMap<Type<?>,TableMapping>();
   
   private SqlStore store;
   
@@ -80,7 +80,7 @@ public class TypeManager
   { this.tableMappings=tableMappings;
   }
 
-  public void setTypeMappers(TypeMapper[] typeMappers)
+  public void setTypeMappers(TypeMapper<?>[] typeMappers)
   { this.typeMappers=typeMappers;
   }
 
@@ -124,7 +124,7 @@ public class TypeManager
   
   private void resolveLocalDataModel()
   {
-    for (TypeMapper mapper: TypeMapper.getStandardTypeMappers())
+    for (TypeMapper<?> mapper: TypeMapper.getStandardTypeMappers())
     { 
       mapper.setDialect(dialect);
       typeMappersByTypeClass.put(mapper.getTypeClass(), mapper);
@@ -132,7 +132,7 @@ public class TypeManager
       
     if (typeMappers!=null)
     {
-      for (TypeMapper mapper: typeMappers)
+      for (TypeMapper<?> mapper: typeMappers)
       { 
         mapper.setDialect(dialect);
         typeMappersByTypeClass.put(mapper.getTypeClass(), mapper);
@@ -170,17 +170,17 @@ public class TypeManager
    *   configured, a default TableMapping will be created if the Type's package is being
    *   handled by this store.
    */
-  public TableMapping getTableMapping(Type type)
+  public TableMapping getTableMapping(Type<?> type)
   { return tableMappingsByType.get(type);
   }
   
   /**
    * @return the TypeMapper associated with a given Type.
    */
-  public TypeMapper getTypeMapperForType(Type type)
+  public TypeMapper<?> getTypeMapperForType(Type<?> type)
   { 
-    TypeMapper mapper=null;
-    Class clazz=type.getClass();
+    TypeMapper<?> mapper=null;
+    Class<?> clazz=type.getClass();
     while (mapper==null && clazz!=null)
     { 
       mapper=typeMappersByTypeClass.get(clazz);

@@ -34,7 +34,7 @@ public class SelectList
     items.add(item);
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (items==null)
     { buffer.append("* ");

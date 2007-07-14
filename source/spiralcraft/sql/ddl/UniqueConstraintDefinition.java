@@ -32,7 +32,7 @@ public abstract class UniqueConstraintDefinition
   
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append(uniqueSpecification).append(" (");
     boolean first=true;

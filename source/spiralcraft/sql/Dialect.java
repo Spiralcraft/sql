@@ -23,16 +23,16 @@ import java.util.HashMap;
 public class Dialect
 {
   
-  private final HashMap<Integer,SqlType> typeMap
-    =new HashMap<Integer,SqlType>();
+  private final HashMap<Integer,SqlType<?>> typeMap
+    =new HashMap<Integer,SqlType<?>>();
     
   /**
    * Specify a set of extended types that will override the basic JDBC type mappings
    *   for specific databases. 
    */
-  public void setExtendedTypes(SqlType[] extendedTypes)
+  public void setExtendedTypes(SqlType<?>[] extendedTypes)
   { 
-    for (SqlType type: extendedTypes)
+    for (SqlType<?> type: extendedTypes)
     { typeMap.put(type.getTypeId(), type);
     }
   }
@@ -48,9 +48,9 @@ public class Dialect
    *@return an appropriate SqlType for this JDBC type id. Will consult the extended types
    *  set up for this Dialect before using a default association.
    */
-  public SqlType getSqlType(int sqlTypeId)
+  public SqlType<?> getSqlType(int sqlTypeId)
   { 
-    SqlType type=typeMap.get(sqlTypeId);
+    SqlType<?> type=typeMap.get(sqlTypeId);
     if (type!=null)
     { return type;
     }

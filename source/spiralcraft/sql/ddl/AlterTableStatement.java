@@ -36,7 +36,7 @@ public class AlterTableStatement
     this.action=action;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\r\n").append(indent);
     

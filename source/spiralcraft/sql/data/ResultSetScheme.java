@@ -56,7 +56,7 @@ public class ResultSetScheme
         } 
         field.setName(goodName);
 
-        Class typeClass=SqlType.getSqlType(metadata.getColumnType(i)).getSqlClass();
+        Class<?> typeClass=SqlType.getSqlType(metadata.getColumnType(i)).getSqlClass();
         if (typeClass==null)
         { 
           System.err.println

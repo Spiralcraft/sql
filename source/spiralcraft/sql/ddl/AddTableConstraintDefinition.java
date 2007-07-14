@@ -27,7 +27,7 @@ public class AddTableConstraintDefinition
   { this.constraintDefinition=constraintDefinition;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("ADD ");
     constraintDefinition.write(buffer,indent,parameterCollector);

@@ -27,7 +27,7 @@ public class AddColumnDefinition
   { this.columnDefinition=columnDefinition;
   }
   
-  public void write(StringBuilder buffer,String indent, List parameterCollector)
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("ADD COLUMN ");
     columnDefinition.write(buffer,indent, parameterCollector);

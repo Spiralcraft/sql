@@ -20,6 +20,7 @@ import spiralcraft.lang.Focus;
 import spiralcraft.lang.Expression;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Selection;
@@ -34,16 +35,16 @@ import spiralcraft.sql.dml.SelectStatement;
 /**
  * A SQL optimized implementation of the Selection Query. 
  */
-public class BoundSelection
-  extends BoundSqlQuery<Selection>
+public class BoundSelection<Tt extends Tuple>
+  extends BoundSqlQuery<Selection,Tt>
 {
   
-  private final BoundQuery source;
-  private Expression criteria;
-  private Expression remainderCriteria;
+  private final BoundQuery<?,?> source;
+  private Expression<Boolean> criteria;
+  private Expression<Boolean> remainderCriteria;
 
   
-  public BoundSelection(Selection selection,Focus parentFocus,SqlStore store)
+  public BoundSelection(Selection selection,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { 
     super(selection,parentFocus,store);
@@ -61,7 +62,7 @@ public class BoundSelection
     this.source=store.query(sources.get(0),parentFocus);
   }
     
-  public Expression getRemainderCriteria()
+  public Expression<Boolean> getRemainderCriteria()
   { return remainderCriteria;
   }
   
@@ -74,7 +75,7 @@ public class BoundSelection
     if (source instanceof BoundScan)
     {
       BoundQueryStatement statement
-        =((BoundScan) source).composeStatement();
+        =((BoundScan<?>) source).composeStatement();
 
       SelectStatement select=(SelectStatement) statement.getSqlFragment();
       
