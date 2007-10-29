@@ -1,11 +1,16 @@
 <project name="build-common">
 
   <property file="build.number"/>
-  <property name="build.name" value="spiralcraft-${module}-${version}-b${build.number}"/>
-  <property name="manifest.class.path" value=""/>
-  <property name="distrib.dir" value="../../distrib/spiralcraft-${module}/${version}"/>
+  <property 
+    name="build.name" value="spiralcraft-${module}-${version}-b${build.number}"
+  />
+  <property name="manifest.class.path" value="" />
+  <property environment="env"/>
+  <property name="spiralcraft.build" value="../../build"/>
   
-  <target name="build">
+  <target name="build" depends="compile,jar,smoke" />
+  
+  <target name="compile">
     <buildnumber/>
     <echo message= "build: ${build.name}"/>
     <javac 
@@ -16,104 +21,51 @@
     />
   </target>
 
-	<target name="smoke">
-		<java classpath="../../lib/bsh.jar;source;${classpath}" classname="bsh.Interpreter" failonerror="true">
-			<arg value="smoke.bsh"/>
-		</java>
+  <target name="smoke" depends="jar">
+    <java
+      classpath="${spiralcraft.build}/lib/bsh.jar;lib/spiralcraft-${module}.jar;${classpath}"
+      classname="bsh.Interpreter" 
+      failonerror="true"
+      fork="true"
+      >
+      <arg value="smoke.bsh"/>
+    </java>
   </target>
   
-  <target name="jar" depends="build,smoke">
+  <target name="jar" depends="compile">
     <echo message= "jar: ${build.name}"/>
     <jar 
-      destfile="../../lib/spiralcraft-${module}.jar" 
+      destfile="lib/spiralcraft-${module}.jar" 
       basedir="source"
-      includes="spiralcraft/**/*.class,spiralcraft/**/*.xml"
       >
-     <Manifest>
+      <Manifest>
         <attribute name="Class-Path" value="${manifest.class.path}"/>
-     </Manifest>
-       
+      </Manifest>
+      <include name="spiralcraft/**/*.class"/>
+      <include name="spiralcraft/**/*.xml"/>
+      <include name="spiralcraft/**/*.tgl"/>
     </jar>
   </target>
 
   <target name="doc" depends="build">
-		<javadoc 
+    <javadoc 
       classpath="source:${classpath}"
-			sourcepath="source"
+      sourcepath="source"
       packagenames="spiralcraft.**.**"
-        
-			header="spiralcraft-${module}-${version} API"
-			destdir="docs/api"
-			author="Spiralcraft, Inc."
-			version="${version}-b${build.number}"
-			use="true"
-			windowtitle="spiralcraft-${module}-${version} API"
-			doctitle="&lt;h1&gt;spiralcraft-${module}-${version} API&lt;/h1&gt;"
-			maxmemory="90M"
-			failonerror="true">
-			<bottom>Copyright 1998,2005 Michael Toth, Spiralcraft, Inc.</bottom>
-		</javadoc>
-
-
+      header="spiralcraft-${module}-${version} API"
+      destdir="docs/api"
+      author="Spiralcraft, Inc."
+      version="${version}-b${build.number}"
+      use="true"
+      windowtitle="spiralcraft-${module}-${version} API"
+      doctitle="&lt;h1&gt;spiralcraft-${module}-${version} API&lt;/h1&gt;"
+      maxmemory="90M"
+      failonerror="true"
+      >
+      <bottom>Copyright 1998,2007 Michael Toth, Spiralcraft, Inc.
+      </bottom>
+    </javadoc>
   </target>
   
-  <target name="distrib-clean">
-    <mkdir dir="${distrib.dir}"/>
-    <delete>
-      <fileset dir="${distrib.dir}" includes="*.jar"/>
-    </delete>
-  </target>
-  
-  <target name="source" depends="build">
-    <property name="stage.dir" value="spiralcraft-${module}-${version}"/>
-    
-    <delete dir="${distrib.dir}/${stage.dir}"/>
-    <mkdir dir="${distrib.dir}/${stage.dir}"/>
-    <copy todir="${distrib.dir}/${stage.dir}">
-      <fileset dir="." includes="*.xml,*.txt,source/**"/>
-    </copy>
-    <copy todir="${distrib.dir}/${stage.dir}">
-      <fileset dir="${license.dir}" includes="SPIRALCRAFT-LICENSE.txt,COPYING.txt,COPYING.LIB.txt,LICENSE-2.0.txt"/>
-    </copy>
-    
-    <jar 
-      destfile="${distrib.dir}/spiralcraft-${module}-${version}-b${build.number}-source.jar" 
-      basedir="${distrib.dir}"
-      includes="${stage.dir}/*.txt,${stage.dir}/*.xml,${stage.dir}/source/**/*.java,${stage.dir}/source/**/*.xml"
-      >
-    </jar>
-    
-    <delete dir="${distrib.dir}/${stage.dir}"/>
-
-  </target>
-
-  <target name="distrib" depends="distrib-clean,source,doc">
-  
-    
-    <copy
-      file="../../lib/spiralcraft-${module}.jar"
-      tofile="${distrib.dir}/spiralcraft-${module}-${version}-b${build.number}.jar" 
-      >
-    </copy>
-
-    <property name="stage.dir" value="spiralcraft-${module}-${version}"/>
-    
-    <delete dir="${distrib.dir}/${stage.dir}"/>
-    <mkdir dir="${distrib.dir}/${stage.dir}"/>
-    <copy todir="${distrib.dir}/${stage.dir}/docs">
-      <fileset dir="docs" includes="**"/>
-    </copy>
-    
-    <jar 
-      destfile="${distrib.dir}/spiralcraft-${module}-${version}-b${build.number}-docs.jar" 
-      basedir="${distrib.dir}"
-      includes="${stage.dir}/docs/**"
-      >
-    </jar>
-    
-    <delete dir="${distrib.dir}/${stage.dir}"/>
-
-    
-  </target>
-
 </project>
+
