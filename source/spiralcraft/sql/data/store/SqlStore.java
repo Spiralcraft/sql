@@ -49,6 +49,9 @@ import javax.sql.DataSource;
 
 import java.util.List;
 
+import spiralcraft.builder.LifecycleException;
+
+
 /**
  * A Store backed by a SQL database
  *
@@ -97,12 +100,23 @@ public class SqlStore
 
   }
   
-  public void initialize()
-    throws DataException
+  @Override
+  public void start()
+    throws LifecycleException
   { 
-    onAttach(); // XXX Waiting for auto-recovery implementation
+    try
+    { onAttach(); // XXX Waiting for auto-recovery implementation
+    }
+    catch (DataException x)
+    { throw new LifecycleException(x.toString(),x);
+    }
   }
 
+  @Override
+  public void stop()
+  {
+  }
+  
   public Space<?> getSpace()
   { return space;
   }
