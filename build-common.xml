@@ -1,4 +1,8 @@
 <project name="build-common">
+	<!--
+	  Master Template
+	  Last updated 2007-11-01 16:19
+  -->
 
   <property file="build.number"/>
   <property 
@@ -40,6 +44,7 @@
       >
       <Manifest>
         <attribute name="Class-Path" value="${manifest.class.path}"/>
+        <attribute name="Main-Class" value="${manifest.main.class}"/>   
       </Manifest>
       <include name="spiralcraft/**/*.class"/>
       <include name="spiralcraft/**/*.xml"/>
