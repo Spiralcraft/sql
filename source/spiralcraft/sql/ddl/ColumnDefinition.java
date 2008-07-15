@@ -32,6 +32,14 @@ public class ColumnDefinition
   
   }
   
+  public String getColumnName()
+  { return columnName;
+  }
+  
+  public DataType getDataType()
+  { return dataType;
+  }
+  
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     
