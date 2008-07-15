@@ -19,7 +19,6 @@ import spiralcraft.data.Field;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.FieldSet;
-import spiralcraft.data.BoundProjection;
 
 import spiralcraft.data.access.DataConsumer; 
 
@@ -28,6 +27,7 @@ import spiralcraft.data.flatfile.ParseException;
 
 import spiralcraft.data.core.KeyImpl;
 
+import spiralcraft.data.lang.TupleFocus;
 import spiralcraft.data.persist.PersistenceException;
 
 import spiralcraft.vfs.Resource;
@@ -37,6 +37,8 @@ import spiralcraft.vfs.UnresolvableURIException;
 
 
 
+import spiralcraft.lang.BindException;
+import spiralcraft.lang.Channel;
 import spiralcraft.sql.Constants;
 
 import spiralcraft.sql.SqlType;
@@ -497,10 +499,8 @@ public class Loader
     implements DataConsumer<Tuple>
   {
     private int count=0;
-    private Tuple data;
+    private TupleFocus<Tuple> dataFocus;
     private FieldSet fieldSet;
-    private BoundProjection insertKeyBinding;
-    private BoundProjection updateKeyBinding;
 
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
@@ -509,12 +509,19 @@ public class Loader
       this.fieldSet=fieldSet;
       // We ask 
       
-      // Check keys
-      if (_insertKeyFields!=null)
-      { insertKeyBinding=new KeyImpl(fieldSet,_insertKeyFields).createBinding();
+      try
+      {
+        // Check keys
+        if (_insertKeyFields!=null)
+        { new KeyImpl(fieldSet,_insertKeyFields).bind(dataFocus);
+        }
+      
+        if (_updateKeyFields!=null)
+        { new KeyImpl(fieldSet,_updateKeyFields).bind(dataFocus);
+        }
       }
-      if (_updateKeyFields!=null)
-      { updateKeyBinding=new KeyImpl(fieldSet,_updateKeyFields).createBinding();
+      catch (BindException x)
+      { throw new DataException("Error binding SqlDataHandler");
       }
       
         
@@ -525,20 +532,14 @@ public class Loader
     }
     
     public Tuple dataGetTuple()
-    { return this.data;
+    { return dataFocus.getSubject().get();
     }
     
     public void dataAvailable(Tuple data)
       throws DataException
     { 
       count++;
-      this.data=data;
-      if (insertKeyBinding!=null)
-      { insertKeyBinding.project(data);
-      }
-      if (updateKeyBinding!=null)
-      { updateKeyBinding.project(data);
-      }
+      dataFocus.getSubject().set(data);
     }
     
     public void dataFinalize()
@@ -555,42 +556,57 @@ public class Loader
 	class SqlDataHandler
 		implements DataConsumer<Tuple>
 	{
-    private Tuple data;
+    private TupleFocus<Tuple> dataFocus;
     private FieldSet fieldSet;
-    private BoundProjection insertKeyBinding;
-    private BoundProjection updateKeyBinding;
+    private KeyImpl insertKey;
+    private KeyImpl updateKey;
+    private Channel<Tuple> insertKeyBinding;
+    private Channel<Tuple> updateKeyBinding;
 
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
     {
       System.err.println(fieldSet.toString());
       this.fieldSet=fieldSet;
-      // We ask 
+      dataFocus
+        =new TupleFocus<Tuple>(fieldSet);
       
-      // Check keys
-      if (_insertKeyFields!=null)
-      { insertKeyBinding=new KeyImpl(fieldSet,_insertKeyFields).createBinding();
+      try
+      {
+        // Check keys
+        if (_insertKeyFields!=null)
+        { 
+          insertKey=new KeyImpl(fieldSet,_insertKeyFields);
+          insertKeyBinding=insertKey.bind(dataFocus);
+        }
+      
+        if (_updateKeyFields!=null)
+        { 
+          updateKey=new KeyImpl(fieldSet,_updateKeyFields);
+          updateKeyBinding=updateKey.bind(dataFocus);
+        }
       }
-      if (_updateKeyFields!=null)
-      { updateKeyBinding=new KeyImpl(fieldSet,_updateKeyFields).createBinding();
+      catch (BindException x)
+      { throw new DataException("Error binding SqlDataHandler");
       }
       
       initializeSql();
       
     }
 
+
     public FieldSet dataGetFieldSet()
     { return this.fieldSet;
     }
     
     public Tuple dataGetTuple()
-    { return this.data;
+    { return dataFocus.getSubject().get();
     }
     
     public void dataAvailable(Tuple data)
       throws DataException
     { 
-      this.data=data;
+      dataFocus.getSubject().set(data);
       performSql();
     }
     
@@ -645,7 +661,7 @@ public class Loader
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
-            if (updateKeyBinding.getProjection().getFieldByName(fieldName)!=null)
+            if (updateKey.getFieldByName(fieldName)!=null)
             {
               // Note the index of the key fields
               _paramMap[count]=(keyCount+1);
@@ -684,9 +700,9 @@ public class Loader
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
-            if (updateKeyBinding.getProjection().getFieldByName(fieldName)!=null)
+            if (updateKey.getFieldByName(fieldName)!=null)
             {
-              int updateFieldCount=updateKeyBinding.getProjection().getFieldCount();
+              int updateFieldCount=updateKey.getFieldCount();
               
               // Note the index of the key fields
               _paramMap[count]=( (_paramMap.length-updateFieldCount)+keyCount+1);
@@ -787,7 +803,7 @@ public class Loader
       boolean notAllNull=false;
       if (insertKeyBinding!=null)
       {
-        Tuple keyData=insertKeyBinding.project(data);
+        Tuple keyData=insertKeyBinding.get();
         if (_keyMap.get(keyData)!=null)
         { 
           System.err.println("DUPLICATE KEY: "+keyData.toString());
@@ -805,7 +821,8 @@ public class Loader
           int fieldCount=0;
           for (Field field: fieldSet.fieldIterable())
           {
-            Object dataObject=field.getValue(data);
+            // XXX Use field bindings
+            Object dataObject=field.getValue(dataGetTuple());
             if (_paramMap[fieldCount]==-1)
             { 
               fieldCount++;
@@ -868,10 +885,10 @@ public class Loader
                 }
               }
               catch (java.text.ParseException x)
-              { throw new RuntimeException("Error parsing '"+dataObject+"' in "+data.toString()+":"+x.toString());
+              { throw new RuntimeException("Error parsing '"+dataObject+"' in "+dataGetTuple().toString()+":"+x.toString());
               }
               catch (ClassCastException x)
-              { throw new RuntimeException("Unexpected data type '"+dataObject.getClass()+"' found for '"+dataObject+"' in "+data.toString());
+              { throw new RuntimeException("Unexpected data type '"+dataObject.getClass()+"' found for '"+dataObject+"' in "+dataGetTuple().toString());
               }
               notAllNull=true;
             }
@@ -889,10 +906,10 @@ public class Loader
               if (count<1)
               { 
                 if (_discardWriter!=null)
-                { _discardWriter.println(data.toString());
+                { _discardWriter.println(dataGetTuple().toString());
                 }
                 else
-                { _logWriter.println(data.toString());
+                { _logWriter.println(dataGetTuple().toString());
                 }
               }
               _count++;
@@ -913,10 +930,10 @@ public class Loader
               }
               int keyCount=rs.getInt(1);
               if (keyCount<1)
-              { _logWriter.println("Missing "+data);
+              { _logWriter.println("Missing "+dataGetTuple());
               }
               else if (keyCount>1)
-              { _logWriter.println("Duplicated "+keyCount+"x "+data); 
+              { _logWriter.println("Duplicated "+keyCount+"x "+dataGetTuple()); 
               }
               
               if (++_count%_transactionSize==0)
@@ -939,7 +956,7 @@ public class Loader
       { 
         _logWriter.println
           ("Caught SqlException processing "
-            +data.toString()
+            +dataGetTuple().toString()
           );
         _logWriter.println(x.toString());
         throw new RuntimeException(x.toString());
@@ -948,7 +965,7 @@ public class Loader
       { 
         _logWriter.println
           ("Caught DataException processing "
-            +data.toString()
+            +dataGetTuple().toString()
           );
         _logWriter.println(x.toString());
         throw new RuntimeException(x.toString());
