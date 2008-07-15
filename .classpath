@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="source"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/spiralcraft-core.jar"/>
-	<classpathentry kind="output" path="source"/>
+	<classpathentry kind="lib" path="lib/spiralcraft-core.jar" sourcepath="/spiralcraft-modules-core"/>
+	<classpathentry kind="output" path="out"/>
 </classpath>

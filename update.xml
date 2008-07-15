@@ -1,0 +1,14 @@
+<project name="spiralcraft-sql" default="build" basedir=".">
+
+  <target name="build">
+  	<copy 
+  	  file="../core/lib/spiralcraft-core.jar"
+  	  todir="lib"
+  	/>
+    <copy 
+      file="../../build/resources/ant/build-common.xml"
+      todir="."
+    />    	
+  </target>
+  
+</project>

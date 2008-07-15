@@ -2,7 +2,7 @@
 
   <property name="module" value="sql"/>
   <property name="version" value="1.0pre1"/>
-  <property name="classpath" value="${spiralcraft-core.jar}"/>
+  <property name="classpath" value="lib/spiralcraft-core.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
 
   <import file="build-common.xml"/>

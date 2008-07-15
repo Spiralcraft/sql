@@ -1,7 +1,7 @@
 <project name="build-common">
 	<!--
 	  Master Template
-	  Last updated 2007-11-01 16:19
+	  Last updated 2008-06-06 19:41
   -->
 
   <property file="build.number"/>
@@ -12,7 +12,13 @@
   <property environment="env"/>
   <property name="spiralcraft.build" value="../../build"/>
   
-  <target name="build" depends="compile,jar,smoke" />
+  <target name="build" depends="clean,compile,jar,smoke" />
+  
+  <target name="clean">
+    <delete>
+      <fileset dir="out" includes="**/*"/>
+    </delete>
+  </target>
   
   <target name="compile">
     <buildnumber/>
@@ -20,9 +26,18 @@
     <javac 
       classpath="${classpath}"
       srcdir="source" 
+      destdir="out"
       debug="true"
       deprecation="true"
     />
+    <copy toDir="out">
+      <fileset
+        dir="source"
+        excludes="**/*.class,**/*.java"
+        >
+        
+      </fileset>
+    </copy>
   </target>
 
   <target name="smoke" depends="jar">
@@ -40,8 +55,9 @@
     <echo message= "jar: ${build.name}"/>
     <jar 
       destfile="lib/spiralcraft-${module}.jar" 
-      basedir="source"
-      >
+      basedir="out"
+      level="9"
+            >
       <Manifest>
         <attribute name="Class-Path" value="${manifest.class.path}"/>
         <attribute name="Main-Class" value="${manifest.main.class}"/>   
@@ -49,6 +65,9 @@
       <include name="spiralcraft/**/*.class"/>
       <include name="spiralcraft/**/*.xml"/>
       <include name="spiralcraft/**/*.tgl"/>
+      <include name="spiralcraft/**/*.webui"/>
+      <include name="spiralcraft/**/*.ghtml"/>
+      <include name="spiralcraft/**/*.properties"/>
     </jar>
   </target>
 

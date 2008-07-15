@@ -1,0 +1,6 @@
+<project name="spiralcraft-sql-doc" default="doc" basedir=".">
+
+  <import file="build.xml"/>
+	
+</project>
+
