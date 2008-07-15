@@ -22,10 +22,10 @@ import spiralcraft.data.access.Cursor;
 
 import spiralcraft.data.Tuple;
 
-public class SqlBinding<T extends Tuple>
-  extends CursorBinding<T>
+public class SqlBinding<T extends Tuple,C extends Cursor<T>>
+  extends CursorBinding<T,C>
 {
-  public SqlBinding(Cursor<T> cursor)
+  public SqlBinding(C cursor)
     throws BindException
   { super(cursor);
   }

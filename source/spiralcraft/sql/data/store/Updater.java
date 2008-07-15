@@ -23,6 +23,7 @@ import spiralcraft.data.access.DataConsumer;
 
 import spiralcraft.data.lang.TupleFocus;
 
+import spiralcraft.lang.Focus;
 import spiralcraft.sql.dml.InsertStatement;
 import spiralcraft.sql.dml.DeleteStatement;
 import spiralcraft.sql.dml.UpdateStatement;
@@ -70,8 +71,8 @@ public class Updater
    * <P>Any rejected updates will be sent to the specified DataConsumer.
    *   
    */
-  public DataConsumer<DeltaTuple> newBatch()
-  { return new Batch();
+  public DataConsumer<DeltaTuple> newBatch(Focus<?> focus)
+  { return new Batch(focus);
   }
 
   
@@ -189,43 +190,54 @@ public class Updater
 
   
   class Batch
-    implements DataConsumer<DeltaTuple>
+    extends spiralcraft.data.access.Updater<DeltaTuple>
   {
 
     private Connection connection;
     private TupleFocus<DeltaTuple> focus;
+    private Focus<?> parentFocus;
     private SqlFragment lastOp;
     private HashMap<SqlFragment,BoundUpdateStatement> boundStatements
       =new HashMap<SqlFragment,BoundUpdateStatement>();
     private BoundUpdateStatement currentStatement;
     
+    public Batch(Focus<?> context)
+    { 
+      super(context);
+      parentFocus=context;
+    }
+    
     public void dataInitialize(FieldSet fieldSet) 
       throws DataException
     {
-      this.focus=new TupleFocus<DeltaTuple>(fieldSet);
+      super.dataInitialize(fieldSet);
+      this.focus=new TupleFocus<DeltaTuple>(parentFocus,fieldSet);
       this.connection=store.allocateConnection();
     }
    
     public void dataAvailable(DeltaTuple tuple)
       throws DataException
     {
-       if (!tuple.isDirty())
-       { return;
-       }
-       focus.setTuple(tuple);
-       if (tuple.getOriginal()==null)
-       { execute(getInsertStatement(tuple),tuple);
-       }
-       else if (tuple.isDelete())
-       { execute(getDeleteStatement(),tuple);
-       }
-       else
-       { execute(getUpdateStatement(tuple),tuple);
-       }
+      super.dataAvailable(tuple);
+      if (!tuple.isDirty())
+      { return;
+      }
+      focus.setTuple(tuple);
+      if (tuple.getOriginal()==null)
+      { execute(getInsertStatement(tuple),tuple);
+      }
+      else if (tuple.isDelete())
+      { execute(getDeleteStatement(),tuple);
+      }
+      else
+      { execute(getUpdateStatement(tuple),tuple);
+      }
+      
     }
     
     public void dataFinalize() throws DataException
     {
+      super.dataFinalize();
       try
       { connection.close();
       }

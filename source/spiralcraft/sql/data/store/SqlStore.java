@@ -18,13 +18,14 @@ package spiralcraft.sql.data.store;
 import spiralcraft.lang.Focus;
 
 import spiralcraft.data.access.DataConsumer;
-import spiralcraft.data.access.Space;
 import spiralcraft.data.access.Store;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.DeltaTuple;
+import spiralcraft.data.Sequence;
 import spiralcraft.data.Type;
 import spiralcraft.data.Tuple;
+import spiralcraft.data.Space;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
@@ -41,6 +42,7 @@ import spiralcraft.sql.ddl.DDLStatement;
 import spiralcraft.registry.Registrant;
 import spiralcraft.registry.RegistryNode;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -57,11 +59,11 @@ import spiralcraft.builder.LifecycleException;
  *
  */
 public class SqlStore
-  implements Store<Tuple>,Registrant
+  implements Store,Registrant
 {
   
   private DataSource dataSource;
-  private Space<?> space;
+  private Space space;
   private TypeManager typeManager=new TypeManager();
   private RegistryNode registryNode;
   private SqlResourceManager resourceManager
@@ -72,6 +74,13 @@ public class SqlStore
    */
   public void setDataSource(DataSource dataSource)
   { this.dataSource=dataSource;
+  }
+  
+
+  public Sequence getSequence(URI sequenceURI)
+  { 
+    throw new UnsupportedOperationException("SQL Sequences not implemented");
+    // XXX Need to implement this
   }
   
   /**
@@ -92,7 +101,7 @@ public class SqlStore
 
   public void register(RegistryNode node)
   { 
-    this.space=(Space<?>) node.findInstance(Space.class);
+    this.space=(Space) node.findInstance(Space.class);
     registryNode=node.createChild(SqlStore.class,this);
     RegistryNode childNode
       =registryNode.createChild("typeManager");
@@ -117,7 +126,7 @@ public class SqlStore
   {
   }
   
-  public Space<?> getSpace()
+  public Space getSpace()
   { return space;
   }
   
@@ -211,9 +220,9 @@ public class SqlStore
    * @return A DataConsumer which is used to push one or more updates into
    *   this Store. 
    */
-  public DataConsumer<DeltaTuple> getUpdater(Type<?> type)
+  public DataConsumer<DeltaTuple> getUpdater(Type<?> type,Focus<?> focus)
     throws DataException
-  { return assertTableMapping(type).getUpdater().newBatch();
+  { return assertTableMapping(type).getUpdater().newBatch(focus);
   }
     
   

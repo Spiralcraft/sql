@@ -37,6 +37,7 @@ public class ResultSetTuple
   private ResultSet resultSet;
   private final int[] map;
   private final ResultSetTuple[] subs;
+  private int resultColumnCount;
   
   public ResultSetTuple(FieldSet fieldSet)
   { 
@@ -53,7 +54,9 @@ public class ResultSetTuple
     subs=new ResultSetTuple[fieldSet.getFieldCount()];
     if (foldTree!=null)
     {
-      int i=0;
+      
+      int i=(baseExtent!=null)
+            ?((ResultSetTuple) baseExtent).getResultColumnCount():0;
       for (LinkedTree<Integer> node: foldTree)
       { 
         if (node.get()!=null)
@@ -68,18 +71,25 @@ public class ResultSetTuple
               );
         }
         i++;
+        
       }
+      resultColumnCount=i;
     }
     else
     { defaultMap();
     }
   }
-      
+
+  int getResultColumnCount()
+  { return resultColumnCount;
+  }
+  
   private void defaultMap()
   {
     for (Field field: fieldSet.fieldIterable())
     { map[field.getIndex()]=field.getIndex()+1;
     }
+    resultColumnCount=fieldSet.getFieldCount();
   }
   
   /**
@@ -94,6 +104,9 @@ public class ResultSetTuple
       if (tuple!=null)
       { tuple.setResultSet(resultSet);
       }
+    }
+    if (baseExtent!=null)
+    { ((ResultSetTuple) baseExtent).setResultSet(resultSet);
     }
   }
   
@@ -124,5 +137,15 @@ public class ResultSetTuple
    */
   public boolean isMutable()
   { return true;
+  }
+
+  @Override
+  protected AbstractTuple createBaseExtent(FieldSet fieldSet)
+  { return new ResultSetTuple(fieldSet);
+  }
+
+  @Override
+  protected AbstractTuple createBaseExtent(Tuple tuple) throws DataException
+  { throw new UnsupportedOperationException("A ResultSetTuple cannot be written to");
   }
 }

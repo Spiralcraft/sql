@@ -17,7 +17,9 @@ package spiralcraft.sql.data;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.FieldSet;
+import spiralcraft.data.Identifier;
 import spiralcraft.data.Tuple;
+import spiralcraft.data.Type;
 import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.spi.ArrayTuple;
@@ -35,6 +37,7 @@ public class SerialResultSetCursor
   protected ResultSet resultSet;
   protected boolean autoClose=true;
   protected boolean noCopy=false;
+  protected Identifier relationId=null;
   
   /**
    * 
@@ -86,6 +89,18 @@ public class SerialResultSetCursor
   { return fieldSet;
   }
 
+  public Type<?> getResultType()
+  { return fieldSet.getType();
+  }
+  
+  public Identifier getRelationId()
+  { return relationId;
+  }
+  
+  public void setRelationId(Identifier id)
+  { relationId=id;
+  }
+  
   /**
    * <P>Specify whether to avoid creating a new Tuple for every result row.
    * 
