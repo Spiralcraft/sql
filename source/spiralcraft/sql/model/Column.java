@@ -21,6 +21,7 @@ import spiralcraft.sql.SqlType;
 import spiralcraft.sql.ddl.ColumnDefinition;
 import spiralcraft.sql.ddl.AlterTableStatement;
 import spiralcraft.sql.ddl.AddColumnDefinition;
+import spiralcraft.sql.ddl.AlterColumnType;
 import spiralcraft.sql.ddl.DDLStatement;
 
 import spiralcraft.sql.dml.ValueExpression;
@@ -178,6 +179,17 @@ public class Column
             (generateColumnDefinition(dialect)
             )
           );
+      ret.add(statement);
+    }
+    else if (storeVersion.getLength()!=length)
+    {
+      // Alter column here
+      AlterTableStatement statement
+      =table.createAlterTableStatement
+        (new AlterColumnType
+          (generateColumnDefinition(dialect)
+          )
+        );
       ret.add(statement);
     }
     else
