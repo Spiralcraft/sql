@@ -1,7 +1,7 @@
 <project name="build-common">
 	<!--
 	  Master Template
-	  Last updated 2008-06-06 19:41
+	  Last updated 2008-07-28 16:47
   -->
 
   <property file="build.number"/>
@@ -15,6 +15,7 @@
   <target name="build" depends="clean,compile,jar,smoke" />
   
   <target name="clean">
+    <mkdir dir="out"/>
     <delete>
       <fileset dir="out" includes="**/*"/>
     </delete>
@@ -29,7 +30,12 @@
       destdir="out"
       debug="true"
       deprecation="true"
-    />
+      compiler="modern"
+      fork="true"
+      >
+      <compilerarg value="-Xlint"/>
+    </javac>
+    
     <copy toDir="out">
       <fileset
         dir="source"
@@ -57,7 +63,7 @@
       destfile="lib/spiralcraft-${module}.jar" 
       basedir="out"
       level="9"
-            >
+      > 
       <Manifest>
         <attribute name="Class-Path" value="${manifest.class.path}"/>
         <attribute name="Main-Class" value="${manifest.main.class}"/>   
