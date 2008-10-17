@@ -41,6 +41,7 @@ public class TableReference
     this.correlation=correlation;
   }
 
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (tableName!=null)

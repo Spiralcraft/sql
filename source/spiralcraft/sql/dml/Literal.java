@@ -24,6 +24,7 @@ public class Literal
 {
   protected String value;
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { buffer.append(value);
   }

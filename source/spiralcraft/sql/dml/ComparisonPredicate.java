@@ -37,6 +37,7 @@ public class ComparisonPredicate
     this.operator=operator;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     

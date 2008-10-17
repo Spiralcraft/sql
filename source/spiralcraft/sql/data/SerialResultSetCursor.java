@@ -22,7 +22,12 @@ import spiralcraft.data.Tuple;
 import spiralcraft.data.Type;
 import spiralcraft.data.access.SerialCursor;
 
+import spiralcraft.data.lang.TupleReflector;
 import spiralcraft.data.spi.ArrayTuple;
+import spiralcraft.lang.AccessException;
+import spiralcraft.lang.BindException;
+import spiralcraft.lang.Channel;
+import spiralcraft.lang.spi.AbstractChannel;
 
 import spiralcraft.util.tree.LinkedTree;
 
@@ -139,6 +144,32 @@ public class SerialResultSetCursor
     catch (SQLException x)
     { throw new DataException("Error advancing ResultSet: "+x,x);
     }
+  }
+
+  @Override
+  public Channel<Tuple> bind() throws BindException
+  {
+    return new AbstractChannel<Tuple>
+      (TupleReflector.getInstance(fieldSet))
+    {
+
+      @Override
+      protected Tuple retrieve()
+      { 
+        try
+        { return dataGetTuple();
+        }
+        catch (DataException x)
+        { throw new AccessException(x);
+        }
+      }
+
+      @Override
+      protected boolean store(Tuple val) throws AccessException
+      { return false;
+      } 
+      
+    };
   }
   
 }

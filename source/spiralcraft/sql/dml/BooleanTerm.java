@@ -32,6 +32,7 @@ public class BooleanTerm
     this.booleanFactor=booleanFactor;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     booleanTerm.write(buffer,indent, parameterCollector);
@@ -40,6 +41,7 @@ public class BooleanTerm
     booleanFactor.write(buffer,indent, parameterCollector);
   }
   
+  @Override
   public int getPrecedence()
   { return 2;
   }

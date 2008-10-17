@@ -19,6 +19,7 @@ public abstract class Predicate
   extends BooleanCondition
 {
   
+  @Override
   public int getPrecedence()
   { return 6;
   }

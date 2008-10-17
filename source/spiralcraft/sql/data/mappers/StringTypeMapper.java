@@ -27,10 +27,12 @@ public class StringTypeMapper
     extends TypeMapper<StringType>
 {
 
+  @Override
   public Class<StringType> getTypeClass()
   { return StringType.class;
   }
   
+  @Override
   public SqlType<?> getSqlType(StringType type)
   {
     

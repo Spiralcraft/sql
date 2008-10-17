@@ -41,6 +41,7 @@ public class IdentifierChain
   }
   
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\"").append(identifier).append("\"");

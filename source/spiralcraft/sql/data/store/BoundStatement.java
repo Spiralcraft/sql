@@ -147,7 +147,7 @@ public abstract class BoundStatement
     }
     else if (dataFields!=null && fieldPath.size()==1)
     { 
-      Field field=dataFields.getFieldByName(fieldPath.getElement(0));
+      Field<?> field=dataFields.getFieldByName(fieldPath.getElement(0));
       if (field!=null)
       { return new IdentifierChain(field.getName());
       }

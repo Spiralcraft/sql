@@ -34,6 +34,7 @@ public class DerivedColumn
     this.columnName=columnName;
   }
 
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     valueExpression.write(buffer, indent, parameterCollector);

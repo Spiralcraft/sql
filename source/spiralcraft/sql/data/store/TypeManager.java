@@ -107,7 +107,7 @@ public class TypeManager
   public void register(RegistryNode node)
   { 
     node.registerInstance(TypeManager.class,this);
-    store=(SqlStore) node.findInstance(SqlStore.class);
+    store=node.findInstance(SqlStore.class);
     if (dialect==null)
     { dialect=new Dialect();
     }

@@ -157,7 +157,7 @@ public class Updater
   
   private void buildDirtyPaths(DeltaTuple tuple,ArrayList<Path> paths,Path parentPath)
   {
-    for (Field field: tuple.getDirtyFields())
+    for (Field<?> field: tuple.getDirtyFields())
     {
       
       Path subPath=parentPath.append(field.getName());
@@ -207,6 +207,7 @@ public class Updater
       parentFocus=context;
     }
     
+    @Override
     public void dataInitialize(FieldSet fieldSet) 
       throws DataException
     {
@@ -215,6 +216,7 @@ public class Updater
       this.connection=store.allocateConnection();
     }
    
+    @Override
     public void dataAvailable(DeltaTuple tuple)
       throws DataException
     {
@@ -235,6 +237,7 @@ public class Updater
       
     }
     
+    @Override
     public void dataFinalize() throws DataException
     {
       super.dataFinalize();

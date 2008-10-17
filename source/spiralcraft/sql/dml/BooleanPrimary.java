@@ -31,10 +31,12 @@ public class BooleanPrimary
   { this.booleanCondition=booleanCondition;
   }
   
+  @Override
   public int getPrecedence()
   { return 5;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (predicate!=null)

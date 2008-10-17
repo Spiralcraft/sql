@@ -26,6 +26,7 @@ public class JoinedTable
   private TableReference rightTableReference;
   
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     leftTableReference.write(buffer,indent, parameterCollector);

@@ -86,7 +86,7 @@ public class ResultSetTuple
   
   private void defaultMap()
   {
-    for (Field field: fieldSet.fieldIterable())
+    for (Field<?> field: fieldSet.fieldIterable())
     { map[field.getIndex()]=field.getIndex()+1;
     }
     resultColumnCount=fieldSet.getFieldCount();
@@ -135,6 +135,7 @@ public class ResultSetTuple
    *@return true, because this Tuple is simply a view of the ResultSet which can
    *  be advanced at any time
    */
+  @Override
   public boolean isMutable()
   { return true;
   }

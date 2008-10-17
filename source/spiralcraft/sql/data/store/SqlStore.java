@@ -101,7 +101,7 @@ public class SqlStore
 
   public void register(RegistryNode node)
   { 
-    this.space=(Space) node.findInstance(Space.class);
+    this.space=node.findInstance(Space.class);
     registryNode=node.createChild(SqlStore.class,this);
     RegistryNode childNode
       =registryNode.createChild("typeManager");

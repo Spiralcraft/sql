@@ -22,6 +22,7 @@ import spiralcraft.sql.SqlFragment;
 public class DerivedTable
   extends SqlFragment
 {
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
   }

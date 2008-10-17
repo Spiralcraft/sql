@@ -26,6 +26,7 @@ public class AlterColumnType
   { super(columnDefinition);
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer

@@ -21,6 +21,7 @@ public class Index
   private Table table;
   private String name;
   
+  @Override
   public boolean isUnique()
   { return unique;
   }

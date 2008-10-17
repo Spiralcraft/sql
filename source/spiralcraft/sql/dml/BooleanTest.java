@@ -35,6 +35,7 @@ public class BooleanTest
     this.truthValue=truthValue;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     booleanPrimary.write(buffer,indent, parameterCollector);
@@ -45,6 +46,7 @@ public class BooleanTest
     truthValue.write(buffer,indent, parameterCollector);
   }
   
+  @Override
   public int getPrecedence()
   { return 4;
   }

@@ -68,6 +68,7 @@ public class BoundSelection
   /**
    * Compose the Select by adding to the TypeAccess
    */
+  @Override
   public BoundQueryStatement composeStatement()
     throws DataException
   {

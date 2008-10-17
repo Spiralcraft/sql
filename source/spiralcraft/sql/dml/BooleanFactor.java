@@ -34,6 +34,7 @@ public class BooleanFactor
     this.booleanTest=booleanTest;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     if (not)
@@ -42,6 +43,7 @@ public class BooleanFactor
     booleanTest.write(buffer,indent, parameterCollector);
   }
   
+  @Override
   public int getPrecedence()
   { return 3;
   }

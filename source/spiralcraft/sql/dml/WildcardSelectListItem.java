@@ -23,6 +23,7 @@ public class WildcardSelectListItem
 {
   private String qualifier;
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { buffer.append(qualifier);
   }

@@ -36,6 +36,8 @@ public class ResultSetScheme
   extends SchemeImpl
 {
   
+  @SuppressWarnings("unchecked") 
+  // FieldConstruction, unknown specific type
   public ResultSetScheme(ResultSetMetaData metadata)
     throws DataException
   {
@@ -44,7 +46,7 @@ public class ResultSetScheme
       int count=metadata.getColumnCount();
       for (int i=1;i<count+1;i++)
       { 
-        FieldImpl field=new FieldImpl();
+        FieldImpl field=new FieldImpl<Object>();
         String mdName=metadata.getColumnName(i);
         
         // TODO: Screen for illegal characters
@@ -67,9 +69,9 @@ public class ResultSetScheme
         }
 
         field.setType
-        (TypeResolver.getTypeResolver()
-            .resolveFromClass(typeClass)
-        );
+         (TypeResolver.getTypeResolver()
+           .resolveFromClass(typeClass)
+         );
         
         addField(field);
       }
@@ -79,6 +81,7 @@ public class ResultSetScheme
     }
   }
   
+  @SuppressWarnings("unchecked") // Unknown Field type
   public void readResultSet(ResultSet rs,EditableTuple tuple)
     throws SQLException,DataException
   {

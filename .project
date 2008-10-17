@@ -3,6 +3,7 @@
 	<name>spiralcraft-modules-sql</name>
 	<comment></comment>
 	<projects>
+		<project>spiralcraft-modules-core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

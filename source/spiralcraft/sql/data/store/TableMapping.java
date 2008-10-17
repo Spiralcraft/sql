@@ -121,7 +121,7 @@ public class TableMapping
     if (primaryKeyWhereClause==null)
     {
       BooleanCondition condition=null;
-      for (Field field:type.getScheme().getPrimaryKey().fieldIterable())
+      for (Field<?> field:type.getScheme().getPrimaryKey().fieldIterable())
       {
         ColumnMapping mapping=getMappingForField(field.getName());
         if (condition==null)
@@ -215,7 +215,7 @@ public class TableMapping
     return columnMappingTree;
   }
   
-  public LinkedTree<ColumnMapping> getColumnMappings(Field field)
+  public LinkedTree<ColumnMapping> getColumnMappings(Field<?> field)
   {
     
     ColumnMapping columnMapping
@@ -269,7 +269,7 @@ public class TableMapping
     ArrayList<ColumnMapping> orderedColumns
       =new ArrayList<ColumnMapping>();
     
-    for (Field field: type.getScheme().fieldIterable())
+    for (Field<?> field: type.getScheme().fieldIterable())
     {
       ColumnMapping columnMapping=getMappingForField(field.getName());
       if (columnMapping==null)
@@ -303,11 +303,11 @@ public class TableMapping
       }
     }
 
-    for (Key key: type.getScheme().keyIterable())
+    for (Key<?> key: type.getScheme().keyIterable())
     { 
       KeyConstraint constraint=new KeyConstraint();
       ArrayList<Column> keyCols=new ArrayList<Column>();
-      for (Field field:key.fieldIterable())
+      for (Field<?> field:key.fieldIterable())
       { 
         ColumnMapping mapping=getMappingForField(field.getName());
         if (mapping==null)
@@ -335,6 +335,6 @@ public class TableMapping
     }
     tableNameSqlFragment=new TableName(schemaName,tableName);
 
-    updater=new Updater((SqlStore) node.findInstance(SqlStore.class),this);
+    updater=new Updater(node.findInstance(SqlStore.class),this);
   }
 }

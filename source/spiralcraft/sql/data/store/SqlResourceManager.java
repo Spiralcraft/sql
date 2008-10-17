@@ -62,6 +62,7 @@ public class SqlResourceManager
     
   }
   
+  @Override
   public SqlBranch createBranch(Transaction transaction)
     throws TransactionException
   { return new SqlBranch(this);

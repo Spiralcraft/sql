@@ -65,6 +65,7 @@ public class QueryTool
     executionContext=context;
     new Arguments()
     { 
+      @Override
       protected boolean processOption(String option)
       { 
         if (option=="database")
@@ -107,6 +108,7 @@ public class QueryTool
         
       }
 
+      @Override
       protected boolean processArgument(String argument)
       { 
         addSql(argument);

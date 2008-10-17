@@ -513,11 +513,11 @@ public class Loader
       {
         // Check keys
         if (_insertKeyFields!=null)
-        { new KeyImpl(fieldSet,_insertKeyFields).bind(dataFocus);
+        { new KeyImpl<Tuple>(fieldSet,_insertKeyFields).bindChannel(dataFocus);
         }
       
         if (_updateKeyFields!=null)
-        { new KeyImpl(fieldSet,_updateKeyFields).bind(dataFocus);
+        { new KeyImpl<Tuple>(fieldSet,_updateKeyFields).bindChannel(dataFocus);
         }
       }
       catch (BindException x)
@@ -558,8 +558,8 @@ public class Loader
 	{
     private TupleFocus<Tuple> dataFocus;
     private FieldSet fieldSet;
-    private KeyImpl insertKey;
-    private KeyImpl updateKey;
+    private KeyImpl<Tuple> insertKey;
+    private KeyImpl<Tuple> updateKey;
     private Channel<Tuple> insertKeyBinding;
     private Channel<Tuple> updateKeyBinding;
 
@@ -576,14 +576,14 @@ public class Loader
         // Check keys
         if (_insertKeyFields!=null)
         { 
-          insertKey=new KeyImpl(fieldSet,_insertKeyFields);
-          insertKeyBinding=insertKey.bind(dataFocus);
+          insertKey=new KeyImpl<Tuple>(fieldSet,_insertKeyFields);
+          insertKeyBinding=insertKey.bindChannel(dataFocus);
         }
       
         if (_updateKeyFields!=null)
         { 
-          updateKey=new KeyImpl(fieldSet,_updateKeyFields);
-          updateKeyBinding=updateKey.bind(dataFocus);
+          updateKey=new KeyImpl<Tuple>(fieldSet,_updateKeyFields);
+          updateKeyBinding=updateKey.bindChannel(dataFocus);
         }
       }
       catch (BindException x)
@@ -614,7 +614,7 @@ public class Loader
     { 
     }
 
-    private int translateType(Field field)
+    private int translateType(Field<?> field)
     {
       if (field.getType().getNativeClass()!=null)
       { return SqlType.getStandardSqlType(field.getType().getNativeClass()).getTypeId();
@@ -657,7 +657,7 @@ public class Loader
           int keyCount=0;
           for (int i=0;i<numFields;i++)
           { 
-            Field field=fieldSet.getFieldByIndex(i);
+            Field<?> field=fieldSet.getFieldByIndex(i);
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
@@ -696,7 +696,7 @@ public class Loader
           int keyCount=0;
           for (int i=0;i<numFields;i++)
           { 
-            Field field=fieldSet.getFieldByIndex(i);
+            Field<?> field=fieldSet.getFieldByIndex(i);
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
             
@@ -741,7 +741,7 @@ public class Loader
           int count=0;
           for (int i=0;i<numFields;i++)
           { 
-            Field field=fieldSet.getFieldByIndex(i);
+            Field<?> field=fieldSet.getFieldByIndex(i);
             _typeMap[count]=translateType(field);
             String fieldName=field.getName();
 
@@ -771,7 +771,7 @@ public class Loader
           int count=0;
           for (int i=0;i<numFields;i++)
           { 
-            Field field=fieldSet.getFieldByIndex(i);
+            Field<?> field=fieldSet.getFieldByIndex(i);
             _typeMap[count]=translateType(field);
             
             if (count>0)
@@ -819,7 +819,7 @@ public class Loader
         if (_count>=_skipCount)
         {
           int fieldCount=0;
-          for (Field field: fieldSet.fieldIterable())
+          for (Field<?> field: fieldSet.fieldIterable())
           {
             // XXX Use field bindings
             Object dataObject=field.getValue(dataGetTuple());

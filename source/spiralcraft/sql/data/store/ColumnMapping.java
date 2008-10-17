@@ -48,7 +48,7 @@ public class ColumnMapping
 {
   private RegistryNode registryNode;
   
-  private Field field;
+  private Field<?> field;
   private String fieldName;
   private String columnName;
   private Column column;
@@ -81,14 +81,14 @@ public class ColumnMapping
   { return flattenedChildren!=null;
   }
 
-  public void setField(Field field)
+  public void setField(Field<?> field)
   { 
     this.field=field;
     fieldName=field.getName();
     columnName=field.getName();
   }
   
-  public Field getField()
+  public Field<?> getField()
   { return field;
   }
   
@@ -130,7 +130,7 @@ public class ColumnMapping
     flattenedChildren=new ArrayList<ColumnMapping>
       (field.getType().getScheme().getFieldCount());
     
-    for (Field subField : field.getType().getScheme().fieldIterable())
+    for (Field<?> subField : field.getType().getScheme().fieldIterable())
     { 
       ColumnMapping subMapping = new ColumnMapping();
       subMapping.setField(subField);
@@ -209,8 +209,7 @@ public class ColumnMapping
       if (column==null)
       {
         TypeManager typeManager
-          =(TypeManager) registryNode.findInstance
-            (TypeManager.class);
+          =registryNode.findInstance(TypeManager.class);
         
         column=new Column();
         column.setName(columnName);

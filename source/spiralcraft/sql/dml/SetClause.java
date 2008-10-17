@@ -32,6 +32,7 @@ public class SetClause
     this.sourceExpression=sourceExpression;
   }
 
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     

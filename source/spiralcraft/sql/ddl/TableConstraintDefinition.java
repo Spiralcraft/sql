@@ -27,6 +27,7 @@ public class TableConstraintDefinition
   { this.constraint=constraint;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { constraint.write(buffer,indent, parameterCollector);
   }

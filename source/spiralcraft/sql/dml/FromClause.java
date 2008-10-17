@@ -32,6 +32,7 @@ public class FromClause
   { tableReference=new TableReference(schemaName,tableName,correlation);
   }
 
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     buffer.append("\r\n").append(indent).append("FROM ");

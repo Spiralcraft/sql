@@ -27,10 +27,12 @@ public class BigDecimalTypeMapper
     extends TypeMapper<BigDecimalType>
 {
 
+  @Override
   public Class<BigDecimalType> getTypeClass()
   { return BigDecimalType.class;
   }
   
+  @Override
   public SqlType<?> getSqlType(BigDecimalType type)
   { return dialect.getSqlType(Types.NUMERIC);
   }

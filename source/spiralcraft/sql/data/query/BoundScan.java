@@ -45,6 +45,7 @@ public class BoundScan
   { super(query,parentFocus,store);
   }
   
+  @Override
   public BoundQueryStatement composeStatement()
     throws DataException
   {

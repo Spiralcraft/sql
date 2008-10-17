@@ -33,10 +33,12 @@ public class SearchCondition
     this.booleanTerm=booleanTerm;
   }
   
+  @Override
   public int getPrecedence()
   { return 1;
   }
   
+  @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
     searchCondition.write(buffer,indent, parameterCollector);

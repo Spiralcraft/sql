@@ -51,6 +51,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
   public abstract BoundQueryStatement composeStatement()
     throws DataException;
 
+  @Override
   public void resolve()
     throws DataException
   {
@@ -62,6 +63,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
     statement.bindParameters(focus);
   }
   
+  @Override
   public SerialCursor<Tuple> execute()
     throws DataException
   { 

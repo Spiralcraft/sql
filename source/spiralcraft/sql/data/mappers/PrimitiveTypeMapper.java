@@ -27,10 +27,12 @@ public class PrimitiveTypeMapper<T>
     extends TypeMapper<PrimitiveTypeImpl>
 {
 
+  @Override
   public Class<PrimitiveTypeImpl> getTypeClass()
   { return PrimitiveTypeImpl.class;
   }
   
+  @Override
   public SqlType getSqlType(PrimitiveTypeImpl type)
   {
      return dialect.getSqlType
