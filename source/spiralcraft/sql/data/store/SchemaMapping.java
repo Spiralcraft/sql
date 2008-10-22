@@ -61,8 +61,7 @@ public class SchemaMapping
       TableMapping mapping=new TableMapping();
       mapping.setSchemaName(schemaName);
       mapping.setType(type);
-      mapping.setTableName
-        (type.getPackageURI().relativize(type.getURI()).getPath());
+      mapping.setTableName(table.getStoreName());
       mappings.add(mapping);
     }
     return mappings.toArray(new TableMapping[mappings.size()]);
