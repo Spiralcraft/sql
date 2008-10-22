@@ -16,6 +16,7 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.data.Type;
 import spiralcraft.data.access.Schema;
+import spiralcraft.data.access.Table;
 
 import java.util.ArrayList;
 
@@ -54,8 +55,9 @@ public class SchemaMapping
     ArrayList<TableMapping> mappings
       =new ArrayList<TableMapping>();
    
-    for (Type<?> type: schema.getTypes())
+    for (Table table: schema.getTables())
     {
+      Type<?> type=table.getType();
       TableMapping mapping=new TableMapping();
       mapping.setSchemaName(schemaName);
       mapping.setType(type);

@@ -210,6 +210,7 @@ public class ColumnMapping
       {
         TypeManager typeManager
           =registryNode.findInstance(TypeManager.class);
+
         
         column=new Column();
         column.setName(columnName);

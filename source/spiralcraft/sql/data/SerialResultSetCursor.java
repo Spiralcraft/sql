@@ -22,12 +22,11 @@ import spiralcraft.data.Tuple;
 import spiralcraft.data.Type;
 import spiralcraft.data.access.SerialCursor;
 
-import spiralcraft.data.lang.TupleReflector;
+import spiralcraft.data.lang.CursorBinding;
 import spiralcraft.data.spi.ArrayTuple;
-import spiralcraft.lang.AccessException;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Channel;
-import spiralcraft.lang.spi.AbstractChannel;
+
 
 import spiralcraft.util.tree.LinkedTree;
 
@@ -43,6 +42,8 @@ public class SerialResultSetCursor
   protected boolean autoClose=true;
   protected boolean noCopy=false;
   protected Identifier relationId=null;
+  private static CursorBinding<Tuple,?> binding;
+  
   
   /**
    * 
@@ -53,6 +54,7 @@ public class SerialResultSetCursor
    *   an immutable Tuple every time the cursor is advanced.
    * @throws DataException
    */
+  @SuppressWarnings("unchecked") // Not genericized
   public SerialResultSetCursor(ResultSet resultSet)
     throws DataException
   { 
@@ -68,14 +70,28 @@ public class SerialResultSetCursor
     }
     tuple=new ResultSetTuple(fieldSet);
     tuple.setResultSet(resultSet);
+    try
+    { binding=new CursorBinding(this);
+    }
+    catch (BindException x)
+    { throw new DataException("Error creating cursor binding",x);
+    }
   }
   
+  @SuppressWarnings("unchecked") // Not genericized
   public SerialResultSetCursor(FieldSet fieldSet,ResultSet resultSet)
+    throws DataException
   {
     this.resultSet=resultSet;
     this.fieldSet=fieldSet;
     tuple=new ResultSetTuple(fieldSet);
     tuple.setResultSet(resultSet);
+    try
+    { binding=new CursorBinding(this);
+    }
+    catch (BindException x)
+    { throw new DataException("Error creating cursor binding",x);
+    }
   }
   
   public SerialResultSetCursor
@@ -147,29 +163,10 @@ public class SerialResultSetCursor
   }
 
   @Override
-  public Channel<Tuple> bind() throws BindException
-  {
-    return new AbstractChannel<Tuple>
-      (TupleReflector.getInstance(fieldSet))
-    {
-
-      @Override
-      protected Tuple retrieve()
-      { 
-        try
-        { return dataGetTuple();
-        }
-        catch (DataException x)
-        { throw new AccessException(x);
-        }
-      }
-
-      @Override
-      protected boolean store(Tuple val) throws AccessException
-      { return false;
-      } 
-      
-    };
+  public Channel<Tuple> bind()
+    throws BindException
+  { return binding;
   }
+
   
 }

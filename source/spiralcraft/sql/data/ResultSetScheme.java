@@ -36,8 +36,7 @@ public class ResultSetScheme
   extends SchemeImpl
 {
   
-  @SuppressWarnings("unchecked") 
-  // FieldConstruction, unknown specific type
+  @SuppressWarnings("unchecked") // Inherently unsafe ops
   public ResultSetScheme(ResultSetMetaData metadata)
     throws DataException
   {
@@ -69,9 +68,10 @@ public class ResultSetScheme
         }
 
         field.setType
-         (TypeResolver.getTypeResolver()
-           .resolveFromClass(typeClass)
-         );
+          (TypeResolver.getTypeResolver()
+            .resolveFromClass(typeClass)
+          );
+
         
         addField(field);
       }
@@ -81,7 +81,8 @@ public class ResultSetScheme
     }
   }
   
-  @SuppressWarnings("unchecked") // Unknown Field type
+
+  @SuppressWarnings("unchecked") // Inherently unsafe ops
   public void readResultSet(ResultSet rs,EditableTuple tuple)
     throws SQLException,DataException
   {
