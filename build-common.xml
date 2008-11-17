@@ -1,15 +1,23 @@
 <project name="build-common">
 	<!--
 	  Master Template
-	  Last updated 2008-07-28 16:47
+	  Last updated 2008-11-03 20:16
   -->
 
-  <property file="build.number"/>
+  <tstamp>
+    <format property="now" pattern="yyyyMMdd-HHmmss"/>
+  </tstamp>
+
+  <property environment="env"/>
+  
+  <exec executable="hostname" outputproperty="host.name"/>
+  
+  <property name="build.id" value="${user.name}@${host.name}-${now}"/>
+  
   <property 
-    name="build.name" value="spiralcraft-${module}-${version}-b${build.number}"
+    name="build.name" value="spiralcraft-${module}-${version}-${build.id}"
   />
   <property name="manifest.class.path" value="" />
-  <property environment="env"/>
   <property name="spiralcraft.build" value="../../build"/>
   
   <target name="build" depends="clean,compile,jar,smoke" />
@@ -22,7 +30,6 @@
   </target>
   
   <target name="compile">
-    <buildnumber/>
     <echo message= "build: ${build.name}"/>
     <javac 
       classpath="${classpath}"
@@ -36,7 +43,10 @@
       <compilerarg value="-Xlint"/>
     </javac>
     
-    <copy toDir="out">
+    <copy toDir="out"
+      preservelastmodified="true"
+      failonerror="true"
+      >
       <fileset
         dir="source"
         excludes="**/*.class,**/*.java"
@@ -44,6 +54,11 @@
         
       </fileset>
     </copy>
+    
+    <propertyfile file="out/build-${build.name}"/>
+    <propertyfile file="build.name.local">
+      <entry key="build.name" value="${build.name}"/>
+    </propertyfile>
   </target>
 
   <target name="smoke" depends="jar">
@@ -63,11 +78,12 @@
       destfile="lib/spiralcraft-${module}.jar" 
       basedir="out"
       level="9"
-      > 
+      >
       <Manifest>
         <attribute name="Class-Path" value="${manifest.class.path}"/>
         <attribute name="Main-Class" value="${manifest.main.class}"/>   
       </Manifest>
+      <include name="build*"/>
       <include name="spiralcraft/**/*.class"/>
       <include name="spiralcraft/**/*.xml"/>
       <include name="spiralcraft/**/*.tgl"/>
@@ -85,7 +101,7 @@
       header="spiralcraft-${module}-${version} API"
       destdir="docs/api"
       author="Spiralcraft, Inc."
-      version="${version}-b${build.number}"
+      version="${version}-b${build.name}"
       use="true"
       windowtitle="spiralcraft-${module}-${version} API"
       doctitle="&lt;h1&gt;spiralcraft-${module}-${version} API&lt;/h1&gt;"

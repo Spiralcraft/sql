@@ -60,9 +60,9 @@ public class QueryTool
   private int fetchSize=1000;
   private boolean update=false;
   
-  public void execute(final ExecutionContext context,String[] args)
+  public void execute(String ... args)
   {
-    executionContext=context;
+    executionContext=ExecutionContext.getInstance();
     new Arguments()
     { 
       @Override
@@ -74,7 +74,7 @@ public class QueryTool
           try
           { setDataSource
               (new ResourceDataSource
-                 (context.canonicalize
+                 (executionContext.canonicalize
                    (URI.create(uri))
                  )
                );

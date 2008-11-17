@@ -117,11 +117,13 @@ public class Loader
   }
 
   
-  public void execute(ExecutionContext context,String[] args)
+  public void execute(String ... args)
   {
+    ExecutionContext context
+      =ExecutionContext.getInstance();
     if (args.length==0)
     {
-      System.err.println(usage());
+      context.err().println(usage());
       return;
     }
     try
