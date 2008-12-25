@@ -5,6 +5,6 @@
   <property name="classpath" value="lib/spiralcraft-core.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
 
-  <import file="build-common.xml"/>
+  <import file="../../build/build-common.xml"/>
 </project>
 
