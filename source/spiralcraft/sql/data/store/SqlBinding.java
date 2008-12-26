@@ -30,6 +30,11 @@ public class SqlBinding<T extends Tuple,C extends Cursor<T>>
   { super(cursor);
   }
   
+  /**
+   * 
+   * @param alias
+   * @return
+   */
   public TableMapping getTableMapping(String alias)
   {
     return null;

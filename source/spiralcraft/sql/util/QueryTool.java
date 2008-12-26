@@ -21,7 +21,6 @@ import spiralcraft.sql.data.SerialResultSetCursor;
 
 import spiralcraft.vfs.Resolver;
 import spiralcraft.vfs.Resource;
-import spiralcraft.vfs.UnresolvableURIException;
 import spiralcraft.vfs.StreamUtil;
 
 import spiralcraft.util.Arguments;
@@ -193,7 +192,7 @@ public class QueryTool
    
  
   public void output(ResultSet rs)
-    throws SQLException,IOException,DataException
+    throws DataException
   { 
     SerialResultSetCursor cursor=new SerialResultSetCursor(rs);
     
@@ -207,7 +206,7 @@ public class QueryTool
   }
   
   private void openConnection()
-    throws IOException,SQLException,UnresolvableURIException
+    throws SQLException
   { 
     connection=dataSource.getConnection();
     connection.setAutoCommit(false);
@@ -235,12 +234,7 @@ public class QueryTool
       { 
         rs=st.executeQuery(sql);
         rs.setFetchSize(fetchSize);
-        try
-        { output(rs);
-        }
-        catch (IOException x)
-        { error("Error writing output for '"+sql+"'",x);
-        }
+        output(rs);
       }
       connection.commit();
     }

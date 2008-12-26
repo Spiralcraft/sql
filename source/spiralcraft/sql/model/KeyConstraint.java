@@ -118,6 +118,9 @@ public class KeyConstraint
     return fieldNames;
   }
   
+  /**
+   * @param dialect
+   */
   public TableConstraintDefinition generateConstraintDefinition(Dialect dialect)
   { 
     if (primary)

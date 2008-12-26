@@ -800,7 +800,6 @@ public class Loader
 
    
 		public void performSql()
-      throws DataException
 		{
       boolean notAllNull=false;
       if (insertKeyBinding!=null)

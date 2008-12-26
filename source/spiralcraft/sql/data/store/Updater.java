@@ -226,13 +226,13 @@ public class Updater
       }
       focus.setTuple(tuple);
       if (tuple.getOriginal()==null)
-      { execute(getInsertStatement(tuple),tuple);
+      { execute(getInsertStatement(tuple));
       }
       else if (tuple.isDelete())
-      { execute(getDeleteStatement(),tuple);
+      { execute(getDeleteStatement());
       }
       else
-      { execute(getUpdateStatement(tuple),tuple);
+      { execute(getUpdateStatement(tuple));
       }
       
     }
@@ -249,7 +249,7 @@ public class Updater
       }
     }
 
-    private void execute(SqlFragment statement,DeltaTuple tuple)
+    private void execute(SqlFragment statement)
       throws DataException
     { 
       if (statement==null)

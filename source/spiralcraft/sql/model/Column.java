@@ -156,6 +156,9 @@ public class Column
   
 
   
+  /**
+   * @param dialect
+   */
   public ColumnDefinition generateColumnDefinition(Dialect dialect)
   { return new ColumnDefinition(name,type.createDDL(length,decimalDigits));
   }
