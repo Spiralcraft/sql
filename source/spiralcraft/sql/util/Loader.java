@@ -20,7 +20,7 @@ import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.FieldSet;
 
-import spiralcraft.data.access.DataConsumer; 
+import spiralcraft.data.DataConsumer; 
 
 import spiralcraft.data.flatfile.Parser;
 import spiralcraft.data.flatfile.ParseException;

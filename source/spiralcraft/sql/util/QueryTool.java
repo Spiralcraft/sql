@@ -30,7 +30,7 @@ import spiralcraft.data.Tuple;
 
 import spiralcraft.data.flatfile.Writer;
 
-import spiralcraft.data.access.DataConsumer;
+import spiralcraft.data.DataConsumer;
 
 
 import java.net.URI;

@@ -19,7 +19,7 @@ import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.Field;
 import spiralcraft.data.FieldSet;
 
-import spiralcraft.data.access.DataConsumer;
+import spiralcraft.data.DataConsumer;
 
 import spiralcraft.data.lang.TupleFocus;
 

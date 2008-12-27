@@ -17,7 +17,7 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.lang.Focus;
 
-import spiralcraft.data.access.DataConsumer;
+import spiralcraft.data.DataConsumer;
 import spiralcraft.data.access.Store;
 
 import spiralcraft.data.DataException;
@@ -51,7 +51,7 @@ import javax.sql.DataSource;
 
 import java.util.List;
 
-import spiralcraft.builder.LifecycleException;
+import spiralcraft.common.LifecycleException;
 
 
 /**
