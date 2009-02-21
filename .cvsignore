@@ -1,4 +1,5 @@
 out
+bin
 *.local
 test-out
 $jarplug.work
