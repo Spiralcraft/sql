@@ -101,7 +101,7 @@ public class Loader
   private boolean _checkKey=false;
   private File _discardFile=null;
   private PrintWriter _discardWriter;
-  private boolean _noTypes;
+  private boolean _implicitTypes;
   private char _delimiter=',';
   private boolean _delete=false;
   private boolean _gzip=false;
@@ -199,8 +199,8 @@ public class Loader
           else if (option.equals("discardfile"))
           { setDiscardFile(new File(args[++i]));
           }
-          else if (option.equals("notypes"))
-          { setNoTypes(true);
+          else if (option.equals("useImplicitTypes"))
+          { setUseImplicitTypes(true);
           }
           else if (option.equals("delimiter"))
           { setDelimiter(args[++i].charAt(0));
@@ -370,7 +370,7 @@ public class Loader
       System.err.println("Creating parser");
       parser=new Parser();
       parser.setReadHeader(true);
-      parser.setNoTypes(_noTypes);
+      parser.setUseImplicitTypes(_implicitTypes);
       parser.setDelimiter(_delimiter);
     }
 
@@ -489,8 +489,8 @@ public class Loader
   { _discardFile=discardFile;
   }
 
-  public void setNoTypes(boolean noTypes)
-  { _noTypes=noTypes;
+  public void setUseImplicitTypes(boolean implicitTypes)
+  { _implicitTypes=implicitTypes;
   }
 
   public void setDelimiter(char delimiter)

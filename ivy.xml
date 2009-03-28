@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+  <info organisation="spiralcraft" module="sql">
+  </info>
+  <dependencies>
+    <dependency
+      org="spiralcraft" 
+      name="core" 
+      rev="latest.integration"
+    />
+  </dependencies>
+</ivy-module>

@@ -140,6 +140,14 @@ public class ResultSetTuple
   { return true;
   }
 
+  /**
+   *@return true, because this Tuple is simply a view of the ResultSet which can
+   *  be advanced at any time
+   */
+  public boolean isVolatile()
+  { return true;
+  }
+  
   @Override
   protected AbstractTuple createBaseExtent(FieldSet fieldSet)
   { return new ResultSetTuple(fieldSet);

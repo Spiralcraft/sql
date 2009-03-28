@@ -195,7 +195,7 @@ public class SqlStore
     return null;
   }
   
-  public BoundQuery<?,?> query(Query query,Focus<?> focus)
+  public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
     throws DataException
   { 
     if (query instanceof Selection)
