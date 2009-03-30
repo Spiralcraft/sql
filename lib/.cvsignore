@@ -1,2 +1,2 @@
-spiralcraft-sql.jar
-spiralcraft-sql-test.jar
+*.jar
+ivy.xml
