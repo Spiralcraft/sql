@@ -23,7 +23,7 @@ import spiralcraft.vfs.Resolver;
 import spiralcraft.vfs.Resource;
 import spiralcraft.vfs.StreamUtil;
 
-import spiralcraft.util.Arguments;
+import spiralcraft.exec.Arguments;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
@@ -115,7 +115,7 @@ public class QueryTool
       }
       
     }
-    .process(args,'-');
+    .process(args);
 
     run();
   }
