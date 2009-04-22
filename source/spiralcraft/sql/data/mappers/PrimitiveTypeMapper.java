@@ -35,8 +35,15 @@ public class PrimitiveTypeMapper<T>
   @Override
   public SqlType getSqlType(PrimitiveTypeImpl type)
   {
-     return dialect.getSqlType
-       (SqlType.getStandardSqlType(type.getNativeClass())
+    SqlType sqlType=SqlType.getStandardSqlType(type.getNativeClass());
+    if (sqlType==null)
+    { 
+      throw new IllegalArgumentException
+        ("Primitive datatype not mapped: "+type.getNativeClass());
+    }
+    
+    return dialect.getSqlType
+       (sqlType
        .getTypeId()
        );
   }

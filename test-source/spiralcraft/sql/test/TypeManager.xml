@@ -1,0 +1,49 @@
+<store:TypeManager
+  xmlns:store="java:/spiralcraft/sql/data/store/"
+  xmlns:example="java:/spiralcraft/data/test/example/"
+  >
+
+  <autoUpgrade>true
+  </autoUpgrade>
+  
+  <schemaMappings>
+    <store:SchemaMapping>
+      
+      <schemaName>public
+      </schemaName>
+      
+      <schema 
+        ref="class:/spiralcraft/data/test/example/Example.schema.xml"
+      />
+    </store:SchemaMapping>
+  </schemaMappings>
+    
+  
+  
+  <tableMappings>
+    <store:TableMapping>
+
+      <type><example:Customer.type/>
+      </type>
+          
+      <tableName>Customer
+      </tableName>
+          
+      <columnMappings>
+
+        <store:ColumnMapping>
+          <fieldName>address
+          </fieldName>
+              
+          <flatten>true
+          </flatten>
+              
+        </store:ColumnMapping>
+            
+      </columnMappings>
+          
+    </store:TableMapping>
+
+  </tableMappings>
+      
+</store:TypeManager>

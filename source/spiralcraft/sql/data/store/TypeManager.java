@@ -116,8 +116,11 @@ public class TypeManager
 
     
     node=node.createChild("tables");
-    for (TableMapping mapping: tableMappings)
-    { mapping.register(node);
+    if (tableMappings!=null)
+    {
+      for (TableMapping mapping: tableMappings)
+      { mapping.register(node);
+      }
     }
     
   }
@@ -158,7 +161,9 @@ public class TypeManager
         TableMapping oldMapping
           =tableMappingsByType.get(mapping.getType());
         
-        mapping.copyDefaults(oldMapping);
+        if (oldMapping!=null)
+        {  mapping.copyDefaults(oldMapping);
+        }
         tableMappingsByType.put(mapping.getType(),mapping);
       }
     }

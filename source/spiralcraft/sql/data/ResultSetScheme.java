@@ -49,6 +49,8 @@ public class ResultSetScheme
         String mdName=metadata.getColumnName(i);
         
         // TODO: Screen for illegal characters
+        
+        mdName=sanitize(mdName,i);
         String goodName=mdName;
         
         int suffix=0;
@@ -82,6 +84,25 @@ public class ResultSetScheme
   }
   
 
+  private String sanitize(String name,int fieldNum)
+  {
+    StringBuilder newName=new StringBuilder();
+    for (int i=0;i<name.length();i++)
+    { 
+      char chr=name.charAt(i);
+      if (i==0 && Character.isDigit(chr))
+      { newName.append("_");
+      }
+      if (Character.isJavaIdentifierPart(chr))
+      { newName.append(chr);
+      }
+      else
+      { newName.append("_x"+Integer.toHexString(chr)+"_");
+      }
+    }
+    return newName.toString();
+  }
+  
   @SuppressWarnings("unchecked") // Inherently unsafe ops
   public void readResultSet(ResultSet rs,EditableTuple tuple)
     throws SQLException,DataException

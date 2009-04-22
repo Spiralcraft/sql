@@ -17,6 +17,7 @@ package spiralcraft.sql.data.store;
 import spiralcraft.data.Type;
 import spiralcraft.data.access.Schema;
 import spiralcraft.data.access.Entity;
+import spiralcraft.log.ClassLog;
 
 import java.util.ArrayList;
 
@@ -26,7 +27,9 @@ import java.util.ArrayList;
  */
 public class SchemaMapping
 {
- 
+  private static final ClassLog log=
+      ClassLog.getInstance(SchemaMapping.class);
+  
   private Schema schema;
   private String schemaName;
  
@@ -62,6 +65,9 @@ public class SchemaMapping
       mapping.setSchemaName(schemaName);
       mapping.setType(type);
       mapping.setTableName(entity.getName());
+      if (mapping.getTableName()==null)
+      { log.warning("Table name is null for "+type);
+      }
       mappings.add(mapping);
     }
     return mappings.toArray(new TableMapping[mappings.size()]);

@@ -1,0 +1,10 @@
+<task:TaskRunner
+  xmlns:task="class:/spiralcraft/task/"
+  xmlns:test="class:/spiralcraft/sql/test/"
+  >
+  <service>
+    <test:TestSpace>
+    </test:TestSpace>
+  </service>
+  
+</task:TaskRunner>

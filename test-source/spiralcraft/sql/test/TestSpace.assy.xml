@@ -1,0 +1,17 @@
+<spi:SingleSpace
+  xmlns:spi="java:/spiralcraft/data/spi"
+  xmlns:store="java:/spiralcraft/sql/data/store/"
+  xmlns:example="java:/spiralcraft/data/test/example/"  
+  >
+  <store>
+  
+    <store:SqlStore>
+      
+      <dataSource dataURI="DataSource.local.xml"/>
+    
+      <typeManager dataURI="class:/spiralcraft/sql/test/TypeManager.xml"/>
+      
+    </store:SqlStore>
+
+  </store>
+</spi:SingleSpace>

@@ -99,6 +99,10 @@ public class SqlStore
   { return typeManager;
   }
 
+  public void setTypeManager(TypeManager typeManager)
+  { this.typeManager=typeManager;
+  }
+  
   public void register(RegistryNode node)
   { 
     this.space=node.findInstance(Space.class);

@@ -61,6 +61,12 @@ public class BoundSelection
     this.source=store.query(sources.get(0),parentFocus);
   }
     
+  /**
+   * The subtree of the supplied criteria that could not be executed on the
+   *   server, and must be processed locally.
+   *   
+   * @return
+   */
   public Expression<Boolean> getRemainderCriteria()
   { return remainderCriteria;
   }

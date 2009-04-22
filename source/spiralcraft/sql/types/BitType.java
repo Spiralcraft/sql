@@ -1,5 +1,5 @@
 //
-//Copyright (c) 1998,2007 Michael Toth
+//Copyright (c) 1998,2009 Michael Toth
 //Spiralcraft Inc., All Rights Reserved
 //
 //This package is part of the Spiralcraft project and is licensed under
@@ -23,7 +23,7 @@ public class BitType
   extends SqlType<Boolean>
 {
   public BitType()
-  { super(Types.CHAR,Boolean.class,"BIT");
+  { super(Types.BIT,Boolean.class,"BIT");
   }
   
 }

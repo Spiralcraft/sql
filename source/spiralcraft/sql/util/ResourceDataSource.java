@@ -31,7 +31,7 @@ public class ResourceDataSource
 {
 
   private static final URI DATA_SOURCE_TYPE_URI
-    =URI.create("java:/javax/sql/DataSource");
+    =URI.create("class:/javax/sql/DataSource");
     
   private final DataSource delegate;
   

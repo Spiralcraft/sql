@@ -1,0 +1,51 @@
+<scm:Change.list
+  xmlns:scm="class:/spiralcraft/scm/meta/"
+  >
+  <scm:Change>
+    <revision>0.3.1
+    </revision>
+    
+    <authorId>miketoth
+    </authorId>
+    
+    <notes>
+      <scm:Note>Change management system testing
+      </scm:Note>
+      <scm:Note>Refresh for production use of spiralcraft.data.access.Store
+        with latest spiralcraft-core.
+      </scm:Note>
+    </notes>
+    
+    <detail>
+      <scm:Change>
+        <date>2009-04-16
+        </date>
+        
+        <path>/source/spiralcraft/sql/data/ResultSetScheme
+        </path>
+        
+        <notes>
+          <scm:Note>Convert field names provided by JDBC to valid 
+            spiralcraft.lang identifiers
+          </scm:Note>
+        
+        </notes>
+      </scm:Change>
+
+      <scm:Change>
+        <date>2009-04-16
+        </date>
+        
+        <path>/source/spiralcraft/sql/util
+        </path>
+        
+        <notes>
+          <scm:Note>Refresh for updates to spiralcraft.data.flatfile and for
+            use in testing and automated setup.
+          </scm:Note>
+        
+        </notes>
+      </scm:Change>
+    </detail>
+  </scm:Change>
+</scm:Change.list>
