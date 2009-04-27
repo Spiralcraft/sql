@@ -121,11 +121,11 @@ public class Loader
   {
     ExecutionContext context
       =ExecutionContext.getInstance();
-    if (args.length==0)
-    {
-      context.err().println(usage());
-      return;
-    }
+//    if (args.length==0)
+//    {
+//      context.err().println(usage());
+//      return;
+//    }
     try
     {
   
@@ -229,7 +229,7 @@ public class Loader
           else
           { 
             System.err.println("Unknown option '-"+option+"'");
-            System.err.println(usage());
+//            System.err.println(usage());
             return;
           }
         }
@@ -244,24 +244,11 @@ public class Loader
     }
   }
 
-  public static String usage()
-  {
-    try
-    { return 
-        new String
-          (StreamUtil.readBytes
-            (Loader.class.getResourceAsStream("TabfileBulkLoad.usage.txt")
-            )
-          );
-    }
-    catch (Exception x)
-    { return ""; 
-    }
-  }
 
   public void setParser(Parser parser)
   { this.parser=parser;
   }
+  
   
   public void setTransactionSize(int val)
   { _transactionSize=val;
@@ -509,8 +496,11 @@ public class Loader
     {
       System.err.println(fieldSet.toString());
       this.fieldSet=fieldSet;
-      // We ask 
+
       
+      dataFocus
+        =new TupleFocus<Tuple>(fieldSet);
+
       try
       {
         // Check keys
@@ -541,7 +531,7 @@ public class Loader
       throws DataException
     { 
       count++;
-      dataFocus.getSubject().set(data);
+      dataFocus.setTuple(data);
     }
     
     public void dataFinalize()
@@ -608,7 +598,7 @@ public class Loader
     public void dataAvailable(Tuple data)
       throws DataException
     { 
-      dataFocus.getSubject().set(data);
+      dataFocus.setTuple(data);
       performSql();
     }
     
@@ -636,7 +626,7 @@ public class Loader
         }
         
         if (_truncate)
-        { _connection.createStatement().executeUpdate("TRUNCATE TABLE "+_tableName);
+        { _connection.createStatement().executeUpdate("TRUNCATE TABLE "+quote(_tableName));
         }
             
         _connection.setAutoCommit(_autoCommit);
@@ -653,7 +643,7 @@ public class Loader
           // Prepare a SELECT
           //
           StringBuffer sql=new StringBuffer();
-          sql.append("SELECT count(*) FROM "+_tableName+" WHERE ");
+          sql.append("SELECT count(*) FROM "+quote(_tableName)+" WHERE ");
 
           int count=0;
           int keyCount=0;
@@ -670,7 +660,8 @@ public class Loader
               if (keyCount>0)
               { sql.append(" AND ");
               }
-              sql.append(fieldName);
+
+              sql.append(quote(fieldName));
               sql.append("= ?");
               keyCount++;
             }
@@ -691,7 +682,7 @@ public class Loader
           //
           StringBuffer sql1=new StringBuffer();
           StringBuffer sql2=new StringBuffer();
-          sql1.append("UPDATE "+_tableName+" SET ");
+          sql1.append("UPDATE "+quote(_tableName)+" SET ");
           sql2.append(" WHERE ");
           int count=0;
           int fieldCount=0;
@@ -711,7 +702,7 @@ public class Loader
               if (keyCount>0)
               { sql2.append(" AND ");
               }
-              sql2.append(fieldName);
+              sql2.append(quote(fieldName));
               sql2.append("= ?");
               keyCount++;
             }
@@ -721,7 +712,7 @@ public class Loader
               if (fieldCount>0)
               { sql1.append(",");
               }
-              sql1.append(fieldName);
+              sql1.append(quote(fieldName));
               sql1.append("= ? ");
               _paramMap[count]=fieldCount+1;
               fieldCount++;
@@ -738,7 +729,7 @@ public class Loader
           // Prepare a DELETE
           //
           StringBuffer sql1=new StringBuffer();
-          sql1.append("DELETE FROM "+_tableName+" WHERE ");
+          sql1.append("DELETE FROM "+quote(_tableName)+" WHERE ");
 
           int count=0;
           for (int i=0;i<numFields;i++)
@@ -752,7 +743,7 @@ public class Loader
             if (count>0)
             { sql1.append(" AND ");
             }
-            sql1.append(fieldName);
+            sql1.append(quote(fieldName));
             sql1.append("= ?");
             count++;
           }
@@ -767,7 +758,7 @@ public class Loader
           //
           StringBuffer sql1=new StringBuffer();
           StringBuffer sql2=new StringBuffer();
-          sql1.append("INSERT INTO "+_tableName+" (");
+          sql1.append("INSERT INTO "+quote(_tableName)+" (");
           sql2.append(" VALUES (");
     
           int count=0;
@@ -781,7 +772,7 @@ public class Loader
               sql1.append(",");
               sql2.append(",");
             }
-            sql1.append(field.getName());
+            sql1.append(quote(field.getName()));
             sql2.append("?");
             _paramMap[count]=count+1;
             count++;
@@ -798,7 +789,10 @@ public class Loader
 		}
 
 
-   
+    private String quote(String name)
+    { return "\""+name+"\"";
+    }
+    
 		public void performSql()
 		{
       boolean notAllNull=false;
