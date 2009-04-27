@@ -18,6 +18,47 @@
     
     <detail>
       <scm:Change>
+        <date>2009-04-27
+        </date>
+        
+        <path>/source/spiralcraft/sql/util/
+        </path>
+        
+        <resources>
+          <URI>Loader.java
+          </URI>
+        </resources>
+        
+        <notes>
+          <scm:Note>Support bean/assy based config (don't require parameters)
+          </scm:Note>
+          <scm:Note>Use quoted identifiers
+          </scm:Note>
+        </notes>
+      </scm:Change>
+
+      <scm:Change>
+        <date>2009-04-27
+        </date>
+        
+        <path>/source/spiralcraft/sql/model/
+        </path>
+        
+        <resources>
+          <URI>Column.java
+          </URI>
+          <URI>Schema.java
+          </URI>
+        </resources>
+        
+        <notes>
+          <scm:Note>Debugging, logging, null checks
+          </scm:Note>
+        
+        </notes>
+      </scm:Change>
+
+      <scm:Change>
         <date>2009-04-16
         </date>
         
