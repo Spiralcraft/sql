@@ -184,7 +184,7 @@ public class Column
           );
       ret.add(statement);
     }
-    else if (storeVersion.getLength()!=length)
+    else if (length!=null && storeVersion.getLength()!=length)
     {
       // Alter column here
       AlterTableStatement statement
