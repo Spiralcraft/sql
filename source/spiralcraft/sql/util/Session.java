@@ -22,7 +22,6 @@ import java.sql.Statement;
 
 import spiralcraft.data.DataException;
 import spiralcraft.log.ClassLog;
-import spiralcraft.sql.data.SerialResultSetCursor;
 import spiralcraft.util.ArrayUtil;
 
 /**

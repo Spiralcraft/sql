@@ -32,7 +32,6 @@ import spiralcraft.data.persist.PersistenceException;
 
 import spiralcraft.vfs.Resource;
 import spiralcraft.vfs.Resolver;
-import spiralcraft.vfs.StreamUtil;
 import spiralcraft.vfs.UnresolvableURIException;
 
 
