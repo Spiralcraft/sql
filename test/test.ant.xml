@@ -2,22 +2,32 @@
 
   <import file="../build.xml"/>
   
-  <target name="spiralcraft-sql-connected-smoke" depends="clean,clean-db">
+  <target name="smoke-db" depends="clean,clean-db">
 	        
+        
+    <devtask
+      codebase=".." 
+      exec ="--log out/spiralcraft --consoleLog SqlSmokeRunner.assy"
+    />   
+  	
+<!-- 	
     <devtask
       codebase=".." 
       exec
-       ='--log out/spiralcraft --consoleLog
+       ='-!-log out/spiralcraft -!-consoleLog
          class:/spiralcraft/sql/util/QueryTool
-         --dataSourceURI DataSource.local.xml
+         -!-dataSourceURI DataSource.local.xml
          "SELECT 1"
          '
     />
-
+ 
+ 
+ -->
+  	
   </target>
 	
   <target name="smoke-tests"
-    depends="clean,spiralcraft-sql-smoke"
+    depends="clean,smoke-nodb,smoke-db"
     >
   </target>
 	
@@ -32,7 +42,17 @@
     <devtask
       codebase=".." 
       exec ="--log out/spiralcraft --consoleLog SqlTestSetup.assy"
-     />  	
+     />  
+
+    <devtask
+      codebase=".."
+      exec = "--log out/spiralcraft --consoleLog LoadDDL.assy"
+    />
+      	
+    <devtask
+      codebase=".."
+      exec = "--log out/spiralcraft --consoleLog Loader.assy"
+    />
   </target>
 	
   <target name="all-tests" 
@@ -41,13 +61,8 @@
 
   </target>
   	
-  <target name="spiralcraft-sql-smoke">
+  <target name="smoke-nodb">
     <mkdir dir="out/sql"/>
-  	
-    <devtask
-      codebase=".." 
-      exec ="--log out/spiralcraft --consoleLog SqlSmokeRunner.assy"
-    />         
 
   </target>
   	

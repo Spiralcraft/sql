@@ -1,10 +1,32 @@
 <task:TaskRunner
   xmlns:task="class:/spiralcraft/task/"
   xmlns:test="class:/spiralcraft/sql/test/"
+  xmlns:query="class:/spiralcraft/data/query/"
+  xmlns:example="class:/spiralcraft/data/test/example/"
   >
   <service>
     <test:TestSpace>
     </test:TestSpace>
   </service>
+  
+  <scenario>
+    <task:Sequence>
+      <scenarios>
+        <query:QueryScenario>
+          <debug>true
+          </debug>
+      
+          <logTaskResults>true
+          </logTaskResults>
+
+          <query>
+            <query:Scan>
+              <type x="[@example:Customer].type"/>
+            </query:Scan>
+          </query>
+        </query:QueryScenario>
+      </scenarios>
+    </task:Sequence>
+  </scenario>
   
 </task:TaskRunner>

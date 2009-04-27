@@ -1,0 +1,5 @@
+<project name="spiralcraft-modules-sql-test-smoke-db" default="smoke-db">
+
+  <import file="test.ant.xml"/>
+  
+</project>

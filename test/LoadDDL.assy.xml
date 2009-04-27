@@ -1,0 +1,17 @@
+<task:TaskRunner
+  xmlns:task="class:/spiralcraft/task/"
+  xmlns:test="class:/spiralcraft/sql/test/"
+  xmlns:ctest="class:/spiralcraft/test/"
+  xmlns:query="class:/spiralcraft/data/query/"
+  xmlns:example="class:/spiralcraft/data/test/example/"
+  >
+  <service>
+    <test:TestSpace>
+    </test:TestSpace>
+  </service>
+  
+  <scenario>
+    <ctest:Stub/>
+  </scenario>
+  
+</task:TaskRunner>

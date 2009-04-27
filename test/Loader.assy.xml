@@ -1,0 +1,14 @@
+<util:Loader
+  xmlns:pg="class:/spiralcraft/sql/vendor/postgresql/"
+  xmlns:util="class:/spiralcraft/sql/util/"
+  >
+  
+  <dataSource dataURI="DataSource.local.xml">
+  </dataSource>
+
+  <inputResource>in/Customer.csv
+  </inputResource>
+  
+  <tableName>Customer
+  </tableName>
+</util:Loader>

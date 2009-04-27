@@ -1,0 +1,4 @@
+id(Integer),displayName,address_address1,address_address2,address_city,paymentTerms,score(Float)
+1,"Johnny First","111 First St.","Suite 1","New York","net 10","20.216"
+2,"Mary Second","222 Second St.","Suite 2","New York","net 20"
+3,"Tommy Third","333 Third St.","Suite 3","New York City","net 30","50.423"
