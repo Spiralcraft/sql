@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import spiralcraft.data.DataException;
 import spiralcraft.log.ClassLog;
 import spiralcraft.util.ArrayUtil;
 
@@ -57,7 +56,7 @@ public class Session
   }
   
   public ResultSet executeQuery(String sql)
-    throws SQLException,DataException
+    throws SQLException
   {
     
     Statement st=null;

@@ -50,7 +50,7 @@ public class ResultSetScheme
         
         // TODO: Screen for illegal characters
         
-        mdName=sanitize(mdName,i);
+        mdName=sanitize(mdName);
         String goodName=mdName;
         
         int suffix=0;
@@ -84,7 +84,7 @@ public class ResultSetScheme
   }
   
 
-  private String sanitize(String name,int fieldNum)
+  private String sanitize(String name)
   {
     StringBuilder newName=new StringBuilder();
     for (int i=0;i<name.length();i++)
