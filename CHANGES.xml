@@ -18,6 +18,25 @@
     
     <detail>
       <scm:Change>
+        <date>2009-04.28
+        </date>
+        
+        <scm:Note>Adapted to spiralcraft.data.access.Cursor interface and
+          design contract change.
+        </scm:Note>
+        
+        <path>/source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>data/SerialResultSetCursor.java
+          </URI>
+          <URI>util/AbstractSqlTool.java
+          </URI>
+        </resources>
+      </scm:Change>
+      
+      <scm:Change>
         <date>2009-04-27
         </date>
         

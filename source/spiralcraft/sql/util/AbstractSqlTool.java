@@ -136,10 +136,10 @@ public abstract class AbstractSqlTool
     SerialResultSetCursor cursor=new SerialResultSetCursor(rs);
     
     DataConsumer<Tuple> writer=new Writer(ExecutionContext.getInstance().out());
-    writer.dataInitialize(cursor.dataGetFieldSet());
+    writer.dataInitialize(cursor.getFieldSet());
     
-    while (cursor.dataNext())
-    { writer.dataAvailable(cursor.dataGetTuple());
+    while (cursor.next())
+    { writer.dataAvailable(cursor.getTuple());
     }
     writer.dataFinalize();
   }

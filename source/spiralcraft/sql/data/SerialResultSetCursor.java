@@ -106,14 +106,17 @@ public class SerialResultSetCursor
     tuple.setResultSet(resultSet);
   }
 
-  public FieldSet dataGetFieldSet()
+  @Override
+  public FieldSet getFieldSet()
   { return fieldSet;
   }
 
+  @Override
   public Type<?> getResultType()
   { return fieldSet.getType();
   }
   
+  @Override
   public Identifier getRelationId()
   { return relationId;
   }
@@ -136,7 +139,8 @@ public class SerialResultSetCursor
   { this.noCopy=volatileTuple;
   }
   
-  public Tuple dataGetTuple() throws DataException
+  @Override
+  public Tuple getTuple() throws DataException
   { 
     // XXX: Optimize by creating one new Tuple per row
     if (noCopy)
@@ -147,7 +151,8 @@ public class SerialResultSetCursor
     }
   }
 
-  public boolean dataNext() throws DataException
+  @Override
+  public boolean next() throws DataException
   { 
     try
     { 
@@ -168,5 +173,15 @@ public class SerialResultSetCursor
   { return binding;
   }
 
+  public void close()
+    throws DataException
+  { 
+    try
+    { resultSet.close();
+    }
+    catch (SQLException x)
+    { throw new DataException("Error closing result set",x);
+    }
+  }
   
 }
