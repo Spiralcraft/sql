@@ -37,7 +37,9 @@ public class SqlBranch
     state=State.STARTED;
     this.resourceManager=resourceManager;
     try
-    { connection=resourceManager.allocateConnection();
+    { 
+      
+      connection=resourceManager.allocateConnection();
     }
     catch (DataException x)
     { throw new TransactionException("Error allocating connection: "+x,x);
@@ -45,7 +47,9 @@ public class SqlBranch
   }
   
   public Connection getConnection()
-  { return connection;
+  { 
+    // XXX Return a fascade that won't close the real connection on close()
+    return connection;
   }
   
   public void commit()

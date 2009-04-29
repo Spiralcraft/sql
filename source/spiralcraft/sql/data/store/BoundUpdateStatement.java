@@ -43,7 +43,7 @@ public class BoundUpdateStatement
   public int execute()
     throws DataException
   {
-    Connection connection=store.allocateConnection();
+    Connection connection=store.getContextConnection();
     
     try
     {

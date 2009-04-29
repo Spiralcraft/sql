@@ -200,7 +200,7 @@ public class TypeManager
     try
     { 
       storeMetaData
-        =new MetaData(store.allocateConnection().getMetaData());
+        =new MetaData(store.getContextConnection().getMetaData());
     }
     catch (SQLException x)
     { throw new DataException("Error reading metadata: "+x,x);

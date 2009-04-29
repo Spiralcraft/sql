@@ -3,7 +3,7 @@
   <info organisation="spiralcraft" module="sql">
   </info>
   <dependencies>
-    <dependency org="spiralcraft" name="core" rev="latest.integration"/>
+    <dependency org="spiralcraft" name="core" rev="[0.3.4,)"/>
     <dependency org="postgresql" name="jdbc4" rev="latest.integration"/>
   </dependencies>
 </ivy-module>

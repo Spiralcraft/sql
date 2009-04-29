@@ -1,3 +1,5 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
 <scm:Change.list
   xmlns:scm="class:/spiralcraft/scm/meta/"
   >
@@ -18,7 +20,37 @@
     
     <detail>
       <scm:Change>
-        <date>2009-04.28
+        <date>2009-04-28
+        </date>
+        
+        <scm:Note>Updated connection management logic
+        </scm:Note>
+        
+        <path>/source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>data/SerialResultSetCursor.java
+          </URI>
+          <URI>data/store/BoundQueryStatement.java
+          </URI>
+          <URI>data/store/BoundUpdateStatement.java
+          </URI>
+          <URI>data/store/SqlBranch.java
+          </URI>
+          <URI>data/store/SqlResourceManager.java
+          </URI>
+          <URI>data/store/SqlStore.java
+          </URI>
+          <URI>data/store/TypeManager.java
+          </URI>
+          <URI>data/store/Updater.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <date>2009-04-28
         </date>
         
         <scm:Note>Adapted to spiralcraft.data.access.Cursor interface and

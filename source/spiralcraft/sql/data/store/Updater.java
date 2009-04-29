@@ -213,7 +213,7 @@ public class Updater
     {
       super.dataInitialize(fieldSet);
       this.focus=new TupleFocus<DeltaTuple>(parentFocus,fieldSet);
-      this.connection=store.allocateConnection();
+      this.connection=store.getContextConnection();
     }
    
     @Override

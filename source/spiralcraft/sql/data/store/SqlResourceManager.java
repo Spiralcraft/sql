@@ -51,7 +51,7 @@ public class SqlResourceManager
     try
     {
       // XXX Adapt for pool
-      Connection connection=sqlStore.getDataSource().getConnection();
+      Connection connection=sqlStore.checkoutConnection();
       connection.setAutoCommit(false);
       return connection;
     }

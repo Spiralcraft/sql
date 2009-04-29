@@ -113,6 +113,18 @@ public class SqlStore
 
   }
   
+  /**
+   * <p>Check out a connection from the pool or the data source.
+   * </p>
+   * 
+   * @return
+   * @throws SQLException
+   */
+  public Connection checkoutConnection()
+    throws SQLException
+  { return dataSource.getConnection();
+  }
+  
   @Override
   public void start()
     throws LifecycleException
@@ -156,7 +168,7 @@ public class SqlStore
     try
     { 
       
-      conn=allocateConnection();
+      conn=getContextConnection();
       autoCommit=conn.getAutoCommit();
       conn.setAutoCommit(false);
       sqlStatement=conn.createStatement();
@@ -231,10 +243,10 @@ public class SqlStore
     
   
   /**
-   * Allocate a Connection that is coordinated with the Transaction in-context, if 
-   *   any.
+   * Return the Connection that is coordinated with the Transaction in-context,
+   *   if any.
    */
-  public Connection allocateConnection()
+  public Connection getContextConnection()
     throws DataException
   { 
     Transaction transaction=Transaction.getContextTransaction();
@@ -242,12 +254,12 @@ public class SqlStore
     { return resourceManager.branch(transaction).getConnection();
     }
     else
-    {
+    { 
       try
-      { return dataSource.getConnection();
+      { return checkoutConnection();
       }
       catch (SQLException x)
-      { throw new DataException("Error allocating connection: "+x,x);
+      { throw new DataException("Error getting connection",x);
       }
     }
   }

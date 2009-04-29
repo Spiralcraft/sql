@@ -30,8 +30,10 @@ import spiralcraft.lang.Channel;
 
 import spiralcraft.util.tree.LinkedTree;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SerialResultSetCursor
   implements SerialCursor<Tuple>
@@ -43,6 +45,8 @@ public class SerialResultSetCursor
   protected boolean noCopy=false;
   protected Identifier relationId=null;
   private static CursorBinding<Tuple,?> binding;
+  protected Statement statement;
+  protected Connection connection;
   
   
   /**
@@ -106,6 +110,15 @@ public class SerialResultSetCursor
     tuple.setResultSet(resultSet);
   }
 
+  /**
+   * The Connection that should be closed when this cursor is closed
+   * 
+   * @param connection
+   */
+  public void setConnection(Connection connection)
+  { this.connection=connection;
+  }
+  
   @Override
   public FieldSet getFieldSet()
   { return fieldSet;
@@ -181,6 +194,26 @@ public class SerialResultSetCursor
     }
     catch (SQLException x)
     { throw new DataException("Error closing result set",x);
+    }
+
+    if (statement!=null)
+    { 
+      try
+      { statement.close();
+      }
+      catch (SQLException x)
+      { throw new DataException("Error closing statement",x);
+      }
+    }
+    
+    if (connection!=null)
+    { 
+      try
+      { connection.close();
+      }
+      catch (SQLException x)
+      { throw new DataException("Error closing connection",x);
+      }
     }
   }
   

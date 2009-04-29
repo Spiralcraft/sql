@@ -59,23 +59,24 @@ public class BoundQueryStatement
   public SerialCursor<Tuple> execute()
     throws DataException
   {
-    // XXX: Presents problems re. returning with an open result set and connection.
-    // XXX: This might want to take a DataConsumer instead for call-back.
-    
     System.err.println("BoundQueryStatement: Preparing "+statementText);
-    
-    Connection connection=store.allocateConnection();
     try
     {
+    
+      Connection connection=store.getContextConnection();
+    
       PreparedStatement statement=connection.prepareStatement(statementText);
       applyParameters(statement);
       ResultSet rs=statement.executeQuery();
+      SerialResultSetCursor result=null;
       if (dataFields!=null)
-      { return new SerialResultSetCursor(dataFields,rs,foldTree);
+      { result=new SerialResultSetCursor(dataFields,rs,foldTree);
       }
       else
-      { return new SerialResultSetCursor(rs);
+      { result=new SerialResultSetCursor(rs);
       }
+      result.setConnection(connection);
+      return result;
     }
     catch (SQLException x)
     { throw new DataException("Error executing "+statementText+": "+x,x);
