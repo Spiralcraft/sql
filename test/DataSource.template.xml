@@ -1,0 +1,16 @@
+<pg:PGSimpleDataSource
+  xmlns:pg="class:/org/postgresql/ds/"
+  >
+  <serverName>localhost
+  </serverName>
+
+  <databaseName>_test
+  </databaseName>
+  		
+  <user>_test
+  </user>
+  		
+  <password>_test
+  </password>
+
+</pg:PGSimpleDataSource>		
