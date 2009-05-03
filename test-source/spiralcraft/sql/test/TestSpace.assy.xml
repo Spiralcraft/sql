@@ -1,9 +1,9 @@
-<spi:SingleSpace
-  xmlns:spi="java:/spiralcraft/data/spi"
-  xmlns:store="java:/spiralcraft/sql/data/store/"
-  xmlns:example="java:/spiralcraft/data/test/example/"  
+<data:Space
+  xmlns:data="class:/spiralcraft/data/"
+  xmlns:store="class:/spiralcraft/sql/data/store/"
+  xmlns:example="class:/spiralcraft/data/test/example/"  
   >
-  <store>
+  <stores>
   
     <store:SqlStore>
       
@@ -13,5 +13,5 @@
       
     </store:SqlStore>
 
-  </store>
-</spi:SingleSpace>
+  </stores>
+</data:Space>

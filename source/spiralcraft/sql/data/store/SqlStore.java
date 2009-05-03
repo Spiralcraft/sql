@@ -148,10 +148,15 @@ public class SqlStore
   
   public boolean containsType(Type<?> type)
   {
-    // TODO Auto-generated method stub
     return typeManager.getTableMapping(type)!=null;
   }
 
+  @Override
+  public boolean isAuthoritative(Type<?> type)
+  {
+    return typeManager.getTableMapping(type)!=null;
+  }
+  
   public BoundQuery<?,Tuple> getAll(Type<?> type)
     throws DataException
   { return new BoundScan(assertTableMapping(type).getScan(),null,this);
@@ -206,9 +211,14 @@ public class SqlStore
   }
   
   public Type<?>[] getTypes()
-  {
-    // TODO Auto-generated method stub
-    return null;
+  { 
+    
+    TableMapping[] mappings=typeManager.getTableMappings();
+    Type<?>[] types=new Type[mappings.length];
+    for (int i=0;i<mappings.length;i++)
+    { types[i]=mappings[i].getType();
+    }
+    return types;
   }
   
   public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
