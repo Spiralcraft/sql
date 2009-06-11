@@ -18,8 +18,7 @@ package spiralcraft.sql.data.store;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Type;
 
-import spiralcraft.registry.Registrant;
-import spiralcraft.registry.RegistryNode;
+import spiralcraft.log.ClassLog;
 
 import spiralcraft.sql.model.MetaData;
 import spiralcraft.sql.model.Schema;
@@ -29,6 +28,7 @@ import spiralcraft.sql.data.mappers.TypeMapper;
 import spiralcraft.sql.ddl.DDLStatement;
 
 import spiralcraft.sql.Dialect;
+import spiralcraft.util.ArrayUtil;
 
 import java.sql.SQLException;
 
@@ -41,8 +41,10 @@ import java.util.List;
  * Handles the translation from spiralcraft.data.Types into SQL tables and types
  */
 public class TypeManager
-  implements Registrant
 {
+  private static final ClassLog log
+    =ClassLog.getInstance(TypeManager.class);
+  
   private TypeMapper<?>[] typeMappers;
   
   private HashMap<Class<?>,TypeMapper<?>> typeMappersByTypeClass
@@ -62,6 +64,8 @@ public class TypeManager
   
   private Dialect dialect;
   
+  private String schemaName;
+  
   private boolean autoUpgrade;
   
   public SchemaMapping[] getSchemaMappings()
@@ -80,6 +84,26 @@ public class TypeManager
   { this.tableMappings=tableMappings;
   }
 
+  /**
+   * Add a TableMapping, during post-configuration stage.
+   * 
+   * @param tableMapping
+   */
+  void addTableMapping(TableMapping tableMapping)
+  {
+    if (tableMapping.getSchemaName()==null)
+    { tableMapping.setSchemaName(schemaName);
+    }
+    if (this.tableMappings!=null)
+    { 
+      this.tableMappings
+        =ArrayUtil.append(tableMappings,tableMapping);
+    }
+    else
+    { this.tableMappings=new TableMapping[] {tableMapping};
+    }
+  }
+  
   public void setTypeMappers(TypeMapper<?>[] typeMappers)
   { this.typeMappers=typeMappers;
   }
@@ -104,25 +128,32 @@ public class TypeManager
    * Called by the SQL store to complete all unspecified mapping details
    *   and review metadata.
    */
-  public void register(RegistryNode node)
+  public void resolve()
   { 
-    node.registerInstance(TypeManager.class,this);
-    store=node.findInstance(SqlStore.class);
     if (dialect==null)
     { dialect=new Dialect();
+    }
+    
+    if (schemaName==null)
+    { schemaName=dialect.getDefaultSchemaName();
     }
     
     resolveLocalDataModel();
 
     
-    node=node.createChild("tables");
     if (tableMappings!=null)
     {
       for (TableMapping mapping: tableMappings)
-      { mapping.register(node);
+      { 
+        mapping.setStore(store);
+        mapping.resolve();
       }
     }
     
+  }
+  
+  void setStore(SqlStore store)
+  { this.store=store;
   }
   
   private void resolveLocalDataModel()
@@ -194,6 +225,11 @@ public class TypeManager
     return mapper;
   }
   
+  /**
+   * Read metadata from the db and update the local copy
+   * 
+   * @throws DataException
+   */
   public void updateMetaData()
     throws DataException
   {
@@ -222,6 +258,7 @@ public class TypeManager
     for (TableMapping mapping: tableMappings)
     {
       Table table=mapping.getTableModel();
+      log.fine("Adding table mapping "+table.getName());
       
       String schemaName=table.getSchemaName();
       if (schemaName!=null)
@@ -234,10 +271,18 @@ public class TypeManager
       }
       else
       { 
-        throw new DataException
-          ("TypeManager: Mapping of "+mapping.getType().getURI()
-          +" to table '"+table.getName()+"' cannot have a null schemaName"
-          );
+        Schema schema=localMetaData.getSchema(dialect.getDefaultSchemaName());
+        if (schema!=null)
+        { schema.addTable(table);
+        }
+        else
+        { 
+          throw new DataException
+            ("TypeManager: Mapping of "+mapping.getType().getURI()
+            +" to table '"+table.getName()+"' no schemaName provided and no "
+            +" default Schema in Dialect "
+            );          
+        }
       }
     }
       
