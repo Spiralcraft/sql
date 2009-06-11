@@ -38,6 +38,8 @@ import spiralcraft.vfs.UnresolvableURIException;
 
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Channel;
+import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.Constants;
 
 import spiralcraft.sql.SqlType;
@@ -49,7 +51,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.File;
 import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
 import java.io.FileWriter;
 
 import java.sql.SQLException;
@@ -83,9 +84,9 @@ public class Loader
   implements Executable
 {
 
+  private static final ClassLog log=ClassLog.getInstance(Loader.class);
   private Resource _schemaResource;
   private DataSource dataSource;
-  private PrintWriter _logWriter=new PrintWriter(new OutputStreamWriter(System.out),true);
   private String _tableName;
   private Connection _connection;
   private PreparedStatement _statement;
@@ -207,9 +208,6 @@ public class Loader
           else if (option.equals("delete"))
           { setDelete(true);
           }
-          else if (option.equals("log"))
-          { setLogFile(new File(args[++i]));
-          }
           else if (option.equals("truncate"))
           { setTruncate(true);
           }
@@ -277,11 +275,7 @@ public class Loader
   { _connectionSetupSql=sql;
   }
   
-  
-  public void setLogFile(File log)
-    throws IOException
-  { _logWriter=new PrintWriter(new FileWriter(log,true),true);
-  }
+ 
 
   public void run()
   {
@@ -353,14 +347,14 @@ public class Loader
     
     if (parser==null)
     { 
-      System.err.println("Creating parser");
+      log.info("Creating parser");
       parser=new Parser();
       parser.setReadHeader(true);
       parser.setUseImplicitTypes(_implicitTypes);
       parser.setDelimiter(_delimiter);
     }
 
-    System.err.println("Checking data in "+resource.getURI()+"...");
+    log.info("Checking data in "+resource.getURI()+"...");
 
     // Prescan data for syntax
     VerifyDataHandler verifyHandler=new VerifyDataHandler();
@@ -393,7 +387,7 @@ public class Loader
         ;
     }
 
-    _logWriter.println(verifyHandler.getCount()+" rows checked.");
+    log.info(verifyHandler.getCount()+" rows checked.");
 
     
     // Load data
@@ -424,10 +418,10 @@ public class Loader
 
     _connection.commit();
     if (!_checkKey)
-    { _logWriter.println("Updated "+_count);
+    { log.info("Updated "+_count);
     }
     else
-    { _logWriter.println("Queried "+_count);
+    { log.info("Queried "+_count);
     }
     _connection.close();
   }
@@ -493,7 +487,7 @@ public class Loader
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
     {
-      System.err.println(fieldSet.toString());
+      log.info("Fields: "+fieldSet.toString());
       this.fieldSet=fieldSet;
 
       
@@ -557,7 +551,6 @@ public class Loader
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
     {
-      System.err.println(fieldSet.toString());
       this.fieldSet=fieldSet;
       dataFocus
         =new TupleFocus<Tuple>(fieldSet);
@@ -800,7 +793,7 @@ public class Loader
         Tuple keyData=insertKeyBinding.get();
         if (_keyMap.get(keyData)!=null)
         { 
-          System.err.println("DUPLICATE KEY: "+keyData.toString());
+          log.warning("DUPLICATE KEY: "+keyData.toString());
           return;
         }
         else
@@ -903,17 +896,17 @@ public class Loader
                 { _discardWriter.println(dataGetTuple().toString());
                 }
                 else
-                { _logWriter.println(dataGetTuple().toString());
+                { log.info(dataGetTuple().toString());
                 }
               }
               _count++;
               if (_count%_statusInterval==0)
-              { _logWriter.println("Sent "+_count+" rows");
+              { log.info("Sent "+_count+" rows");
               }
               if (_count%_transactionSize==0)
               { 
                 _connection.commit();
-                _logWriter.println("Updated "+_count);
+                log.info("Updated "+_count);
               }
             }
             else
@@ -924,44 +917,44 @@ public class Loader
               }
               int keyCount=rs.getInt(1);
               if (keyCount<1)
-              { _logWriter.println("Missing "+dataGetTuple());
+              { log.info("Missing "+dataGetTuple());
               }
               else if (keyCount>1)
-              { _logWriter.println("Duplicated "+keyCount+"x "+dataGetTuple()); 
+              { log.info("Duplicated "+keyCount+"x "+dataGetTuple()); 
               }
               
               if (++_count%_transactionSize==0)
-              { _logWriter.println("Queried "+_count);
+              { log.info("Queried "+_count);
               }
             }
           }
           else
-          { _logWriter.println("Skipped null row "+_count);
+          { log.info("Skipped null row "+_count);
           }
         }
         else
         { 
           if (++_count%_transactionSize==0)
-          { _logWriter.println("Skipped "+_count);
+          { log.info("Skipped "+_count);
           }
         }
       }
       catch (SQLException x)
       { 
-        _logWriter.println
-          ("Caught SqlException processing "
+        log.log
+          (Level.SEVERE,"Caught SqlException processing "
             +dataGetTuple().toString()
+          ,x
           );
-        _logWriter.println(x.toString());
         throw new RuntimeException(x.toString());
       }
       catch (DataException x)
       { 
-        _logWriter.println
-          ("Caught DataException processing "
+        log.log(Level.SEVERE
+          ,"Caught DataException processing "
             +dataGetTuple().toString()
+          ,x
           );
-        _logWriter.println(x.toString());
         throw new RuntimeException(x.toString());
       }
 
