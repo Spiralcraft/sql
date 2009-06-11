@@ -10,8 +10,8 @@
     </test:TestSpace>
   </service>
   
-  <scenario>
+  <chain>
     <ctest:Stub/>
-  </scenario>
+  </chain>
   
 </task:TaskRunner>

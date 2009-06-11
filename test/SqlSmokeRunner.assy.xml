@@ -1,32 +1,47 @@
 <task:TaskRunner
   xmlns:task="class:/spiralcraft/task/"
-  xmlns:test="class:/spiralcraft/sql/test/"
+  xmlns:stest="class:/spiralcraft/sql/test/"
+  xmlns:test="class:/spiralcraft/test/"
   xmlns:query="class:/spiralcraft/data/query/"
+  xmlns:dtask="class:/spiralcraft/data/task/"
   xmlns:example="class:/spiralcraft/data/test/example/"
   >
   <service>
-    <test:TestSpace>
-    </test:TestSpace>
+    <stest:TestSpace>
+    </stest:TestSpace>
   </service>
   
-  <scenario>
+  <chain>
+    <test:TestGroup>
+      <name>spiralcraft-sql
+      </name>
+    </test:TestGroup>
+    
     <task:Sequence>
       <scenarios>
-        <query:QueryScenario>
+        <dtask:Fetch>
           <debug>true
           </debug>
-      
-          <logTaskResults>true
-          </logTaskResults>
 
           <query>
             <query:Scan>
               <type x="[@example:Customer].type"/>
             </query:Scan>
           </query>
-        </query:QueryScenario>
+          
+          <chain>
+            <test:Stub>
+              <messageX>""+[example:Customer.list].@size()+" results"
+              </messageX>
+              <conditionX>[example:Customer.list].@size()==3
+              </conditionX>
+              <name>Fetch all customers
+              </name>
+            </test:Stub>
+          </chain>
+        </dtask:Fetch>
       </scenarios>
     </task:Sequence>
-  </scenario>
+  </chain>
   
 </task:TaskRunner>

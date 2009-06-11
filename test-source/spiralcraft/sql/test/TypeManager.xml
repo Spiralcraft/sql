@@ -13,12 +13,16 @@
       </schemaName>
       
       <schema 
-        ref="class:/spiralcraft/data/test/example/Example.schema.xml"
+        ref="example:Example.schema.xml"
       />
     </store:SchemaMapping>
   </schemaMappings>
     
-  
+  <dialect>
+    <pg:PostgresqlDialect 
+      xmlns:pg="class:/spiralcraft/sql/vendor/postgresql/"
+    />
+  </dialect>  
   
   <tableMappings>
     <store:TableMapping>
