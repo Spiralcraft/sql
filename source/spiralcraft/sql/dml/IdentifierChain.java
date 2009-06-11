@@ -36,7 +36,7 @@ public class IdentifierChain
     if (rest!=null && rest.length>0)
     { 
       this.rest=new IdentifierChain
-        (rest[0],(String[]) ArrayUtil.truncateBefore(rest,1));
+        (rest[0],ArrayUtil.truncateBefore(rest,1));
     }
   }
   
