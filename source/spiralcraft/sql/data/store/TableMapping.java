@@ -14,12 +14,18 @@
 //
 package spiralcraft.sql.data.store;
 
+import spiralcraft.data.DataException;
+import spiralcraft.data.Tuple;
 import spiralcraft.data.Type;
 import spiralcraft.data.Field;
 import spiralcraft.data.Key;
 
+import spiralcraft.data.query.BoundQuery;
+import spiralcraft.data.query.Query;
+import spiralcraft.data.query.Queryable;
 import spiralcraft.data.query.Scan;
 
+import spiralcraft.sql.data.query.BoundScan;
 import spiralcraft.sql.dml.TableName;
 import spiralcraft.sql.dml.WhereClause;
 import spiralcraft.sql.dml.BooleanCondition;
@@ -27,8 +33,7 @@ import spiralcraft.sql.dml.BooleanCondition;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-import spiralcraft.registry.RegistryNode;
-import spiralcraft.registry.Registrant;
+import spiralcraft.lang.Focus;
 
 import spiralcraft.sql.model.Table;
 import spiralcraft.sql.model.Column;
@@ -42,7 +47,7 @@ import spiralcraft.util.tree.LinkedTree;
  * An association between a Type and a Table in a SQL Store
  */
 public class TableMapping
-  implements Registrant
+  implements Queryable<Tuple>
 {
   private Type<?> type;
   private String tableName;
@@ -50,10 +55,11 @@ public class TableMapping
   private ArrayList<ColumnMapping> columnMappings
     =new ArrayList<ColumnMapping>();
   private Scan scan;
-  private RegistryNode registryNode;
   private Table tableModel;
   private Updater updater;
   private LinkedTree<ColumnMapping> columnMappingTree;
+  private SqlStore sqlStore;
+  private boolean resolved;
 
 
   private HashMap<String,ColumnMapping> columnFieldMap
@@ -70,6 +76,23 @@ public class TableMapping
   
   public Type<?> getType()
   { return type;
+  }
+  
+  public Type<?>[] getTypes()
+  { return new Type[] {type};
+  }
+  
+  public boolean containsType(Type<?> type)
+  { return type==this.type;
+  }
+  
+  public void setStore(SqlStore store)
+  { this.sqlStore=store;
+  }
+  
+  public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
+    throws DataException
+  { return query.solve(focus,this);
   }
   
   public void setType(Type<?> type)
@@ -104,7 +127,7 @@ public class TableMapping
   
   public void setColumnMappings(ColumnMapping[] fieldMappings)
   { 
-    if (registryNode!=null)
+    if (resolved)
     { 
       throw new IllegalStateException
         ("Mappings cannot be changed after startup");
@@ -179,6 +202,18 @@ public class TableMapping
   { return columnNameMap.get(columnName);
   }
 
+  @Override
+  public BoundScan getAll(Type<?> type)
+    throws DataException
+  {
+    if (this.type==type)
+    { return new BoundScan(getScan(),null,sqlStore);
+    }
+    else
+    { return null;
+    }
+  }
+  
   public synchronized Scan getScan()
   { 
     if (scan==null && type!=null)
@@ -260,11 +295,8 @@ public class TableMapping
   /**
    * Fill in missing details, publish interface
    */
-  public void register(RegistryNode node)
+  public void resolve()
   { 
-    registryNode=node;
-    node=node.createChild(getSchemaName()+"."+getQualifiedTableName());
-    node.registerInstance(TableMapping.class, this);
     
     ArrayList<ColumnMapping> orderedColumns
       =new ArrayList<ColumnMapping>();
@@ -283,7 +315,8 @@ public class TableMapping
       }
       columnMapping.setPath(new Path().append(field.getName()));
       orderedColumns.add(columnMapping);
-      columnMapping.register(node);
+      columnMapping.setStore(sqlStore);
+      columnMapping.resolve();
     }
     columnMappings.clear();
     columnMappings.addAll(orderedColumns);
@@ -335,6 +368,7 @@ public class TableMapping
     }
     tableNameSqlFragment=new TableName(schemaName,tableName);
 
-    updater=new Updater(node.findInstance(SqlStore.class),this);
+    updater=new Updater(sqlStore,this);
+    resolved=true;
   }
 }
