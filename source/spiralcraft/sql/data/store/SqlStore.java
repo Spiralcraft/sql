@@ -16,31 +16,39 @@ package spiralcraft.sql.data.store;
 
 
 import spiralcraft.lang.Focus;
+import spiralcraft.lang.SimpleFocus;
+import spiralcraft.lang.spi.SimpleChannel;
 
 import spiralcraft.data.DataConsumer;
-import spiralcraft.data.access.Store;
+import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.DeltaTuple;
+import spiralcraft.data.EditableTuple;
+import spiralcraft.data.Field;
 import spiralcraft.data.Sequence;
 import spiralcraft.data.Type;
 import spiralcraft.data.Tuple;
-import spiralcraft.data.Space;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Selection;
 import spiralcraft.data.query.Scan;
 
+import spiralcraft.data.spi.AbstractStore;
+import spiralcraft.data.spi.ArrayDeltaTuple;
+import spiralcraft.data.spi.EditableArrayTuple;
 import spiralcraft.data.transaction.Transaction;
+import spiralcraft.data.transaction.WorkException;
+import spiralcraft.data.transaction.WorkUnit;
+import spiralcraft.data.transaction.Transaction.Nesting;
 
 import spiralcraft.sql.data.query.BoundSelection;
 import spiralcraft.sql.data.query.BoundScan;
 
 import spiralcraft.sql.ddl.DDLStatement;
+import spiralcraft.sql.pool.ConnectionPool;
 
-import spiralcraft.registry.Registrant;
-import spiralcraft.registry.RegistryNode;
 
 import java.net.URI;
 import java.sql.Connection;
@@ -59,15 +67,22 @@ import spiralcraft.common.LifecycleException;
  *
  */
 public class SqlStore
-  implements Store,Registrant
+  extends AbstractStore
 {
   
   private DataSource dataSource;
-  private Space space;
+  private ConnectionPool connectionPool=new ConnectionPool();
   private TypeManager typeManager=new TypeManager();
-  private RegistryNode registryNode;
   private SqlResourceManager resourceManager
     =new SqlResourceManager(this);
+  
+  private TableMapping sequenceTableMapping;
+  
+  
+  public SqlStore()
+    throws DataException
+  {
+  }
   
   /**
    * Specify the dataSource that will supply JDBC connections 
@@ -76,12 +91,10 @@ public class SqlStore
   { this.dataSource=dataSource;
   }
   
-
-  public Sequence getSequence(URI sequenceURI)
-  { 
-    throw new UnsupportedOperationException("SQL Sequences not implemented");
-    // XXX Need to implement this
+  public ConnectionPool getConnectionPool()
+  { return connectionPool;
   }
+
   
   /**
    * Obtain a direct reference to the DataSource that supplies JDBC connections
@@ -103,13 +116,19 @@ public class SqlStore
   { this.typeManager=typeManager;
   }
   
-  public void register(RegistryNode node)
+
+  private void resolve()
   { 
-    this.space=node.findInstance(Space.class);
-    registryNode=node.createChild(SqlStore.class,this);
-    RegistryNode childNode
-      =registryNode.createChild("typeManager");
-    typeManager.register(childNode);
+
+    
+    sequenceTableMapping
+      =new TableMapping();
+    sequenceTableMapping.setType(sequenceType);
+    sequenceTableMapping.setTableName("Sequence");
+    typeManager.addTableMapping(sequenceTableMapping);
+    
+    typeManager.setStore(this);
+    typeManager.resolve();
 
   }
   
@@ -122,46 +141,38 @@ public class SqlStore
    */
   public Connection checkoutConnection()
     throws SQLException
-  { return dataSource.getConnection();
+  { return connectionPool.checkout();
   }
   
   @Override
   public void start()
     throws LifecycleException
   { 
+    // TODO: Change to "bind" and use focus chain
+    resolve();
+    TableMapping[] mappings=typeManager.getTableMappings();
+    for (TableMapping mapping: mappings) 
+    { addPrimaryQueryable(mapping.getType(),mapping);
+    }
+    
+    connectionPool.setDataSource(dataSource);
+    connectionPool.start();
     try
     { onAttach(); // XXX Waiting for auto-recovery implementation
     }
     catch (DataException x)
     { throw new LifecycleException(x.toString(),x);
     }
+    super.start();
   }
 
   @Override
   public void stop()
+    throws LifecycleException
   {
+    super.stop();
+    connectionPool.stop();
   }
-  
-  public Space getSpace()
-  { return space;
-  }
-  
-  public boolean containsType(Type<?> type)
-  {
-    return typeManager.getTableMapping(type)!=null;
-  }
-
-  @Override
-  public boolean isAuthoritative(Type<?> type)
-  {
-    return typeManager.getTableMapping(type)!=null;
-  }
-  
-  public BoundQuery<?,Tuple> getAll(Type<?> type)
-    throws DataException
-  { return new BoundScan(assertTableMapping(type).getScan(),null,this);
-  }
-
   
   public void executeDDL(List<DDLStatement> statements)
     throws DataException
@@ -210,17 +221,9 @@ public class SqlStore
     }
   }
   
-  public Type<?>[] getTypes()
-  { 
-    
-    TableMapping[] mappings=typeManager.getTableMappings();
-    Type<?>[] types=new Type[mappings.length];
-    for (int i=0;i<mappings.length;i++)
-    { types[i]=mappings[i].getType();
-    }
-    return types;
-  }
+
   
+  @Override
   public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
     throws DataException
   { 
@@ -235,9 +238,7 @@ public class SqlStore
     { return new BoundScan((Scan) query,focus,this);
     }
     else
-    { 
-      // Solve it until we get something we can understand
-      return query.solve(focus,getSpace());
+    { return super.query(query,focus);
     }
   }
   
@@ -274,6 +275,154 @@ public class SqlStore
     }
   }
 
+  @Override
+  protected Sequence createSequence(Field<?> field)
+  { return new SqlSequence(field.getURI());
+  }
+  
+  class SqlSequence
+    implements Sequence
+  {
+
+    private int increment;
+    private volatile int next;
+    private volatile int stop;
+    private BoundQuery<?,Tuple> boundQuery;
+    private Focus<URI> uriFocus;
+    private URI uri;
+    
+    public SqlSequence (URI uri)
+    { 
+      this.uri=uri;
+      uriFocus=new SimpleFocus<URI>(new SimpleChannel<URI>(uri,true));
+    }
+
+    public void start()
+      throws LifecycleException
+    {
+      try
+      {
+        boundQuery
+          =sequenceTableMapping.query(sequenceQuery,uriFocus);
+      }
+      catch (DataException x)
+      { throw new LifecycleException("Error binding sequence query");
+      }
+    }
+    
+    public void stop()
+    {
+    }
+    
+    public void allocate()
+      throws DataException
+    {
+      synchronized(sequenceTableMapping)
+      {
+        SerialCursor<Tuple> result=boundQuery.execute();
+        Tuple resultRow=null;
+        try
+        { 
+          resultRow=result.next()?result.getTuple().snapshot():null;
+          if (result.next())
+          {
+            throw new DataException
+              ("Cardinality violation in Sequence store- non unique URI "+uri); 
+          }
+        }
+        finally
+        { result.close();
+        }
+        
+        if (resultRow==null)
+        {
+          final EditableTuple row=new EditableArrayTuple(sequenceType.getScheme());
+          row.set("uri",uri);
+          row.set("nextValue",200);
+          row.set("increment",100);
+          next=100;
+          stop=200;
+          increment=100;
+            
+          new WorkUnit<Void>()
+          {
+            { this.nesting=Nesting.ISOLATE;
+            }
+            
+            @Override
+            protected Void run() throws WorkException
+            {
+              try
+              {
+                DataConsumer<DeltaTuple> updater
+                  =getUpdater(sequenceType,null);
+                updater.dataInitialize(sequenceType.getFieldSet());
+            
+                updater.dataAvailable(new ArrayDeltaTuple(null,row));
+                updater.dataFinalize();
+              
+                return null;
+              }
+              catch (DataException x)
+              { throw new WorkException("Error updating sequence",x);
+              }
+            }
+            
+          }.work();
+          
+        }
+        else
+        {
+          final EditableTuple row=(EditableTuple) result.getTuple();
+          next=(Integer) resultRow.get("nextValue");
+          increment=(Integer) resultRow.get("increment");
+          
+          stop=next+increment;
+          row.set("nextValue",next+increment);
+
+          final Tuple original=resultRow;
+          new WorkUnit<Void>()
+          {
+            { this.nesting=Nesting.ISOLATE;
+            }
+            
+            @Override
+            protected Void run() throws WorkException
+            {
+              try
+              {
+                DataConsumer<DeltaTuple> updater=getUpdater(sequenceType,null);
+                updater.dataInitialize(sequenceType.getFieldSet());
+           
+                updater.dataAvailable(new ArrayDeltaTuple(original,row));
+                updater.dataFinalize();
+                return null;
+              }
+              catch (DataException x)
+              { throw new WorkException("Error updating sequence",x);
+              }
+            }
+            
+          }.work();
+          
+            
+        }
+
+                
+      }
+    }
+    
+    @Override
+    public synchronized Integer next()
+      throws DataException
+    {
+      if (next==stop)
+      { allocate();
+      }
+      return next++;
+    }
+  }
+  
   /**
    * Called after the database becomes available.
    */
@@ -294,6 +443,8 @@ public class SqlStore
     }
     return mapping;
   }
+
+
   
   
 }
