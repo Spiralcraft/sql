@@ -36,10 +36,16 @@ public class PrimitiveTypeMapper<T>
   public SqlType getSqlType(PrimitiveTypeImpl type)
   {
     SqlType sqlType=SqlType.getStandardSqlType(type.getNativeClass());
+    if (sqlType==null && type.isStringEncodable())
+    { sqlType=SqlType.getStandardSqlType(String.class);
+    }
+      
     if (sqlType==null)
-    { 
+    {
       throw new IllegalArgumentException
-        ("Primitive datatype not mapped: "+type.getNativeClass());
+        ("Primitive datatype not mapped and not encodable as a String: "
+        +type.getNativeClass()
+        );
     }
     
     return dialect.getSqlType
