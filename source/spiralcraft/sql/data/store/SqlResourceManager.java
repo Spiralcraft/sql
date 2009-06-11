@@ -36,9 +36,7 @@ public class SqlResourceManager
   public void deallocateConnection(Connection connection)
   {
     try
-    { 
-      // XXX Adapt for pool
-      connection.close();
+    { connection.close();
     }
     catch (SQLException x)
     { x.printStackTrace();
@@ -50,7 +48,6 @@ public class SqlResourceManager
   { 
     try
     {
-      // XXX Adapt for pool
       Connection connection=sqlStore.checkoutConnection();
       connection.setAutoCommit(false);
       return connection;
