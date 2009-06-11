@@ -30,6 +30,12 @@
         </path>
         
         <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>SqlType.java
+          </URI>
+          <URI>data/mappers/PrimitiveTypeMapper.java
+          </URI>
           <URI>data/SerialResultSetCursor.java
           </URI>
           <URI>data/store/BoundQueryStatement.java
@@ -45,6 +51,8 @@
           <URI>data/store/TypeManager.java
           </URI>
           <URI>data/store/Updater.java
+          </URI>
+          <URI>data/store/ColumnMapping.java
           </URI>
         </resources>
       </scm:Change>
