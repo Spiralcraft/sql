@@ -27,11 +27,11 @@ import spiralcraft.sql.dml.ComparisonPredicate;
 
 import spiralcraft.sql.model.Column;
 
-import spiralcraft.registry.Registrant;
-import spiralcraft.registry.RegistryNode;
 
 import spiralcraft.lang.Expression;
 import spiralcraft.lang.ParseException;
+import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import spiralcraft.util.Path;
 import spiralcraft.util.tree.LinkedTree;
@@ -44,9 +44,11 @@ import java.util.HashMap;
  * An association between a Field in the Scheme of a Type and a Table column
  */
 public class ColumnMapping
-  implements Registrant
 {
-  private RegistryNode registryNode;
+  private static final ClassLog log=ClassLog.getInstance(ColumnMapping.class);
+  private static final Level debugLevel
+    =ClassLog.getInitialDebugLevel(ColumnMapping.class, null);
+  
   
   private Field<?> field;
   private String fieldName;
@@ -64,6 +66,7 @@ public class ColumnMapping
   private SetClause parameterizedSetClause;
   private SqlParameterReference parameterReference;
   private BooleanCondition parameterizedKeyCondition;
+  private SqlStore store;
   
   public ColumnMapping()
   {
@@ -162,18 +165,19 @@ public class ColumnMapping
     return null;
   }
   
-  public void register(RegistryNode node)
+  public void resolve()
   {
-    System.err.println("ColumnMapping: "+fieldName+":"+columnName);
-    node=node.createChild(fieldName);
-    node.registerInstance(ColumnMapping.class,this);
-    registryNode=node;
+    if (debugLevel.canLog(Level.DEBUG))
+    { log.debug("ColumnMapping: "+fieldName+":"+columnName);
+    }
+
     if (flatten && field.getType().getScheme()!=null)
     { 
       flatten();
       for (ColumnMapping subMapping : flattenedChildren)
       { 
-        subMapping.register(registryNode);
+        subMapping.setStore(store);
+        subMapping.resolve();
         
       }
     }
@@ -187,6 +191,10 @@ public class ColumnMapping
    */
   public Column getColumnModel()
   { return column;
+  }
+  
+  void setStore(SqlStore store)
+  { this.store=store;
   }
    
   @SuppressWarnings("unchecked") // Not using typeMapper in a generics way
@@ -208,21 +216,22 @@ public class ColumnMapping
     { 
       if (column==null)
       {
-        TypeManager typeManager
-          =registryNode.findInstance(TypeManager.class);
 
         
         column=new Column();
         column.setName(columnName);
 
         TypeMapper typeMapper
-          =typeManager.getTypeMapperForType(field.getType());
+          =store.getTypeManager().getTypeMapperForType(field.getType());
         if (typeMapper==null)
         { 
-          System.err.println
-            ("ColumnMapping.getColumnModels(): No mapper for type "
-            +field.getType().getURI()
-            );
+          if (debugLevel.canLog(Level.DEBUG))
+          {
+            log.debug
+              ("ColumnMapping.getColumnModels(): No mapper for type "
+              +field.getType().getURI()
+              );
+          }
           return new Column[0];
         }
             
@@ -244,7 +253,10 @@ public class ColumnMapping
       {
         parameterReference
           =new SqlParameterReference(Expression.parse(path.format(".")));
-        // System.err.println("ColumnMapping: "+columnName+" refs "+path.format("."));
+        
+        if (debugLevel.canLog(Level.DEBUG))
+        { log.debug("ColumnMapping: "+columnName+" refs "+path.format("."));
+        }
       }
       catch (ParseException x)
       { throw new RuntimeException("Cannot parse "+path.format("."));
@@ -307,6 +319,7 @@ public class ColumnMapping
     
   }
   
+
   /**
    * Create the set of SelectListItem SqlFragments that return the
    *   one or many values that make up this mapping.
