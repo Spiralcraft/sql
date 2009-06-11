@@ -59,4 +59,13 @@ public class Dialect
     }
   }
   
+  /**
+   * The default schema name to use for application tables if no specific
+   *   schema name is specified.
+   * 
+   * @return
+   */
+  public String getDefaultSchemaName()
+  { return null;
+  }
 }
