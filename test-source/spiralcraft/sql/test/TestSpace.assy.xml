@@ -2,6 +2,7 @@
   xmlns:data="class:/spiralcraft/data/"
   xmlns:store="class:/spiralcraft/sql/data/store/"
   xmlns:example="class:/spiralcraft/data/test/example/"  
+  xmlns:stest="class:/spiralcraft/sql/test/"
   >
   <stores>
   
@@ -9,8 +10,13 @@
       
       <dataSource dataURI="DataSource.local.xml"/>
     
-      <typeManager dataURI="class:/spiralcraft/sql/test/TypeManager.xml"/>
+      <typeManager dataURI="stest:TypeManager.xml"/>
       
+      <connectionPool.maxStartupMs>1000
+      </connectionPool.maxStartupMs>
+
+      <connectionPool.maxCheckoutMs>1000
+      </connectionPool.maxCheckoutMs>
     </store:SqlStore>
 
   </stores>

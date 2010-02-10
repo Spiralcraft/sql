@@ -14,12 +14,14 @@
 //
 package spiralcraft.sql.data.store;
 
+import spiralcraft.data.Aggregate;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.Type;
 import spiralcraft.data.Field;
 import spiralcraft.data.Key;
 
+import spiralcraft.data.access.CursorAggregate;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Queryable;
@@ -60,6 +62,7 @@ public class TableMapping
   private LinkedTree<ColumnMapping> columnMappingTree;
   private SqlStore sqlStore;
   private boolean resolved;
+  private volatile long lastTransactionId;
 
 
   private HashMap<String,ColumnMapping> columnFieldMap
@@ -290,6 +293,25 @@ public class TableMapping
   { 
     columnMappings.add(mapping);
     columnFieldMap.put(mapping.getFieldName(),mapping);
+  }
+  
+  /**
+   * Update the table to match the presented dataset
+   * 
+   * @param aggregate
+   */
+  public void update(Aggregate<Tuple> aggregate)
+    throws DataException
+  {
+  }
+  
+  public Aggregate<Tuple> snapshot()
+    throws DataException
+  { return new CursorAggregate<Tuple>(getAll(type).execute());
+  }
+  
+  public long getLastTransactionId()
+  { return lastTransactionId;
   }
   
   /**

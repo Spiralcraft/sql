@@ -6,5 +6,34 @@
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
 
   <import file="../../build/build-spiralcraft-common.xml"/>
+    
+  <target name="build" depends="init,build-common.build"/>
+      
+  <target name="init" if="configMissing">
+    <echo>Creating file test/DataSource.local.xml...
+    </echo>
+    <echo>Creating file test/DataSource.master.local.xml...
+    </echo>
+        
+    <copy
+      tofile="test/DataSource.local.xml" 
+      file="test/DataSource.template.xml"
+    />
+      <copy
+        tofile="test/DataSource.master.local.xml" 
+        file="test/DataSource.master.template.xml"
+      />
+  </target>
+        
+  <condition property="configMissing">
+    <or>
+      <not>
+        <available file="test/DataSource.local.xml"/>
+      </not>
+      <not>
+        <available file="test/DataSource.master.local.xml"/>
+      </not>
+    </or>
+  </condition>        
 </project>
 

@@ -4,6 +4,38 @@
   xmlns:scm="class:/spiralcraft/scm/meta/"
   >
   <scm:Change>
+    <revision>0.4.4.3
+    </revision>
+  
+    <authorId>miketoth
+    </authorId>
+  
+    <notes>
+      <scm:Note>Refresh for spiralcraft-core 0.4.4.3 re. updated
+        AbstractTuple signature, spiralcraft.lang AST changes, and
+        Store.snapshot(), Store.update() functionality.
+      </scm:Note>
+    </notes>
+    
+    <path>source/spiralcraft/sql/
+    </path>
+    
+    <resources>
+      <URI>data/ResultSetTuple.java
+      </URI>
+      <URI>data/store/CriteriaTranslator.java
+      </URI>
+      <URI>data/store/SqlStore.java
+      </URI>
+      <URI>data/store/TableMapping.java
+      </URI>
+      <URI>util/Loader.java
+      </URI>
+    
+    </resources>
+  </scm:Change>
+  
+  <scm:Change>
     <revision>0.3.1
     </revision>
     

@@ -18,10 +18,13 @@ package spiralcraft.sql.data.store;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.SimpleFocus;
 import spiralcraft.lang.spi.SimpleChannel;
+import spiralcraft.log.Level;
 
 import spiralcraft.data.DataConsumer;
 import spiralcraft.data.access.SerialCursor;
+import spiralcraft.data.access.Snapshot;
 
+import spiralcraft.data.Aggregate;
 import spiralcraft.data.DataException;
 import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.EditableTuple;
@@ -32,16 +35,19 @@ import spiralcraft.data.Tuple;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
+import spiralcraft.data.query.Queryable;
 import spiralcraft.data.query.Selection;
 import spiralcraft.data.query.Scan;
 
 import spiralcraft.data.spi.AbstractStore;
 import spiralcraft.data.spi.ArrayDeltaTuple;
+import spiralcraft.data.spi.EditableArrayListAggregate;
 import spiralcraft.data.spi.EditableArrayTuple;
 import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.transaction.WorkException;
 import spiralcraft.data.transaction.WorkUnit;
 import spiralcraft.data.transaction.Transaction.Nesting;
+import spiralcraft.data.types.standard.AnyType;
 
 import spiralcraft.sql.data.query.BoundSelection;
 import spiralcraft.sql.data.query.BoundScan;
@@ -77,7 +83,6 @@ public class SqlStore
     =new SqlResourceManager(this);
   
   private TableMapping sequenceTableMapping;
-  
   
   public SqlStore()
     throws DataException
@@ -141,7 +146,13 @@ public class SqlStore
    */
   public Connection checkoutConnection()
     throws SQLException
-  { return connectionPool.checkout();
+  { 
+    try
+    { return connectionPool.checkout();
+    }
+    catch (InterruptedException x)
+    { throw new SQLException("Timed out waiting for connection pool");
+    }
   }
   
   @Override
@@ -161,7 +172,9 @@ public class SqlStore
     { onAttach(); // XXX Waiting for auto-recovery implementation
     }
     catch (DataException x)
-    { throw new LifecycleException(x.toString(),x);
+    { 
+      connectionPool.stop();
+      throw new LifecycleException(x.toString(),x);
     }
     super.start();
   }
@@ -444,6 +457,63 @@ public class SqlStore
     return mapping;
   }
 
+  public void update(Snapshot snapshot)
+  {
+    for (Aggregate<Tuple> aggregate : snapshot.getData())
+    { 
+      Type<?> type=aggregate.getType().getContentType();
+      Queryable<?> queryable=getQueryable(type);
+      if (queryable==null || !(queryable instanceof TableMapping))
+      { log.warning("Ignoring snapshot of "+type.getURI());
+      }
+      else
+      { 
+        try
+        { ((TableMapping) queryable).update(aggregate);
+        }
+        catch (DataException x)
+        { 
+          log.log
+            (Level.WARNING,"Failed to deliver subscription to "+type.getURI()
+            ,x);
+        }
+      }
+      
+    }
+    lastTransactionId=snapshot.getTransactionId();
+  }
+
+  public Snapshot snapshot(long transactionId)
+    throws DataException
+  {
+    if (transactionId==0 || lastTransactionId>transactionId)
+    {
+      EditableArrayTuple snapshot=new EditableArrayTuple(Snapshot.TYPE);
+      
+      // Note- do not set to 0 here or entire dataset will be sent repeatedly
+      snapshot.set("transactionId",(lastTransactionId!=0)?lastTransactionId:1);
+      
+      EditableArrayListAggregate<Aggregate<Tuple>> data
+        =new EditableArrayListAggregate<Aggregate<Tuple>>
+          (Type.resolve(AnyType.TYPE_URI+".list.list")
+          );
+      for (Queryable<?> queryable:getPrimaryQueryables())
+      {
+        TableMapping table
+          =(TableMapping) queryable;
+        if (transactionId==0
+            || table.getLastTransactionId()>transactionId
+            )
+        { data.add(table.snapshot());
+        }
+      }
+      snapshot.set("data",data);
+      return Snapshot.TYPE.fromData(snapshot,null);
+    }
+    else
+    { return null;
+    }
+  }  
 
   
   

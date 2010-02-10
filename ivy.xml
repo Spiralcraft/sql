@@ -2,8 +2,12 @@
 <ivy-module version="2.0">
   <info organisation="spiralcraft" module="sql">
   </info>
+  <publications>
+    <artifact name="spiralcraft-sql" type="jar" ext="jar"/>
+    <artifact name="spiralcraft-sql-test" type="jar" ext="jar"/>
+  </publications> 
   <dependencies>
-    <dependency org="spiralcraft" name="core" rev="[0.3.4,)"/>
+    <dependency org="spiralcraft" name="core" rev="[0.4.4.3,)"/>
     <dependency org="postgresql" name="jdbc4" rev="latest.integration"/>
   </dependencies>
 </ivy-module>

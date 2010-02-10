@@ -498,11 +498,15 @@ public class Loader
       {
         // Check keys
         if (_insertKeyFields!=null)
-        { new KeyImpl<Tuple>(fieldSet,_insertKeyFields).bindChannel(dataFocus);
+        { 
+          new KeyImpl<Tuple>(fieldSet,_insertKeyFields)
+            .bindChannel(dataFocus.getSubject(),dataFocus,null);
         }
       
         if (_updateKeyFields!=null)
-        { new KeyImpl<Tuple>(fieldSet,_updateKeyFields).bindChannel(dataFocus);
+        { 
+          new KeyImpl<Tuple>(fieldSet,_updateKeyFields)
+            .bindChannel(dataFocus.getSubject(),dataFocus,null);
         }
       }
       catch (BindException x)
@@ -561,13 +565,15 @@ public class Loader
         if (_insertKeyFields!=null)
         { 
           insertKey=new KeyImpl<Tuple>(fieldSet,_insertKeyFields);
-          insertKeyBinding=insertKey.bindChannel(dataFocus);
+          insertKeyBinding=insertKey.bindChannel
+            (dataFocus.getSubject(),dataFocus,null);
         }
       
         if (_updateKeyFields!=null)
         { 
           updateKey=new KeyImpl<Tuple>(fieldSet,_updateKeyFields);
-          updateKeyBinding=updateKey.bindChannel(dataFocus);
+          updateKeyBinding=updateKey.bindChannel
+            (dataFocus.getSubject(),dataFocus,null);
         }
       }
       catch (BindException x)

@@ -21,7 +21,7 @@ import spiralcraft.lang.parser.LogicalAndNode;
 import spiralcraft.lang.parser.LogicalOrNode;
 import spiralcraft.lang.parser.EqualityNode;
 import spiralcraft.lang.parser.RelationalNode;
-import spiralcraft.lang.parser.PrimaryIdentifierNode;
+import spiralcraft.lang.parser.ContextIdentifierNode;
 import spiralcraft.lang.parser.CurrentFocusNode;
 
 
@@ -102,8 +102,8 @@ public class CriteriaTranslator
   private Translation<ValueExpression> translateValueExpression(Node node)
   {
 
-    if (node instanceof PrimaryIdentifierNode)
-    { return translatePrimaryIdentifier((PrimaryIdentifierNode) node);
+    if (node instanceof ContextIdentifierNode)
+    { return translateContextIdentifier((ContextIdentifierNode) node);
     }
     else
     { 
@@ -116,7 +116,7 @@ public class CriteriaTranslator
   }
   
   private Translation<ValueExpression>
-    translatePrimaryIdentifier(PrimaryIdentifierNode node)
+    translateContextIdentifier(ContextIdentifierNode node)
   { 
     // Determine if this refers to a name on the server side or on the client 
     //   side.

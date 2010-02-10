@@ -16,6 +16,7 @@ package spiralcraft.sql.data;
 
 import spiralcraft.data.spi.AbstractTuple;
 
+import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.Field;
 import spiralcraft.data.Tuple;
@@ -155,6 +156,12 @@ public class ResultSetTuple
 
   @Override
   protected AbstractTuple createBaseExtent(Tuple tuple) throws DataException
+  { throw new UnsupportedOperationException("A ResultSetTuple cannot be written to");
+  }
+
+  @Override
+  protected AbstractTuple createDeltaBaseExtent(DeltaTuple tuple) 
+      throws DataException
   { throw new UnsupportedOperationException("A ResultSetTuple cannot be written to");
   }
 }
