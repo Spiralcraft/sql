@@ -26,7 +26,11 @@ public class TableElementList
   private ArrayList<TableElement> elements=new ArrayList<TableElement>();
 
   public void addElement(TableElement element)
-  { elements.add(element);
+  { 
+    if (element==null)
+    { throw new IllegalArgumentException("Element can't be null");
+    }
+    elements.add(element);
   }
   
   @Override
