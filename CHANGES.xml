@@ -4,16 +4,22 @@
   xmlns:scm="class:/spiralcraft/scm/meta/"
   >
   <scm:Change>
-    <revision>0.4.4.3
+    <revision>0.4.5
     </revision>
   
     <authorId>miketoth
     </authorId>
   
     <notes>
-      <scm:Note>Refresh for spiralcraft-core 0.4.4.3 re. updated
+      <scm:Note>Refresh for spiralcraft-core 0.4.5 re. updated
         AbstractTuple signature, spiralcraft.lang AST changes, and
         Store.snapshot(), Store.update() functionality.
+      </scm:Note>
+      <scm:Note>Ignore non-persistent fields and keys
+      </scm:Note>
+      <scm:Note>Sort out Schema TableMapping override behavior
+      </scm:Note>
+      <scm:Note>Make identifiers quoted
       </scm:Note>
     </notes>
     
@@ -28,6 +34,16 @@
       <URI>data/store/SqlStore.java
       </URI>
       <URI>data/store/TableMapping.java
+      </URI>
+      <URI>data/store/TypeManager.java
+      </URI>
+      <URI>ddl/UniqueConstraintDefinition.java
+      </URI>
+      <URI>ddl/TableElementList.java
+      </URI>
+      <URI>model/KeyConstraint.java
+      </URI>
+      <URI>model/Table.java
       </URI>
       <URI>util/Loader.java
       </URI>
