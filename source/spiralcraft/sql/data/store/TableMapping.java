@@ -328,17 +328,25 @@ public class TableMapping
       ColumnMapping columnMapping=getMappingForField(field.getName());
       if (columnMapping==null)
       { 
-        columnMapping=new ColumnMapping();
-        columnMapping.setField(field);
-        addColumnMapping(columnMapping);
+        if (!field.isTransient())
+        {
+          columnMapping=new ColumnMapping();
+          columnMapping.setField(field);
+          addColumnMapping(columnMapping);
+        }
       }
       else
       { columnMapping.setField(field);
       }
-      columnMapping.setPath(new Path().append(field.getName()));
-      orderedColumns.add(columnMapping);
-      columnMapping.setStore(sqlStore);
-      columnMapping.resolve();
+        
+      if (columnMapping!=null)
+      {
+        columnMapping.setPath(new Path().append(field.getName()));
+        orderedColumns.add(columnMapping);
+        columnMapping.setStore(sqlStore);
+        columnMapping.resolve();
+      }
+      
     }
     columnMappings.clear();
     columnMappings.addAll(orderedColumns);

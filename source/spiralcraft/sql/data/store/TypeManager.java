@@ -28,10 +28,10 @@ import spiralcraft.sql.data.mappers.TypeMapper;
 import spiralcraft.sql.ddl.DDLStatement;
 
 import spiralcraft.sql.Dialect;
-import spiralcraft.util.ArrayUtil;
 
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,7 +53,9 @@ public class TypeManager
   
   private SchemaMapping[] schemaMappings;
 
-  private TableMapping[] tableMappings;
+  private ArrayList<TableMapping> tableMappings
+    =new ArrayList<TableMapping>();
+  private TableMapping[] configuredTableMappings;
   private HashMap<Type<?>,TableMapping> tableMappingsByType
     =new HashMap<Type<?>,TableMapping>();
   
@@ -77,11 +79,11 @@ public class TypeManager
   }
 
   public TableMapping[] getTableMappings()
-  { return tableMappings;
+  { return tableMappings.toArray(new TableMapping[tableMappings.size()]);
   }
   
   public void setTableMappings(TableMapping[] tableMappings)
-  { this.tableMappings=tableMappings;
+  { this.configuredTableMappings=tableMappings;
   }
 
   /**
@@ -94,14 +96,8 @@ public class TypeManager
     if (tableMapping.getSchemaName()==null)
     { tableMapping.setSchemaName(schemaName);
     }
-    if (this.tableMappings!=null)
-    { 
-      this.tableMappings
-        =ArrayUtil.append(tableMappings,tableMapping);
-    }
-    else
-    { this.tableMappings=new TableMapping[] {tableMapping};
-    }
+    tableMappings.add(tableMapping);
+    tableMappingsByType.put(tableMapping.getType(),tableMapping);
   }
   
   public void setTypeMappers(TypeMapper<?>[] typeMappers)
@@ -140,14 +136,11 @@ public class TypeManager
     
     resolveLocalDataModel();
 
-    
-    if (tableMappings!=null)
-    {
-      for (TableMapping mapping: tableMappings)
-      { 
-        mapping.setStore(store);
-        mapping.resolve();
-      }
+
+    for (TableMapping mapping: tableMappings)
+    { 
+      mapping.setStore(store);
+      mapping.resolve();
     }
     
   }
@@ -179,22 +172,28 @@ public class TypeManager
       for (SchemaMapping mapping: schemaMappings)
       {
         for (TableMapping tableMapping: mapping.createTableMappings())
-        { tableMappingsByType.put(tableMapping.getType(),tableMapping);
+        { 
+          tableMappings.add(tableMapping);
+          tableMappingsByType.put(tableMapping.getType(),tableMapping);
         }
       }
     }
     
     
-    if (tableMappings!=null)
+    if (configuredTableMappings!=null)
     {
-      for (TableMapping mapping: tableMappings)
+      for (TableMapping mapping: configuredTableMappings)
       { 
         TableMapping oldMapping
-          =tableMappingsByType.get(mapping.getType());
+          =tableMappingsByType.remove(mapping.getType());
         
         if (oldMapping!=null)
-        {  mapping.copyDefaults(oldMapping);
+        {  
+          mapping.copyDefaults(oldMapping);
+          tableMappings.remove(oldMapping);
+          
         }
+        tableMappings.add(mapping);
         tableMappingsByType.put(mapping.getType(),mapping);
       }
     }
