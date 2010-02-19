@@ -138,13 +138,18 @@ public class KeyConstraint
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     if (storeVersion==null)
     { 
-      AlterTableStatement statement
-        =table.createAlterTableStatement
-          (new AddTableConstraintDefinition
-            (generateConstraintDefinition(dialect)
-            )
-          );
-      ret.add(statement);
+      TableConstraintDefinition constraint
+        =generateConstraintDefinition(dialect);
+      if (constraint!=null)
+      {
+        AlterTableStatement statement
+          =table.createAlterTableStatement
+            (new AddTableConstraintDefinition
+              (constraint
+              )
+            );
+        ret.add(statement);
+      }
     }
     else
     {

@@ -16,6 +16,7 @@ package spiralcraft.sql.model;
 
 import spiralcraft.sql.Dialect;
 
+import spiralcraft.sql.ddl.TableElement;
 import spiralcraft.sql.ddl.TableElementList;
 import spiralcraft.sql.ddl.CreateTableStatement;
 import spiralcraft.sql.ddl.AlterTableStatement;
@@ -162,7 +163,11 @@ public class Table
       }
       
       for (KeyConstraint key: keys)
-      { elements.addElement(key.generateConstraintDefinition(dialect));
+      { 
+        TableElement element=key.generateConstraintDefinition(dialect);
+        if (element!=null)
+        { elements.addElement(key.generateConstraintDefinition(dialect));
+        }
       }
       
       CreateTableStatement statement
