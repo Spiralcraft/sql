@@ -45,7 +45,7 @@ public abstract class UniqueConstraintDefinition
       else
       { buffer.append(",");
       }
-      buffer.append(col);
+      buffer.append("\"").append(col).append("\"");
     }
     buffer.append(") ");
   }
