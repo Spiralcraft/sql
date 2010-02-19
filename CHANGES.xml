@@ -9,7 +9,10 @@
   
     <authorId>miketoth
     </authorId>
-  
+    
+    <date>2010-02-19
+    </date>
+      
     <notes>
       <scm:Note>Refresh for spiralcraft-core 0.4.5 re. updated
         AbstractTuple signature, spiralcraft.lang AST changes, and
