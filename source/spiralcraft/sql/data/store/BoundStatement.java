@@ -90,15 +90,14 @@ public abstract class BoundStatement
    *    which this statement will be executed, or when a different application
    *    context is to be used.
    */
-  @SuppressWarnings("unchecked") // Use of Focus is not specifically typed
-  public void bindParameters(Focus focus)
+  public void bindParameters(Focus<?> focus)
     throws DataException
   { 
     try
     {
       
       parameterBindings.clear();
-      for (Expression expression: parameterExpressions)
+      for (Expression<?> expression: parameterExpressions)
       { 
         System.err.println
           ("BindParameters "+parameterBindings.size()+"= "

@@ -23,7 +23,8 @@ import java.sql.SQLException;
 public class ByteConverter
 	implements Converter<Byte,Object>
 {
-	public Byte toSql(Object value)
+	@Override
+  public Byte toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -41,10 +42,12 @@ public class ByteConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Byte.");
 	}
   
+  @Override
   public Byte fromSql(Byte val)
   { return val;
   }
  
+  @Override
   public Class<?> getSqlClass()
   { return Byte.class;
   }  

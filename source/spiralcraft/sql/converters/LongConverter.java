@@ -23,7 +23,8 @@ import java.sql.SQLException;
 public class LongConverter
 	implements Converter<Long,Object>
 {
-	public Long toSql(Object value)
+	@Override
+  public Long toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -41,10 +42,12 @@ public class LongConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Float.");
 	}
   
+  @Override
   public Long fromSql(Long value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return Long.class;
   }    

@@ -212,7 +212,7 @@ public class Updater
       throws DataException
     {
       super.dataInitialize(fieldSet);
-      this.focus=new TupleFocus<DeltaTuple>(parentFocus,fieldSet);
+      this.focus=TupleFocus.create(parentFocus,fieldSet);
       this.connection=store.getContextConnection();
     }
    

@@ -31,7 +31,8 @@ public class DateConverter
   private static SimpleDateFormat _format
     =new SimpleDateFormat("yyyy-MM-dd");
 
-	public Date toSql(Object value)
+	@Override
+  public Date toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -55,10 +56,12 @@ public class DateConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Date.");
 	}
   
+  @Override
   public java.util.Date fromSql(Date date)
   { return date;
   }
 
+  @Override
   public Class<?> getSqlClass()
   { return Date.class;
   }    

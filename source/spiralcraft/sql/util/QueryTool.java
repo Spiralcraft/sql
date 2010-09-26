@@ -36,6 +36,7 @@ public class QueryTool
   private List<String> sqlList=new ArrayList<String>();
   private boolean update=false;
   
+  @Override
   public void execute(String ... args)
   {
     

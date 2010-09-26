@@ -117,6 +117,7 @@ public class Loader
   }
 
   
+  @Override
   public void execute(String ... args)
   {
     ExecutionContext context
@@ -483,16 +484,25 @@ public class Loader
     private int count=0;
     private TupleFocus<Tuple> dataFocus;
     private FieldSet fieldSet;
+    private boolean debug;
+    
+    @Override
+    public void setDebug(boolean debug)
+    { this.debug=debug;
+    }
 
+    @Override
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
     {
-      log.info("Fields: "+fieldSet.toString());
+      if (debug)
+      { log.info("Fields: "+fieldSet.toString());
+      }
       this.fieldSet=fieldSet;
 
       
       dataFocus
-        =new TupleFocus<Tuple>(fieldSet);
+        =TupleFocus.create(null,fieldSet);
 
       try
       {
@@ -524,6 +534,7 @@ public class Loader
     { return dataFocus.getSubject().get();
     }
     
+    @Override
     public void dataAvailable(Tuple data)
       throws DataException
     { 
@@ -531,6 +542,7 @@ public class Loader
       dataFocus.setTuple(data);
     }
     
+    @Override
     public void dataFinalize()
     { 
     }
@@ -551,13 +563,24 @@ public class Loader
     private KeyImpl<Tuple> updateKey;
     private Channel<Tuple> insertKeyBinding;
     private Channel<Tuple> updateKeyBinding;
-
+    private boolean debug;
+    
+    @Override
+    public void setDebug(boolean debug)
+    { this.debug=debug;
+    }
+    
+    @Override
     public void dataInitialize(FieldSet fieldSet)
       throws DataException
     {
+      if (debug)
+      { log.debug("Initializing updater for "+fieldSet);
+      }
+      
       this.fieldSet=fieldSet;
       dataFocus
-        =new TupleFocus<Tuple>(fieldSet);
+        =TupleFocus.<Tuple>create(null,fieldSet);
       
       try
       {
@@ -593,6 +616,7 @@ public class Loader
     { return dataFocus.getSubject().get();
     }
     
+    @Override
     public void dataAvailable(Tuple data)
       throws DataException
     { 
@@ -600,6 +624,7 @@ public class Loader
       performSql();
     }
     
+    @Override
     public void dataFinalize()
     { 
     }

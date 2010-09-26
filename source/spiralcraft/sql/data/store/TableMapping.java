@@ -81,10 +81,12 @@ public class TableMapping
   { return type;
   }
   
+  @Override
   public Type<?>[] getTypes()
   { return new Type[] {type};
   }
   
+  @Override
   public boolean containsType(Type<?> type)
   { return type==this.type;
   }
@@ -93,6 +95,7 @@ public class TableMapping
   { this.sqlStore=store;
   }
   
+  @Override
   public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
     throws DataException
   { return query.solve(focus,this);

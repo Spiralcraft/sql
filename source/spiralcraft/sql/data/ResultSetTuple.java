@@ -111,6 +111,7 @@ public class ResultSetTuple
     }
   }
   
+  @Override
   public Object get(int index)
     throws DataException
   {
@@ -145,6 +146,7 @@ public class ResultSetTuple
    *@return true, because this Tuple is simply a view of the ResultSet which can
    *  be advanced at any time
    */
+  @Override
   public boolean isVolatile()
   { return true;
   }

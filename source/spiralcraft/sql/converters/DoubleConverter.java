@@ -23,7 +23,8 @@ import java.sql.SQLException;
 public class DoubleConverter
 	implements Converter<Double,Object>
 {
-	public Double toSql(Object value)
+	@Override
+  public Double toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -41,10 +42,12 @@ public class DoubleConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Float.");
 	}
   
+  @Override
   public Double fromSql(Double value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return Double.class;
   }    

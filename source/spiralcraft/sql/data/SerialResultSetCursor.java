@@ -58,7 +58,7 @@ public class SerialResultSetCursor
    *   an immutable Tuple every time the cursor is advanced.
    * @throws DataException
    */
-  @SuppressWarnings("unchecked") // Not genericized
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Not genericized
   public SerialResultSetCursor(ResultSet resultSet)
     throws DataException
   { 
@@ -82,7 +82,7 @@ public class SerialResultSetCursor
     }
   }
   
-  @SuppressWarnings("unchecked") // Not genericized
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Not genericized
   public SerialResultSetCursor(FieldSet fieldSet,ResultSet resultSet)
     throws DataException
   {
@@ -186,6 +186,7 @@ public class SerialResultSetCursor
   { return binding;
   }
 
+  @Override
   public void close()
     throws DataException
   { 

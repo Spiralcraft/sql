@@ -40,10 +40,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
   public BoundSqlQuery(Tq query,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { 
-    focus=new TupleFocus<Tuple>(query.getFieldSet());
-    if (parentFocus!=null)
-    { focus.setParentFocus(parentFocus);
-    }
+    focus=TupleFocus.<Tuple>create(parentFocus,query.getFieldSet());
     this.store=store;
     setQuery(query);
   }

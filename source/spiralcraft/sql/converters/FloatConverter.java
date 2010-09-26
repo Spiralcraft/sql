@@ -23,7 +23,8 @@ import java.sql.SQLException;
 public class FloatConverter
 	implements Converter<Float,Object>
 {
-	public Float toSql(Object value)
+	@Override
+  public Float toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -41,10 +42,12 @@ public class FloatConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Float.");
 	}
   
+  @Override
   public Float fromSql(Float value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return Float.class;
   }    

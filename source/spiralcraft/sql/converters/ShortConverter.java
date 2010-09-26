@@ -23,7 +23,8 @@ import java.sql.SQLException;
 public class ShortConverter
 	implements Converter<Short,Object>
 {
-	public Short toSql(Object value)
+	@Override
+  public Short toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -41,10 +42,12 @@ public class ShortConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Short.");
 	}
   
+  @Override
   public Short fromSql(Short value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return Short.class;
   }    

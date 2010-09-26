@@ -24,7 +24,8 @@ import java.math.BigDecimal;
 public class BigDecimalConverter
 	implements Converter<BigDecimal,Object>
 {
-	public BigDecimal toSql(Object value)
+	@Override
+  public BigDecimal toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -42,10 +43,12 @@ public class BigDecimalConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a BigDecimal.");
 	}
   
+  @Override
   public BigDecimal fromSql(BigDecimal value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return BigDecimal.class;
   }

@@ -34,6 +34,7 @@ public class ConnectionPool
   { this.dataSource=dataSource;
   }
 
+  @Override
   public PooledConnection createResource()
     throws SQLException
   { 
@@ -42,6 +43,7 @@ public class ConnectionPool
     
   }
 
+  @Override
   public void discardResource(PooledConnection resource)
   { 
     try
@@ -112,6 +114,7 @@ public class ConnectionPool
         Scheduler.instance().scheduleNow
           (new Runnable()
           {
+            @Override
             public void run()
             { 
               try

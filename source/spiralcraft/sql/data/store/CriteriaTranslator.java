@@ -76,7 +76,7 @@ public class CriteriaTranslator
   { return whereClause;
   }
   
-  @SuppressWarnings("unchecked") // Nodes genericized for internal purposes only
+  @SuppressWarnings("rawtypes")
   private Translation<BooleanCondition> translateBooleanCondition(Node node)
   { 
     if (node instanceof LogicalAndNode)
@@ -160,7 +160,7 @@ public class CriteriaTranslator
   }
   
   
-  @SuppressWarnings("unchecked") // RelationNode genericized for internal use
+  @SuppressWarnings("rawtypes")
   private Translation<BooleanCondition> translateRelational(RelationalNode node)
   {
     Node lhs=node.getLeftOperand();
@@ -207,7 +207,7 @@ public class CriteriaTranslator
     return result;
   }
   
-  @SuppressWarnings("unchecked") // Genericized for internal purposes only
+  @SuppressWarnings("rawtypes")
   private Translation<BooleanCondition> translateEquals(EqualityNode node)
   {
     Node lhs=node.getLeftOperand();

@@ -35,7 +35,8 @@ public class TimestampConverter
   { _format.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
-	public Timestamp toSql(Object value)
+	@Override
+  public Timestamp toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -62,10 +63,12 @@ public class TimestampConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Date.");
 	}
   
+  @Override
   public java.util.Date fromSql(Timestamp value)
   { return value;
   }
   
+  @Override
   public Class<Timestamp> getSqlClass()
   { return Timestamp.class;
   }

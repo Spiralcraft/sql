@@ -28,7 +28,7 @@ public class SqlParameterReference
   }
   
   @Override
-  @SuppressWarnings("unchecked") // Tag is heterogeneous
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Tag is heterogeneous
   public void write(StringBuilder buffer,String indent, List parameterCollector)
   { 
     buffer.append("? ");

@@ -32,7 +32,8 @@ public class TimeConverter
   private static SimpleDateFormat _format
     =new SimpleDateFormat("HH:mm:ss");
 
-	public Time toSql(Object value)
+	@Override
+  public Time toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -56,10 +57,12 @@ public class TimeConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a Time.");
 	}
   
+  @Override
   public java.util.Date fromSql(Time value)
   { return value;
   }
   
+  @Override
   public Class<?> getSqlClass()
   { return Time.class;
   }  

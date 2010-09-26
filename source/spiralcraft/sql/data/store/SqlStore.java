@@ -260,6 +260,7 @@ public class SqlStore
    * @return A DataConsumer which is used to push one or more updates into
    *   this Store. 
    */
+  @Override
   public DataConsumer<DeltaTuple> getUpdater(Type<?> type,Focus<?> focus)
     throws DataException
   { return assertTableMapping(type).getUpdater().newBatch(focus);
@@ -310,6 +311,7 @@ public class SqlStore
       uriFocus=new SimpleFocus<URI>(new SimpleChannel<URI>(uri,true));
     }
 
+    @Override
     public void start()
       throws LifecycleException
     {
@@ -323,6 +325,7 @@ public class SqlStore
       }
     }
     
+    @Override
     public void stop()
     {
     }
@@ -457,6 +460,7 @@ public class SqlStore
     return mapping;
   }
 
+  @Override
   public void update(Snapshot snapshot)
   {
     for (Aggregate<Tuple> aggregate : snapshot.getData())
@@ -483,6 +487,7 @@ public class SqlStore
     lastTransactionId=snapshot.getTransactionId();
   }
 
+  @Override
   public Snapshot snapshot(long transactionId)
     throws DataException
   {

@@ -27,7 +27,8 @@ import java.sql.SQLException;
 public class VarcharConverter
 	implements Converter<String,Object>
 {
-	public String toSql(Object value)
+	@Override
+  public String toSql(Object value)
 		throws SQLException
 	{
 		if (value==null)
@@ -57,10 +58,12 @@ public class VarcharConverter
 		throw new SQLException("Could not safely convert object of type '"+value.getClass().getName()+"' to a String.");
 	}
   
+  @Override
   public String fromSql(String value)
   { return value;
   }
   
+  @Override
   public Class<String> getSqlClass()
   { return String.class;
   }

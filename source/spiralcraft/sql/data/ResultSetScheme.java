@@ -36,7 +36,7 @@ public class ResultSetScheme
   extends SchemeImpl
 {
   
-  @SuppressWarnings("unchecked") // Inherently unsafe ops
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Inherently unsafe ops
   public ResultSetScheme(ResultSetMetaData metadata)
     throws DataException
   {
@@ -103,7 +103,7 @@ public class ResultSetScheme
     return newName.toString();
   }
   
-  @SuppressWarnings("unchecked") // Inherently unsafe ops
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Inherently unsafe ops
   public void readResultSet(ResultSet rs,EditableTuple tuple)
     throws SQLException,DataException
   {

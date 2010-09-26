@@ -31,7 +31,7 @@ import spiralcraft.sql.model.Column;
  *   according to database specific thresholds. 
  *   
  */
-@SuppressWarnings("unchecked") // XXX Complete this and genericize if possible
+@SuppressWarnings("rawtypes")
 public abstract class TypeMapper<T extends Type>
 {
   

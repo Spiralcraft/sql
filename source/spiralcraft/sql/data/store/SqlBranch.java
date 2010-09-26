@@ -52,6 +52,7 @@ public class SqlBranch
     return connection;
   }
   
+  @Override
   public void commit()
     throws TransactionException
   {
@@ -64,14 +65,17 @@ public class SqlBranch
     state=State.COMMITTED;
   }
 
+  @Override
   public State getState()
   { return state;
   }
 
+  @Override
   public void prepare()
   { state=State.PREPARED;    
   }
 
+  @Override
   public void rollback()
     throws TransactionException
   {
@@ -85,6 +89,7 @@ public class SqlBranch
     state=State.ABORTED;
   }
   
+  @Override
   public void complete()
   { 
     if (connection!=null)
@@ -92,6 +97,7 @@ public class SqlBranch
     }
   }
   
+  @Override
   public boolean is2PC()
   { return false;
   }
