@@ -55,8 +55,6 @@ public class StringTypeMapper
     if (type.getMaxLength()>0)
     { col.setLength(type.getMaxLength());
     }
-    
-    // TODO Auto-generated method stub
 
   }
 
