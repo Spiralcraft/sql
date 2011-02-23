@@ -1,3 +1,0 @@
-<project name="spiralcraft-sql-publish" basedir="." default="share">
-  <import file="build.xml"/>
-</project>

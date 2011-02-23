@@ -4,6 +4,56 @@
   xmlns:scm="class:/spiralcraft/scm/meta/"
   >
   <scm:Change>
+    <revision>0.4.13
+    </revision>
+  
+    <authorId>miketoth
+    </authorId>
+    
+    <date>2010-02-19
+    </date>
+    
+    <detail>
+      <scm:Change>
+        <notes>
+          <scm:Note>
+            Factor for changes to base abstractions of spiralcraft.data.access
+              package.
+          </scm:Note>
+        
+        </notes>
+        
+        <path>source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>data/store/SchemaMapping.java
+          </URI>
+          <URI>data/store/SqlStore.java
+          </URI>
+          <URI>data/store/SqlStoreConnection.java
+          </URI>
+          <URI>data/store/SqlUpdater.java
+          </URI>
+          <URI>data/store/TableMapping.java
+          </URI>
+          <URI>data/store/TypeManager.java
+          </URI>
+          <URI>data/store/Updater.java
+          </URI>
+          <URI>pool/ConnectionFactory.java
+          </URI>
+          <URI>pool/ConnectionPool.java
+          </URI>
+        </resources>
+      
+      </scm:Change>
+    
+    </detail>
+    
+  </scm:Change>
+  
+  <scm:Change>
     <revision>0.4.5
     </revision>
   
