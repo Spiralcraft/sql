@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import spiralcraft.lang.Focus;
+import spiralcraft.log.ClassLog;
 
 import spiralcraft.sql.model.Table;
 import spiralcraft.sql.model.Column;
@@ -51,6 +52,9 @@ import spiralcraft.util.tree.LinkedTree;
 public class TableMapping
   implements Queryable<Tuple>
 {
+  private static final ClassLog log
+    =ClassLog.getInstance(TableMapping.class);
+  
   private Type<?> type;
   private String tableName;
   private String schemaName;
@@ -58,7 +62,7 @@ public class TableMapping
     =new ArrayList<ColumnMapping>();
   private Scan scan;
   private Table tableModel;
-  private Updater updater;
+  private SqlUpdater updater;
   private LinkedTree<ColumnMapping> columnMappingTree;
   private SqlStore sqlStore;
   private boolean resolved;
@@ -150,7 +154,7 @@ public class TableMapping
     if (primaryKeyWhereClause==null)
     {
       BooleanCondition condition=null;
-      for (Field<?> field:type.getScheme().getPrimaryKey().fieldIterable())
+      for (Field<?> field:type.getPrimaryKey().fieldIterable())
       {
         ColumnMapping mapping=getMappingForField(field.getName());
         if (condition==null)
@@ -200,7 +204,7 @@ public class TableMapping
     }
   }
   
-  public ColumnMapping getMappingForField(String fieldName)
+  private ColumnMapping getMappingForField(String fieldName)
   { return columnFieldMap.get(fieldName);
   }
 
@@ -231,7 +235,7 @@ public class TableMapping
   /**
    * @return The Updater which handles SQL update logic for this table
    */
-  public Updater getUpdater()
+  public SqlUpdater getUpdater()
   { return updater;
   }
   
@@ -317,6 +321,46 @@ public class TableMapping
   { return lastTransactionId;
   }
   
+  private ColumnMapping resolveMappingForField(Field<?> field)
+  {
+    ColumnMapping columnMapping=getMappingForField(field.getName());
+    if (columnMapping==null)
+    { 
+      if (!field.isTransient())
+      {
+        columnMapping=new ColumnMapping();
+        columnMapping.setStore(sqlStore);        
+        columnMapping.setField(field);
+        
+        // Check to make sure the type is resolvable
+        Column[] models=columnMapping.getColumnModels();
+        if (models.length>0)
+        { addColumnMapping(columnMapping);
+        }
+        else
+        { 
+          columnMapping=null;
+          log.warning
+            ("Non transient field "+field.getURI()+" could not be mapped to "
+            +" table columns and will not be persisted"
+            ); 
+        }
+      }
+    }
+    else
+    { 
+      columnMapping.setStore(sqlStore);
+      columnMapping.setField(field);
+    }
+    
+    if (columnMapping!=null)
+    {
+      columnMapping.setPath(new Path().append(field.getName()));
+      columnMapping.resolve();
+    }
+    return columnMapping;
+  }
+  
   /**
    * Fill in missing details, publish interface
    */
@@ -328,26 +372,10 @@ public class TableMapping
     
     for (Field<?> field: type.getScheme().fieldIterable())
     {
-      ColumnMapping columnMapping=getMappingForField(field.getName());
-      if (columnMapping==null)
-      { 
-        if (!field.isTransient())
-        {
-          columnMapping=new ColumnMapping();
-          columnMapping.setField(field);
-          addColumnMapping(columnMapping);
-        }
-      }
-      else
-      { columnMapping.setField(field);
-      }
         
+      ColumnMapping columnMapping=resolveMappingForField(field);
       if (columnMapping!=null)
-      {
-        columnMapping.setPath(new Path().append(field.getName()));
-        orderedColumns.add(columnMapping);
-        columnMapping.setStore(sqlStore);
-        columnMapping.resolve();
+      { orderedColumns.add(columnMapping);
       }
       
     }
@@ -401,7 +429,7 @@ public class TableMapping
     }
     tableNameSqlFragment=new TableName(schemaName,tableName);
 
-    updater=new Updater(sqlStore,this);
+    updater=new SqlUpdater(sqlStore,this);
     resolved=true;
   }
 }

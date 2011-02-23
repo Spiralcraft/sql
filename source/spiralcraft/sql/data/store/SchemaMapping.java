@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.data.store;
 
+import spiralcraft.data.DataException;
 import spiralcraft.data.Type;
 import spiralcraft.data.access.Schema;
 import spiralcraft.data.access.Entity;
@@ -54,10 +55,16 @@ public class SchemaMapping
    * Create table mappings for all the types in the Schema
    */
   public TableMapping[] createTableMappings()
+    throws DataException
   {
     ArrayList<TableMapping> mappings
       =new ArrayList<TableMapping>();
    
+    schema.resolve();
+    if (schema.getEntities()==null)
+    { log.warning("No entities in "+schema);
+    }
+    
     for (Entity entity: schema.getEntities())
     {
       Type<?> type=entity.getType();

@@ -125,6 +125,7 @@ public class TypeManager
    *   and review metadata.
    */
   public void resolve()
+    throws DataException
   { 
     if (dialect==null)
     { dialect=new Dialect();
@@ -150,6 +151,7 @@ public class TypeManager
   }
   
   private void resolveLocalDataModel()
+    throws DataException
   {
     for (TypeMapper<?> mapper: TypeMapper.getStandardTypeMappers())
     { 

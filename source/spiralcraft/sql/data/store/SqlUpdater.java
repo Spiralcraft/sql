@@ -19,11 +19,15 @@ import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.Field;
 import spiralcraft.data.FieldSet;
 
-import spiralcraft.data.DataConsumer;
 
-import spiralcraft.data.lang.TupleFocus;
+import spiralcraft.data.lang.DataReflector;
 
+import spiralcraft.data.access.Updater;
+
+import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
+import spiralcraft.lang.reflect.BeanReflector;
+import spiralcraft.lang.spi.ThreadLocalChannel;
 import spiralcraft.sql.dml.InsertStatement;
 import spiralcraft.sql.dml.DeleteStatement;
 import spiralcraft.sql.dml.UpdateStatement;
@@ -34,8 +38,6 @@ import spiralcraft.sql.SqlFragment;
 
 import spiralcraft.util.Path;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import java.util.HashMap;
 
@@ -44,7 +46,8 @@ import java.util.ArrayList;
 /**
  * Handles SQL table updates by primary key
  */
-public class Updater
+public class SqlUpdater
+  extends Updater<DeltaTuple>
 {
 
   private TableMapping tableMapping;
@@ -58,22 +61,21 @@ public class Updater
   
   private DeleteStatement deleteStatement;
   
-  public Updater(SqlStore store,TableMapping tableMapping)
+
+  private ThreadLocalChannel<Batch> batch;
+  private ThreadLocalChannel<DeltaTuple> tuple;
+  private Focus<DeltaTuple> paramFocus;
+
+  private HashMap<SqlFragment,BoundUpdateStatement> boundStatements
+    =new HashMap<SqlFragment,BoundUpdateStatement>();
+  
+  public SqlUpdater(SqlStore store,TableMapping tableMapping)
   { 
     this.tableMapping=tableMapping;
     this.store=store;
+    setFieldSet(tableMapping.getType().getFieldSet());
   }
 
-  /**
-   * <P>Batch-update data in the Store with the specified changes, expressed as 
-   *   a SerialCursor of DeltaTuples of the same type.
-   *   
-   * <P>Any rejected updates will be sent to the specified DataConsumer.
-   *   
-   */
-  public DataConsumer<DeltaTuple> newBatch(Focus<?> focus)
-  { return new Batch(focus);
-  }
 
   
   /**
@@ -188,65 +190,87 @@ public class Updater
     
   }
 
+
+  @Override
+  public Focus<?> bind(Focus<?> focus)
+    throws BindException
+  {
+
+    batch
+      =new ThreadLocalChannel<Batch>
+        (BeanReflector.<Batch>getInstance(Batch.class));
+    
+    tuple
+      =new ThreadLocalChannel<DeltaTuple>
+        (DataReflector.<DeltaTuple>getInstance(tableMapping.getType()));
+    paramFocus=focus.chain(tuple);
+    return super.bind(focus);
+  }
+
+  @Override
+  public void dataInitialize(FieldSet fieldSet) 
+    throws DataException
+  {
+    batch.push(new Batch());
+    tuple.push();
+    super.dataInitialize(fieldSet);
+
+  }
+  
+  @Override
+  public void dataFinalize() throws DataException
+  {
+    
+    try
+    {
+      super.dataFinalize();
+      batch.get().flush();
+    }
+    finally
+    { batch.pop();
+    }
+  }
+  
+  
+  @Override
+  public void dataAvailable(DeltaTuple deltaTuple)
+    throws DataException
+  {
+    super.dataAvailable(deltaTuple);
+    tuple.set(deltaTuple);
+    if (!deltaTuple.isDirty())
+    { return;
+    }
+    if (deltaTuple.getOriginal()==null)
+    { batch.get().execute(getInsertStatement(deltaTuple));
+    }
+    else if (deltaTuple.isDelete())
+    { batch.get().execute(getDeleteStatement());
+    }
+    else
+    { batch.get().execute(getUpdateStatement(deltaTuple));
+    }
+    
+  }
+  
+
+  
+  
   
   class Batch
     extends spiralcraft.data.access.Updater<DeltaTuple>
   {
 
-    private Connection connection;
-    private TupleFocus<DeltaTuple> focus;
-    private Focus<?> parentFocus;
     private SqlFragment lastOp;
-    private HashMap<SqlFragment,BoundUpdateStatement> boundStatements
-      =new HashMap<SqlFragment,BoundUpdateStatement>();
     private BoundUpdateStatement currentStatement;
     
-    public Batch(Focus<?> context)
-    { 
-      super(context);
-      parentFocus=context;
-    }
+
+
     
-    @Override
-    public void dataInitialize(FieldSet fieldSet) 
+    private void flush()
       throws DataException
     {
-      super.dataInitialize(fieldSet);
-      this.focus=TupleFocus.create(parentFocus,fieldSet);
-      this.connection=store.getContextConnection();
-    }
-   
-    @Override
-    public void dataAvailable(DeltaTuple tuple)
-      throws DataException
-    {
-      super.dataAvailable(tuple);
-      if (!tuple.isDirty())
-      { return;
-      }
-      focus.setTuple(tuple);
-      if (tuple.getOriginal()==null)
-      { execute(getInsertStatement(tuple));
-      }
-      else if (tuple.isDelete())
-      { execute(getDeleteStatement());
-      }
-      else
-      { execute(getUpdateStatement(tuple));
-      }
       
-    }
-    
-    @Override
-    public void dataFinalize() throws DataException
-    {
-      super.dataFinalize();
-      try
-      { connection.close();
-      }
-      catch (SQLException x)
-      { throw new DataException("Error closing connection: "+x,x);
-      }
     }
 
     private void execute(SqlFragment statement)
@@ -264,7 +288,7 @@ public class Updater
           currentStatement
             =new BoundUpdateStatement(store,tableMapping.getType().getScheme());
           currentStatement.setSqlFragment(statement);
-          currentStatement.bindParameters(focus);
+          currentStatement.bindParameters(paramFocus);
           boundStatements.put(statement,currentStatement);
         }
       }

@@ -15,12 +15,14 @@
 package spiralcraft.sql.data.store;
 
 
+import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.SimpleFocus;
 import spiralcraft.lang.spi.SimpleChannel;
 import spiralcraft.log.Level;
 
 import spiralcraft.data.DataConsumer;
+import spiralcraft.data.access.Entity;
 import spiralcraft.data.access.SerialCursor;
 import spiralcraft.data.access.Snapshot;
 
@@ -43,6 +45,7 @@ import spiralcraft.data.spi.AbstractStore;
 import spiralcraft.data.spi.ArrayDeltaTuple;
 import spiralcraft.data.spi.EditableArrayListAggregate;
 import spiralcraft.data.spi.EditableArrayTuple;
+import spiralcraft.data.spi.EntityBinding;
 import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.transaction.WorkException;
 import spiralcraft.data.transaction.WorkUnit;
@@ -53,6 +56,7 @@ import spiralcraft.sql.data.query.BoundSelection;
 import spiralcraft.sql.data.query.BoundScan;
 
 import spiralcraft.sql.ddl.DDLStatement;
+import spiralcraft.sql.pool.ConnectionFactory;
 import spiralcraft.sql.pool.ConnectionPool;
 
 
@@ -77,7 +81,20 @@ public class SqlStore
 {
   
   private DataSource dataSource;
-  private ConnectionPool connectionPool=new ConnectionPool();
+  private ConnectionPool<SqlStoreConnection> connectionPool
+    =new ConnectionPool<SqlStoreConnection>();
+  
+  { 
+    connectionPool.setConnectionFactory
+      (new ConnectionFactory<SqlStoreConnection>()
+        {
+          @Override
+          public SqlStoreConnection newConnection(Connection delegate)
+          { return new SqlStoreConnection(delegate);
+          }
+        }
+      );
+  }
   private TypeManager typeManager=new TypeManager();
   private SqlResourceManager resourceManager
     =new SqlResourceManager(this);
@@ -96,7 +113,7 @@ public class SqlStore
   { this.dataSource=dataSource;
   }
   
-  public ConnectionPool getConnectionPool()
+  public ConnectionPool<SqlStoreConnection> getConnectionPool()
   { return connectionPool;
   }
 
@@ -123,6 +140,7 @@ public class SqlStore
   
 
   private void resolve()
+    throws DataException
   { 
 
     
@@ -136,6 +154,8 @@ public class SqlStore
     typeManager.resolve();
 
   }
+  
+  
   
   /**
    * <p>Check out a connection from the pool or the data source.
@@ -156,16 +176,37 @@ public class SqlStore
   }
   
   @Override
+  public Focus<?> bind(Focus<?> focus)
+    throws BindException
+  {
+    try
+    { resolve();
+    }
+    catch (DataException x)
+    { throw new BindException("Error resolving data model",x);
+    }
+    
+    TableMapping[] mappings=typeManager.getTableMappings();
+    for (TableMapping mapping: mappings) 
+    { 
+      EntityBinding binding=createEntityBinding(new Entity(mapping.getType()));
+      binding.setAuthoritative(true);
+      binding.setQueryable(mapping);
+      binding.setUpdater(mapping.getUpdater());   
+      addEntityBinding(binding);
+      
+    }
+    
+    
+    
+    return super.bind(focus);
+  }
+
+  
+  @Override
   public void start()
     throws LifecycleException
   { 
-    // TODO: Change to "bind" and use focus chain
-    resolve();
-    TableMapping[] mappings=typeManager.getTableMappings();
-    for (TableMapping mapping: mappings) 
-    { addPrimaryQueryable(mapping.getType(),mapping);
-    }
-    
     connectionPool.setDataSource(dataSource);
     connectionPool.start();
     try
@@ -263,7 +304,7 @@ public class SqlStore
   @Override
   public DataConsumer<DeltaTuple> getUpdater(Type<?> type,Focus<?> focus)
     throws DataException
-  { return assertTableMapping(type).getUpdater().newBatch(focus);
+  { return assertTableMapping(type).getUpdater();
   }
     
   
@@ -299,8 +340,8 @@ public class SqlStore
   {
 
     private int increment;
-    private volatile int next;
-    private volatile int stop;
+    private volatile long next;
+    private volatile long stop;
     private BoundQuery<?,Tuple> boundQuery;
     private Focus<URI> uriFocus;
     private URI uri;
@@ -390,7 +431,7 @@ public class SqlStore
         else
         {
           final EditableTuple row=(EditableTuple) result.getTuple();
-          next=(Integer) resultRow.get("nextValue");
+          next=(Long) resultRow.get("nextValue");
           increment=(Integer) resultRow.get("increment");
           
           stop=next+increment;
@@ -429,7 +470,7 @@ public class SqlStore
     }
     
     @Override
-    public synchronized Integer next()
+    public synchronized Long next()
       throws DataException
     {
       if (next==stop)
@@ -518,6 +559,20 @@ public class SqlStore
     else
     { return null;
     }
+  }
+
+  @Override
+  public URI getLocalResourceURI()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  protected Sequence createTxIdSequence()
+  {
+    return new SqlSequence
+      (URI.create("class:/spiralcraft/sql/store/SqlStore.txId"));
   }  
 
   

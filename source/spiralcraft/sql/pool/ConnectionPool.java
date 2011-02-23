@@ -19,12 +19,21 @@ import spiralcraft.time.Scheduler;
  *   own Threads with support for Thread recycling to
  *   conserve resources.
  */
-public class ConnectionPool
-  extends Pool<ConnectionPool.PooledConnection>
-  implements ResourceFactory<ConnectionPool.PooledConnection>
+public class ConnectionPool<T extends Connection>
+  extends Pool<ConnectionPool<T>.PooledConnection>
+  implements ResourceFactory<ConnectionPool<T>.PooledConnection>
 {
 
   private DataSource dataSource;
+  private ConnectionFactory<T> connectionFactory
+    =new ConnectionFactory<T>()
+    {
+      @SuppressWarnings("unchecked")
+      @Override
+      public T newConnection(Connection delegate)
+      { return (T) delegate;
+      }
+    };
   
   
   { setResourceFactory(this);
@@ -35,16 +44,15 @@ public class ConnectionPool
   }
 
   @Override
-  public PooledConnection createResource()
+  public ConnectionPool<T>.PooledConnection createResource()
     throws SQLException
   { 
     PooledConnection connection=new PooledConnection();
     return connection;
-    
   }
 
   @Override
-  public void discardResource(PooledConnection resource)
+  public void discardResource(ConnectionPool<T>.PooledConnection resource)
   { 
     try
     { resource.getConnection().close();
@@ -70,7 +78,8 @@ public class ConnectionPool
     private Connection newConnection()
       throws SQLException
     {
-      return new StatementCachingConnection(dataSource.getConnection());
+      Connection ret=new StatementCachingConnection(dataSource.getConnection());
+      return connectionFactory.newConnection(ret);
     }
     
     public Connection getConnection()
@@ -139,6 +148,11 @@ public class ConnectionPool
           );
       }
     }
+  }
+
+  public void setConnectionFactory
+    (ConnectionFactory<T> connectionFactory)
+  { this.connectionFactory=connectionFactory;
   }
 
 
