@@ -197,8 +197,7 @@ public class ColumnMapping
   { this.store=store;
   }
    
-  @SuppressWarnings({ "unchecked", "rawtypes"
-    }) // Not using typeMapper in a generics way
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Not using typeMapper in a generics way
   public Column[] getColumnModels()
   { 
     if (flattenedChildren!=null)
