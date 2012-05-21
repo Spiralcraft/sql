@@ -49,14 +49,22 @@ public class SqlTestSetup
     throws SQLException
   {
     adminSession.start(connection);
+    log.fine("Checking for database "+targetDatabase);
     if (adminSession.databaseExists(targetDatabase))
-    { adminSession.dropDatabase(targetDatabase);
+    { 
+      log.fine("Dropping database "+targetDatabase);
+      adminSession.dropDatabase(targetDatabase);
     }
+    log.fine("Checking for login "+targetUsername);
     if (adminSession.loginExists(targetUsername))
-    { adminSession.dropLogin(targetUsername);
+    { 
+      log.fine("Dropping login "+targetUsername);
+      adminSession.dropLogin(targetUsername);
     }
     
+    log.fine("Creating login "+targetUsername);
     adminSession.createLogin(targetUsername,targetPassword);
+    log.fine("Creating database "+targetDatabase);
     adminSession.createDatabase(targetDatabase,targetPassword);
   }
  

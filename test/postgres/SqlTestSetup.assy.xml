@@ -1,5 +1,5 @@
 <test:SqlTestSetup
-  xmlns:hsqldb="class:/spiralcraft/sql/vendor/hsqldb/"
+  xmlns:pg="class:/spiralcraft/sql/vendor/postgresql/"
   xmlns:test="class:/spiralcraft/sql/test/"
   >
   
@@ -15,7 +15,7 @@
   <targetDatabase>_test
   </targetDatabase>
   
-  <adminSession><hsqldb:HsqldbAdminSession/>
+  <adminSession><pg:PostgresqlAdminSession/>
   </adminSession>
   
 </test:SqlTestSetup>

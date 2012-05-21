@@ -1,6 +1,7 @@
 <store:TypeManager
   xmlns:store="class:/spiralcraft/sql/data/store/"
   xmlns:example="class:/spiralcraft/data/test/example/"
+  xmlns:config="context:/"
   >
 
   <autoUpgrade>true
@@ -16,9 +17,7 @@
   </schemaMappings>
     
   <dialect>
-    <hsql:HsqldbDialect 
-      xmlns:hsql="class:/spiralcraft/sql/vendor/hsqldb/"
-    />
+    <config:Dialect/>
   </dialect>  
   
   <tableMappings>
