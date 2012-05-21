@@ -17,6 +17,7 @@ package spiralcraft.sql.vendor.postgresql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import spiralcraft.log.Level;
 import spiralcraft.sql.util.AdminSession;
 
 public class PostgresqlAdminSession
@@ -72,14 +73,29 @@ public class PostgresqlAdminSession
   @Override
   public boolean databaseExists(String databaseName) throws SQLException
   {
-    ResultSet rs
-      =executePreparedQuery
-        ("SELECT count(*) AS count from pg_database where datname=?"
-        ,databaseName
-        );
+    ResultSet rs=null;
+    try
+    {
+      rs=executePreparedQuery
+          ("SELECT count(*) AS count from pg_database where datname=?"
+          ,databaseName
+          );
     
-    rs.next();
-    return rs.getInt(1)>0;
+      rs.next();
+      return rs.getInt(1)>0;
+    }
+    finally
+    { 
+      if (rs!=null)
+      { 
+        try
+        { rs.close();
+        }
+        catch (SQLException x)
+        { log.log(Level.WARNING,"databaseExists()",x);
+        }
+      }
+    }
 
   }
 

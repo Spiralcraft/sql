@@ -16,6 +16,7 @@ package spiralcraft.sql.util;
 
 import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
+import spiralcraft.log.ClassLog;
 
 import spiralcraft.sql.data.SerialResultSetCursor;
 
@@ -48,6 +49,9 @@ import javax.sql.DataSource;
 public abstract class AbstractSqlTool
   implements Executable
 {
+  protected static final ClassLog log
+    =ClassLog.getInstance(AbstractSqlTool.class);
+  
   protected Connection connection;
   private DataSource dataSource;
   private URI dataSourceURI;

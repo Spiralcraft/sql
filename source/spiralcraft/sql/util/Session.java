@@ -105,6 +105,7 @@ public class Session
     throws SQLException
   {
     PreparedStatement st=null;
+    log.debug("Preparing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
 
     st=connection.prepareStatement(sql); 
     for (int i=0;i<params.length;i++)
