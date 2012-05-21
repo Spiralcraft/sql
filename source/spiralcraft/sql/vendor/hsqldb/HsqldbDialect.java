@@ -1,5 +1,5 @@
 //
-// Copyright (c) 1998,2007 Michael Toth
+// Copyright (c) 2009 Michael Toth
 // Spiralcraft Inc., All Rights Reserved
 //
 // This package is part of the Spiralcraft project and is licensed under
@@ -12,25 +12,24 @@
 // Unless otherwise agreed to in writing, this software is distributed on an
 // "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
 //
-package spiralcraft.sql.ddl;
+package spiralcraft.sql.vendor.hsqldb;
 
-import java.util.List;
+import spiralcraft.sql.Dialect;
 
-
-public class CreateSchemaStatement
-  extends DDLStatement
+public class HsqldbDialect
+  extends Dialect
 {
-  
-  private String schemaName;
-  
-  public CreateSchemaStatement(String schemaName)
-  { this.schemaName=schemaName;
-  }
-  
+
+  /**
+   * The default schema name to use for application tables if no specific
+   *   schema name is specified.
+   * 
+   * @return
+   */
   @Override
-  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
-  {
-    buffer.append("CREATE SCHEMA ");
-    buffer.append("\""+schemaName+"\"").append(" ");    
+  public String getDefaultSchemaName()
+  { return "PUBLIC";
   }
+  
+
 }

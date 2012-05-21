@@ -18,7 +18,7 @@ package spiralcraft.sql.test;
 import java.sql.SQLException;
 
 
-import spiralcraft.exec.BeanArguments;
+import spiralcraft.cli.BeanArguments;
 import spiralcraft.sql.util.AbstractSqlTool;
 import spiralcraft.sql.util.AdminSession;
 
@@ -40,7 +40,7 @@ public class SqlTestSetup
   @Override
   public void execute(String ... args)
   {
-    new BeanArguments(this).process(args);
+    new BeanArguments<SqlTestSetup>(this).process(args);
     run();
   }
     

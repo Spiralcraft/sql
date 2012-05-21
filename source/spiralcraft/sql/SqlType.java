@@ -149,8 +149,8 @@ public abstract class SqlType<T>
    * @return The DataType definiton DDL fragment for this Type. Defaults to the
    *   field name of the java.sql.Types class associated with this type.
    */
-  public DataType createDDL(Integer length,Integer decimals)
-  { return new DataType(ddl,length,decimals);
+  public DataType createDDL(Dialect dialect,Integer length,Integer decimals)
+  { return new DataType(dialect,ddl,length,decimals);
   }
   
 }

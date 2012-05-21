@@ -25,6 +25,8 @@ import spiralcraft.data.DataConsumer;
 import spiralcraft.data.access.Entity;
 import spiralcraft.data.access.SerialCursor;
 import spiralcraft.data.access.Snapshot;
+import spiralcraft.data.access.kit.AbstractStore;
+import spiralcraft.data.access.kit.EntityBinding;
 
 import spiralcraft.data.Aggregate;
 import spiralcraft.data.DataException;
@@ -41,11 +43,9 @@ import spiralcraft.data.query.Queryable;
 import spiralcraft.data.query.Selection;
 import spiralcraft.data.query.Scan;
 
-import spiralcraft.data.spi.AbstractStore;
 import spiralcraft.data.spi.ArrayDeltaTuple;
 import spiralcraft.data.spi.EditableArrayListAggregate;
 import spiralcraft.data.spi.EditableArrayTuple;
-import spiralcraft.data.spi.EntityBinding;
 import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.transaction.WorkException;
 import spiralcraft.data.transaction.WorkUnit;
@@ -69,6 +69,7 @@ import javax.sql.DataSource;
 
 import java.util.List;
 
+import spiralcraft.common.ContextualException;
 import spiralcraft.common.LifecycleException;
 
 
@@ -101,6 +102,9 @@ public class SqlStore
   
   private TableMapping sequenceTableMapping;
   
+  @SuppressWarnings("unused")
+  private URI localResourceURI;
+  
   public SqlStore()
     throws DataException
   {
@@ -117,6 +121,10 @@ public class SqlStore
   { return connectionPool;
   }
 
+  @Override
+  public void setLocalResourceURI(URI localResourceURI)
+  { this.localResourceURI=localResourceURI;
+  }
   
   /**
    * Obtain a direct reference to the DataSource that supplies JDBC connections
@@ -177,7 +185,7 @@ public class SqlStore
   
   @Override
   public Focus<?> bind(Focus<?> focus)
-    throws BindException
+    throws ContextualException
   {
     try
     { resolve();
@@ -191,7 +199,7 @@ public class SqlStore
     { 
       EntityBinding binding=createEntityBinding(new Entity(mapping.getType()));
       binding.setAuthoritative(true);
-      binding.setQueryable(mapping);
+      binding.setAccessor(mapping);
       binding.setUpdater(mapping.getUpdater());   
       addEntityBinding(binding);
       
@@ -226,6 +234,7 @@ public class SqlStore
   {
     super.stop();
     connectionPool.stop();
+    // log.fine("Stopped SqlStore");
   }
   
   public void executeDDL(List<DDLStatement> statements)
@@ -573,8 +582,7 @@ public class SqlStore
   {
     return new SqlSequence
       (URI.create("class:/spiralcraft/sql/store/SqlStore.txId"));
-  }  
+  }
 
-  
   
 }

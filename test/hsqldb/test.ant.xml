@@ -1,0 +1,70 @@
+<project name="spiralcraft-sql-test" basedir="." default="smoke-tests">
+
+  <import file="../../build.xml"/>
+  
+  <target name="smoke-db" depends="clean,clean-db">
+	        
+        
+    <devtask
+      codebase="../.." 
+      exec ="--log out/spiralcraft --consoleLog ../SqlSmokeRunner"
+    />   
+  	
+<!-- 	
+    <devtask
+      codebase=".." 
+      exec
+       ='-!-log out/spiralcraft -!-consoleLog
+         class:/spiralcraft/sql/util/QueryTool
+         -!-dataSourceURI DataSource.local.xml
+         "SELECT 1"
+         '
+    />
+ 
+ 
+ -->
+  	
+  </target>
+	
+  <target name="smoke-tests"
+    depends="clean,smoke-nodb,smoke-db"
+    >
+  </target>
+	
+  <target name="clean">
+    <mkdir dir="out"/>
+    <delete>
+      <fileset dir="out" includes="**/*"/>
+    </delete>   
+  </target>
+  	
+  <target name="clean-db" depends="clean">
+    <delete dir="out/hsqldb"/>
+    <mkdir dir="out/hsqldb"/>
+      
+    <devtask
+      codebase="../.."
+      exec = "--log out/spiralcraft --consoleLog ../LoadDDL"
+    />
+      	
+    <devtask
+      codebase="../.."
+      exec = "--log out/spiralcraft --consoleLog ../Loader"
+    />
+  </target>
+	
+  <target name="all-tests" 
+    depends="clean,smoke-tests"
+    >
+
+  </target>
+  	
+  <target name="smoke-nodb">
+    <mkdir dir="out/sql"/>
+
+  </target>
+  	
+
+	
+	
+</project>

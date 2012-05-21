@@ -9,9 +9,6 @@
   <schemaMappings>
     <store:SchemaMapping>
       
-      <schemaName>public
-      </schemaName>
-      
       <schema 
         ref="example:Example.schema.xml"
       />
@@ -19,8 +16,8 @@
   </schemaMappings>
     
   <dialect>
-    <pg:PostgresqlDialect 
-      xmlns:pg="class:/spiralcraft/sql/vendor/postgresql/"
+    <hsql:HsqldbDialect 
+      xmlns:hsql="class:/spiralcraft/sql/vendor/hsqldb/"
     />
   </dialect>  
   

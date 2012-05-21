@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.model;
 
+import spiralcraft.log.ClassLog;
 import spiralcraft.sql.Dialect;
 
 import spiralcraft.sql.ddl.TableElement;
@@ -36,6 +37,10 @@ import java.util.HashMap;
 public class Table
 {
 
+  @SuppressWarnings("unused")
+  private static final ClassLog log
+    =ClassLog.getInstance(Table.class);
+  
   private String catalogName;
   private String schemaName;
   private String name;
@@ -65,7 +70,8 @@ public class Table
     System.err.println("Table: read "+name+": catalog="+catalogName+" schema="+schemaName);
   }
   
-  public void readMetaData(DatabaseMetaData metadata)
+  
+  public void readMetaData(Dialect dialect,DatabaseMetaData metadata)
     throws SQLException
   {
     ResultSet rs=metadata.getColumns(catalogName,schemaName,name,"%");
@@ -73,13 +79,24 @@ public class Table
     while (rs.next())
     {  addColumn(new Column(rs));
     }
+    rs.close();
     
     rs=metadata.getPrimaryKeys(catalogName,schemaName,name);
     KeyConstraint primaryKey=new KeyConstraint(this,rs,true);
+    rs.close();
     if (primaryKey.getColumns().length>0)
     { this.addKeyConstraint(primaryKey);
     }
-    // XXX Read constraints
+    
+    KeyConstraint[] uniqueConstraints
+      =dialect.getUniqueConstraints(metadata.getConnection(),this);
+    for (KeyConstraint constraint: uniqueConstraints)
+    { 
+      if (constraint.getColumns().length>0)
+      { this.addKeyConstraint(constraint);
+      }
+    }
+    
     
   }
   
@@ -102,6 +119,10 @@ public class Table
   
   public Column getColumn(String name)
   { return columnMap.get(name);
+  }
+  
+  public String getCatalogName()
+  { return catalogName;
   }
   
   public String getSchemaName()
@@ -159,14 +180,16 @@ public class Table
       TableElementList elements=new TableElementList();
       
       for (Column column: columns)
-      { elements.addElement(column.generateColumnDefinition(dialect));
+      { 
+        // log.fine("Adding column "+column);
+        elements.addElement(column.generateColumnDefinition(dialect));
       }
       
       for (KeyConstraint key: keys)
       { 
         TableElement element=key.generateConstraintDefinition(dialect);
         if (element!=null)
-        { elements.addElement(key.generateConstraintDefinition(dialect));
+        { elements.addElement(element);
         }
       }
       

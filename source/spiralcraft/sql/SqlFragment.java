@@ -23,6 +23,12 @@ import java.util.List;
 public abstract class SqlFragment
 {
   
+  protected Dialect dialect=Dialect.DEFAULT;
+  
+  public void setDialect(Dialect dialect)
+  { this.dialect=dialect;
+  }
+  
   /**
    * <P>Write the SqlFragment and its children to the specified buffer.
    *  

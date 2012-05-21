@@ -62,7 +62,7 @@ public class MetaData
   /**
    * Construct a MetaData collection that describes an existing database.
    */
-  public MetaData(DatabaseMetaData metadata)
+  public MetaData(Dialect dialect,DatabaseMetaData metadata)
     throws SQLException
   {
 
@@ -72,7 +72,7 @@ public class MetaData
     }
      
     for (Schema schema: schemas)
-    { schema.readTables(metadata);
+    { schema.readTables(dialect,metadata);
     }
   } 
 
@@ -80,7 +80,19 @@ public class MetaData
   { 
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     for (Schema schema: schemas)
-    { ret.addAll(schema.generateUpdateDDL(dialect,storeVersion.getSchema(schema.getName())));
+    { 
+      String schemaName=schema.getName();
+      if (schemaName==null)
+      { schemaName=dialect.getDefaultSchemaName();
+      }
+      
+      Schema storeSchema
+        =schema.getName()!=null
+        ?storeVersion.getSchema(schema.getName())
+        :storeVersion.getSchema(dialect.getDefaultSchemaName())
+        ;
+        
+      ret.addAll(schema.generateUpdateDDL(dialect,storeSchema));
     }
     return ret;
   }

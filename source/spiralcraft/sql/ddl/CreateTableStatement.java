@@ -42,10 +42,8 @@ public class CreateTableStatement
     buffer.append("\r\n").append(indent);
     
     buffer.append("CREATE TABLE ");
-    if (schemaName!=null)
-    { buffer.append(schemaName).append(".");
-    }
-    buffer.append("\"").append(tableName).append("\"").append(" ");
+    
+    buffer.append(dialect.getQualifiedTableName(null,schemaName,tableName));
     
     indent=indent+"  ";
     

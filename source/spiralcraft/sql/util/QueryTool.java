@@ -19,7 +19,7 @@ import spiralcraft.vfs.Resolver;
 import spiralcraft.vfs.Resource;
 import spiralcraft.vfs.StreamUtil;
 
-import spiralcraft.exec.BeanArguments;
+import spiralcraft.cli.BeanArguments;
 import spiralcraft.exec.ExecutionContext;
 
 import java.net.URI;
@@ -40,7 +40,7 @@ public class QueryTool
   public void execute(String ... args)
   {
     
-    new BeanArguments(this)
+    new BeanArguments<QueryTool>(this)
     { 
       @Override
       protected boolean processArgument(String argument)

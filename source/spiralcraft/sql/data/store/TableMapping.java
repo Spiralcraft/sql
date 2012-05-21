@@ -22,9 +22,9 @@ import spiralcraft.data.Field;
 import spiralcraft.data.Key;
 
 import spiralcraft.data.access.CursorAggregate;
+import spiralcraft.data.access.EntityAccessor;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
-import spiralcraft.data.query.Queryable;
 import spiralcraft.data.query.Scan;
 
 import spiralcraft.sql.data.query.BoundScan;
@@ -50,7 +50,7 @@ import spiralcraft.util.tree.LinkedTree;
  * An association between a Type and a Table in a SQL Store
  */
 public class TableMapping
-  implements Queryable<Tuple>
+  implements EntityAccessor<Tuple>
 {
   private static final ClassLog log
     =ClassLog.getInstance(TableMapping.class);
@@ -87,7 +87,7 @@ public class TableMapping
   
   @Override
   public Type<?>[] getTypes()
-  { return new Type[] {type};
+  { return new Type<?>[] {type};
   }
   
   @Override
@@ -100,9 +100,26 @@ public class TableMapping
   }
   
   @Override
+  public Focus<?> bind(Focus<?> context)
+  { return context;
+  }
+  
+  @Override
   public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
     throws DataException
-  { return query.solve(focus,this);
+  { 
+    BoundQuery<?,Tuple> ret=solve(query,focus);
+    if (ret==null)
+    { ret= query.solve(focus,this);
+    }
+    ret.resolve();
+    return ret;
+  }
+  
+  @Override
+  public BoundQuery<?,Tuple> solve(Query query,Focus<?> focus)
+  {
+    return null;
   }
   
   public void setType(Type<?> type)
@@ -331,6 +348,8 @@ public class TableMapping
         columnMapping=new ColumnMapping();
         columnMapping.setStore(sqlStore);        
         columnMapping.setField(field);
+        columnMapping.setPath(new Path().append(field.getName()));        
+        columnMapping.resolve();
         
         // Check to make sure the type is resolvable
         Column[] models=columnMapping.getColumnModels();
@@ -349,15 +368,16 @@ public class TableMapping
     }
     else
     { 
+      // Mapping has been manually specified
       columnMapping.setStore(sqlStore);
       columnMapping.setField(field);
-    }
-    
-    if (columnMapping!=null)
-    {
       columnMapping.setPath(new Path().append(field.getName()));
       columnMapping.resolve();
+      
     }
+    
+
+    // log.fine("Mapped "+field.getURI()+" to "+columnMapping);
     return columnMapping;
   }
   
@@ -370,7 +390,7 @@ public class TableMapping
     ArrayList<ColumnMapping> orderedColumns
       =new ArrayList<ColumnMapping>();
     
-    for (Field<?> field: type.getScheme().fieldIterable())
+    for (Field<?> field: type.getFieldSet().fieldIterable())
     {
         
       ColumnMapping columnMapping=resolveMappingForField(field);
@@ -390,8 +410,10 @@ public class TableMapping
     int i=1;
     for (ColumnMapping mapping: columnMappings)
     { 
+      // log.fine("Mapping "+mapping);
       for (Column column: mapping.getColumnModels())
       { 
+        // log.fine(""+column);
         column.setPosition(i++);
         tableModel.addColumn(column);
       }

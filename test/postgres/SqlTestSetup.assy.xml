@@ -1,0 +1,21 @@
+<test:SqlTestSetup
+  xmlns:hsqldb="class:/spiralcraft/sql/vendor/hsqldb/"
+  xmlns:test="class:/spiralcraft/sql/test/"
+  >
+  
+  <dataSource dataURI="DataSource.master.local.xml">
+  </dataSource>
+
+  <targetUsername>_test
+  </targetUsername>
+  
+  <targetPassword>_test
+  </targetPassword>
+  
+  <targetDatabase>_test
+  </targetDatabase>
+  
+  <adminSession><hsqldb:HsqldbAdminSession/>
+  </adminSession>
+  
+</test:SqlTestSetup>

@@ -1,7 +1,7 @@
 <project name="spiralcraft-sql" default="build" basedir=".">
 
   <property name="module" value="sql"/>
-  <property name="buildVersion" value="0.4.13-dev1"/>
+  <property name="buildVersion" value="0.4.15-dev1"/>
   <property name="classpath" value="lib/spiralcraft-core.jar;lib/spiralcraft-core-test.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
 
@@ -16,22 +16,15 @@
     </echo>
         
     <copy
-      tofile="test/DataSource.local.xml" 
-      file="test/DataSource.template.xml"
+      tofile="test/hsqldb/DataSource.local.xml" 
+      file="test/hsqldb/DataSource.template.xml"
     />
-      <copy
-        tofile="test/DataSource.master.local.xml" 
-        file="test/DataSource.master.template.xml"
-      />
   </target>
         
   <condition property="configMissing">
     <or>
       <not>
-        <available file="test/DataSource.local.xml"/>
-      </not>
-      <not>
-        <available file="test/DataSource.master.local.xml"/>
+        <available file="test/hsqldb/DataSource.local.xml"/>
       </not>
     </or>
   </condition>        

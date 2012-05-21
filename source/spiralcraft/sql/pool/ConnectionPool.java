@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import spiralcraft.common.callable.Sink;
 import spiralcraft.log.Level;
 import spiralcraft.pool.Pool;
 import spiralcraft.pool.ResourceFactory;
@@ -36,7 +37,17 @@ public class ConnectionPool<T extends Connection>
     };
   
   
-  { setResourceFactory(this);
+  { 
+    setResourceFactory(this);
+    setOnCheckout
+      (new Sink<PooledConnection>()
+        { 
+          @Override
+          public void accept(PooledConnection connection) 
+          { connection.checkedIn=false;
+          }
+        }
+      );
   }
 
   public void setDataSource(DataSource dataSource)

@@ -29,6 +29,7 @@ import spiralcraft.sql.ddl.DDLStatement;
 
 import spiralcraft.sql.Dialect;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.List;
  */
 public class TypeManager
 {
+  @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(TypeManager.class);
   
@@ -234,13 +236,29 @@ public class TypeManager
   public void updateMetaData()
     throws DataException
   {
+    Connection con=null;
     try
     { 
+      
+      con=store.getContextConnection();
       storeMetaData
-        =new MetaData(store.getContextConnection().getMetaData());
+        =new MetaData(dialect,con.getMetaData());
+      
     }
     catch (SQLException x)
     { throw new DataException("Error reading metadata: "+x,x);
+    }
+    finally
+    {
+      if (con!=null)
+      { 
+        try
+        { con.close();
+        }
+        catch (SQLException x)
+        { throw new DataException("Error closing connection",x);
+        }
+      }
     }
     
     
@@ -259,7 +277,7 @@ public class TypeManager
     for (TableMapping mapping: tableMappings)
     {
       Table table=mapping.getTableModel();
-      log.fine("Adding table mapping "+table.getName());
+      // log.fine("Adding table mapping "+table.getName());
       
       String schemaName=table.getSchemaName();
       if (schemaName!=null)
@@ -272,7 +290,7 @@ public class TypeManager
       }
       else
       { 
-        Schema schema=localMetaData.getSchema(dialect.getDefaultSchemaName());
+        Schema schema=localMetaData.getSchema(null);
         if (schema!=null)
         { schema.addTable(table);
         }
@@ -280,8 +298,7 @@ public class TypeManager
         { 
           throw new DataException
             ("TypeManager: Mapping of "+mapping.getType().getURI()
-            +" to table '"+table.getName()+"' no schemaName provided and no "
-            +" default Schema in Dialect "
+            +" to table '"+table.getName()+"' no mapping for default schema in local metadata "
             );          
         }
       }

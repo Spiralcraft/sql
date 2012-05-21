@@ -160,7 +160,7 @@ public class Column
    * @param dialect
    */
   public ColumnDefinition generateColumnDefinition(Dialect dialect)
-  { return new ColumnDefinition(name,type.createDDL(length,decimalDigits));
+  { return new ColumnDefinition(name,type.createDDL(dialect,length,decimalDigits));
   }
   
   public synchronized ValueExpression getValueExpression()
@@ -201,4 +201,8 @@ public class Column
     return ret;
   }  
   
+  @Override
+  public String toString()
+  { return super.toString()+"["+(table!=null?table.getName()+".":"")+name+"]";
+  }
 }

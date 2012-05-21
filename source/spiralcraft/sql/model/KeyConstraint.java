@@ -123,6 +123,9 @@ public class KeyConstraint
    */
   public TableConstraintDefinition generateConstraintDefinition(Dialect dialect)
   { 
+    if (getFieldNames().length==0)
+    { return null;
+    }
     if (primary)
     { return new TableConstraintDefinition(new PrimaryKeyConstraint(getFieldNames()));
     }

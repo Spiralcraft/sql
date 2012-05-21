@@ -32,6 +32,7 @@ import java.sql.SQLXML;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 /**
  * Wraps a connection by delegating all methods
@@ -348,6 +349,40 @@ public abstract class ConnectionWrapper
   public  PreparedStatement prepareStatement(String sql, String columnNames[])
   	throws SQLException
   { return connection.prepareStatement(sql,columnNames);
+  }
+
+  @Override
+  public void setSchema(
+    String schema)
+    throws SQLException
+  { connection.setSchema(schema);
+  }
+
+  @Override
+  public String getSchema()
+    throws SQLException
+  { return connection.getSchema();
+  }
+
+  @Override
+  public void abort(
+    Executor executor)
+    throws SQLException
+  { connection.abort(executor);
+  }
+
+  @Override
+  public void setNetworkTimeout(
+    Executor executor,
+    int milliseconds)
+    throws SQLException
+  { connection.setNetworkTimeout(executor,milliseconds);
+  }
+
+  @Override
+  public int getNetworkTimeout()
+    throws SQLException
+  { return connection.getNetworkTimeout();
   }
 
 }

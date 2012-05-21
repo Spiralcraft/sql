@@ -66,7 +66,7 @@ public class Schema
     log.debug("From DB: schema="+name+": catalog="+catalogName);
   }
   
-  public void readTables(DatabaseMetaData metadata)
+  public void readTables(Dialect dialect,DatabaseMetaData metadata)
     throws SQLException
   {
     ResultSet rs
@@ -76,9 +76,10 @@ public class Schema
     while (rs.next())
     { addTable(new Table(rs));
     }
+    rs.close();
     
     for (Table table: tables)
-    { table.readMetaData(metadata);
+    { table.readMetaData(dialect,metadata);
     }
   }
   
@@ -109,7 +110,13 @@ public class Schema
   {
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     if (storeVersion==null)
-    { ret.add(new CreateSchemaStatement(name));
+    {
+      if (name!=null)
+      { ret.add(new CreateSchemaStatement(name));
+      }
+      else
+      { ret.add(new CreateSchemaStatement(dialect.getDefaultSchemaName()));
+      }
     }
     
     for (Table table: tables)

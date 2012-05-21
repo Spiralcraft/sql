@@ -6,7 +6,7 @@
   <dataSource dataURI="DataSource.local.xml">
   </dataSource>
 
-  <inputResource>in/Customer.csv
+  <inputResource>${spiralcraft.builder.dir}/in/Customer.csv
   </inputResource>
   
   <tableName>Customer

@@ -40,9 +40,9 @@ public abstract class BoundSqlQuery<Tq extends Query>
   public BoundSqlQuery(Tq query,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { 
+    super(query,parentFocus);
     focus=TupleFocus.<Tuple>create(parentFocus,query.getFieldSet());
     this.store=store;
-    setQuery(query);
   }
   
   public abstract BoundQueryStatement composeStatement()
@@ -53,7 +53,7 @@ public abstract class BoundSqlQuery<Tq extends Query>
     throws DataException
   {
     if (resolved)
-    { throw new IllegalStateException("Already resolved");
+    { return;
     }
     resolved=true;
     statement=composeStatement();
@@ -61,13 +61,8 @@ public abstract class BoundSqlQuery<Tq extends Query>
   }
   
   @Override
-  public SerialCursor<Tuple> execute()
+  public SerialCursor<Tuple> doExecute()
     throws DataException
-  { 
-    if (!resolved)
-    { resolve();
-    }
-    
-    return statement.execute(); 
+  { return statement.execute(); 
   }
 }

@@ -63,7 +63,7 @@ public class CriteriaTranslator
     { whereClause=new WhereClause(result.sql);
     }
     if (result.remainder!=null)
-    { filterExpression=new Expression<Boolean>(result.remainder,null);
+    { filterExpression=Expression.<Boolean>create(result.remainder);
     }
     
   }
@@ -146,7 +146,7 @@ public class CriteriaTranslator
     { 
       // A source in something other than the current context. Parameterize it.
       translation.sql=new SqlParameterReference
-        (new Expression<Object>(node,null));
+        (Expression.<Object>create(node));
     }
     return translation;
   }
@@ -155,7 +155,7 @@ public class CriteriaTranslator
   { 
     Translation<ValueExpression> translation=new Translation<ValueExpression>();
     translation.sql=new SqlParameterReference
-      (new Expression<Object>(node,null));
+      (Expression.<Object>create(node));
     return translation;
   }
   

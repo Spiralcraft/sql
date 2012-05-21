@@ -16,6 +16,7 @@ package spiralcraft.sql.ddl;
 
 import java.util.List;
 
+import spiralcraft.sql.Dialect;
 import spiralcraft.sql.SqlFragment;
 
 public class DataType
@@ -25,11 +26,12 @@ public class DataType
   private Integer length;
   private Integer decimals;
   
-  public DataType(String typeName,Integer length,Integer decimals)
+  public DataType(Dialect dialect,String typeName,Integer length,Integer decimals)
   {
     this.typeName=typeName;
     this.length=length;
     this.decimals=decimals;
+    this.dialect=dialect;
   }
   
   @Override

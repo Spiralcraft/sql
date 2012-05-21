@@ -67,6 +67,7 @@ public class ColumnMapping
   private SqlParameterReference parameterReference;
   private BooleanCondition parameterizedKeyCondition;
   private SqlStore store;
+  private boolean resolved;
   
   public ColumnMapping()
   {
@@ -133,7 +134,7 @@ public class ColumnMapping
     flattenedChildren=new ArrayList<ColumnMapping>
       (field.getType().getScheme().getFieldCount());
     
-    for (Field<?> subField : field.getType().getScheme().fieldIterable())
+    for (Field<?> subField : field.getType().getFieldSet().fieldIterable())
     { 
       ColumnMapping subMapping = new ColumnMapping();
       subMapping.setField(subField);
@@ -141,6 +142,7 @@ public class ColumnMapping
       subMapping.setPath(this.path.append(subField.getName()));
       flattenedChildren.add(subMapping);
       childMapByField.put(subMapping.getFieldName(), subMapping);
+      // log.fine(""+field.getURI()+" -> "+subMapping);
       
     }
     
@@ -173,14 +175,17 @@ public class ColumnMapping
 
     if (flatten && field.getType().getScheme()!=null)
     { 
+      // log.fine("Flattening "+field.getURI());
       flatten();
       for (ColumnMapping subMapping : flattenedChildren)
       { 
         subMapping.setStore(store);
         subMapping.resolve();
+        // log.fine("Flattened to "+subMapping);
         
       }
     }
+    resolved=true;
 
   }
   
@@ -200,12 +205,16 @@ public class ColumnMapping
   @SuppressWarnings({ "unchecked", "rawtypes" }) // Not using typeMapper in a generics way
   public Column[] getColumnModels()
   { 
+    if (!resolved)
+    { throw new IllegalStateException("Not resolved");
+    }
     if (flattenedChildren!=null)
     { 
       ArrayList<Column> retList
         =new ArrayList<Column>();
       for (ColumnMapping mapping : flattenedChildren)
       { 
+        // log.fine("Expanding "+mapping);
         for (Column column: mapping.getColumnModels()) 
         { retList.add(column);
         }
@@ -338,6 +347,14 @@ public class ColumnMapping
       columnMappings=node;
     }
     return columnMappings;
+  }
+  
+  @Override
+  public String toString()
+  { 
+    return super.toString()
+     +"[field="+field.getURI()+", columnName="+columnName+"]"
+     +(columnMappings!=null?columnMappings.toString():"");
   }
   
 }

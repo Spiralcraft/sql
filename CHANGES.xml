@@ -4,6 +4,85 @@
   xmlns:scm="class:/spiralcraft/scm/meta/"
   >
   <scm:Change>
+    <revision>0.4.17
+    </revision>
+  
+    <authorId>miketoth
+    </authorId>
+    
+    <date>
+    </date>
+
+    <detail>
+      <scm:Change>
+        <revision>0.4.17
+        </revision>
+        
+        <notes>
+          <scm:Note>Incorporate HSQLDB as standard for smoke testing
+          </scm:Note>
+          <scm:Note>Update for API changes in core
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>SqlFragment.java
+          </URI>
+          <URI>SqlType.java
+          </URI>
+          <URI>data/query/BoundSqlQuery.java
+          </URI>
+          <URI>data/store/ColumnMapping.java
+          </URI>
+          <URI>data/store/CriteriaTranslator.java
+          </URI>
+          <URI>data/store/SqlStore.java
+          </URI>
+          <URI>data/store/TableMapping.java
+          </URI>
+          <URI>data/store/TypeManager.java
+          </URI>
+          <URI>sql/ddl/CreateSchemaStatement.java
+          </URI>
+          <URI>sql/ddl/CreateTableStatement.java
+          </URI>
+          <URI>sql/ddl/DataType.java
+          </URI>
+          <URI>sql/jdbc/ConnectionWrapper.java
+          </URI>
+          <URI>sql/model/Column.java
+          </URI>
+          <URI>sql/model/KeyConstraint.java
+          </URI>
+          <URI>sql/model/MetaData.java
+          </URI>
+          <URI>sql/model/Schema.java
+          </URI>
+          <URI>sql/model/Table.java
+          </URI>
+          <URI>sql/pool/ConnectionPool.java
+          </URI>
+          <URI>sql/util/QueryTool.java
+          </URI>
+          <URI>sql/util/ResourceDataSource.java
+          </URI>
+          <URI>sql/util/SQLUtil.java
+          </URI>
+          <URI>sql/vendor/hsqldb/HsqldbAdminSession.java
+          </URI>
+          <URI>sql/vendor/hsqldb/HsqldbDialect.java
+          </URI>
+        </resources>
+      </scm:Change>
+    </detail>
+  </scm:Change>
+  
+  <scm:Change>
     <revision>0.4.13
     </revision>
   
