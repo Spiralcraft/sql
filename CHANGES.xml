@@ -30,7 +30,7 @@
         </path>
         
         <resources>
-          <URI>ColumnMaping.java
+          <URI>ColumnMapping.java
           </URI>
           <URI>SchemaMapping.java
           </URI>
