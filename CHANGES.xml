@@ -15,7 +15,34 @@
 
     <detail>
       <scm:Change>
-        <revision>0.4.17
+        <revision>dev-1
+        </revision>
+        
+        <notes>
+          <scm:Note>Remove need for explicit TypeManager configuration
+          </scm:Note>
+          <scm:Note>Non-transient fields of non-primitive types will be
+            auto-flattened.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store
+        </path>
+        
+        <resources>
+          <URI>ColumnMaping.java
+          </URI>
+          <URI>SchemaMapping.java
+          </URI>
+          <URI>SqlStore.java
+          </URI>
+          <URI>TypeManager.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
         </revision>
         
         <notes>

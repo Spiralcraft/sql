@@ -3,14 +3,23 @@
   xmlns:store="class:/spiralcraft/sql/data/store/"
   xmlns:example="class:/spiralcraft/data/test/example/"  
   xmlns:stest="class:/spiralcraft/sql/test/"
+  xmlns:config="context:/"
   >
   <stores>
   
     <store:SqlStore>
+      <schema 
+        dataURI="example:Example.schema.xml"
+      />
       
       <dataSource dataURI="DataSource.local.xml"/>
-    
-      <typeManager dataURI="stest:TypeManager.xml"/>
+      
+      <dialect>
+        <config:Dialect/>
+      </dialect>        
+      
+      <autoUpgrade>true
+      </autoUpgrade>
       
       <connectionPool.maxStartupMs>1000
       </connectionPool.maxStartupMs>
