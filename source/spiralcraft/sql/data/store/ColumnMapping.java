@@ -173,9 +173,16 @@ public class ColumnMapping
     { log.debug("ColumnMapping: "+fieldName+":"+columnName);
     }
 
+    if (!field.isTransient() 
+        && !field.getType().isPrimitive() 
+        && field.getType().getScheme()!=null
+        )
+    { flatten=true;
+    }
+    
     if (flatten && field.getType().getScheme()!=null)
     { 
-      // log.fine("Flattening "+field.getURI());
+      log.fine("Flattening "+field.getURI());
       flatten();
       for (ColumnMapping subMapping : flattenedChildren)
       { 

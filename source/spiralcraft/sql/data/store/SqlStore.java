@@ -52,6 +52,7 @@ import spiralcraft.data.transaction.WorkUnit;
 import spiralcraft.data.transaction.Transaction.Nesting;
 import spiralcraft.data.types.standard.AnyType;
 
+import spiralcraft.sql.Dialect;
 import spiralcraft.sql.data.query.BoundSelection;
 import spiralcraft.sql.data.query.BoundScan;
 
@@ -105,6 +106,9 @@ public class SqlStore
   @SuppressWarnings("unused")
   private URI localResourceURI;
   
+  private Dialect dialect;
+  private boolean autoUpgrade;
+  
   public SqlStore()
     throws DataException
   {
@@ -120,11 +124,20 @@ public class SqlStore
   public ConnectionPool<SqlStoreConnection> getConnectionPool()
   { return connectionPool;
   }
+  
+  /**
+   * Specify the Dialect for the specific database server product that will provide
+   *   product specific information and type translations.
+   */
+  public void setDialect(Dialect dialect)
+  { this.dialect=dialect;
+  }
 
   @Override
   public void setLocalResourceURI(URI localResourceURI)
   { this.localResourceURI=localResourceURI;
   }
+
   
   /**
    * Obtain a direct reference to the DataSource that supplies JDBC connections
@@ -133,6 +146,9 @@ public class SqlStore
   { return dataSource;
   }
 
+  public void setAutoUpgrade(boolean autoUpgrade)
+  { this.autoUpgrade=autoUpgrade;
+  }
   
   /**
    * Obtain a direct reference to the TypeManager that maps 
@@ -140,10 +156,6 @@ public class SqlStore
    */
   public TypeManager getTypeManager()
   { return typeManager;
-  }
-
-  public void setTypeManager(TypeManager typeManager)
-  { this.typeManager=typeManager;
   }
   
 
@@ -159,6 +171,15 @@ public class SqlStore
     typeManager.addTableMapping(sequenceTableMapping);
     
     typeManager.setStore(this);
+    if (schema!=null)
+    { 
+      typeManager.setSchemaMappings
+        (new SchemaMapping[] {new SchemaMapping(null,schema)});
+    }
+    if (dialect!=null)
+    { typeManager.setDialect(dialect);
+    }
+    typeManager.setAutoUpgrade(autoUpgrade);
     typeManager.resolve();
 
   }

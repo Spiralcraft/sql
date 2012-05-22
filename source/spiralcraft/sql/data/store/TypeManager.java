@@ -110,7 +110,7 @@ public class TypeManager
    * Specify the Dialect for the specific database server product that will provide
    *   product specific information and type translations.
    */
-  public void setDialect(Dialect dialect)
+  void setDialect(Dialect dialect)
   { this.dialect=dialect;
   }
   
@@ -119,9 +119,10 @@ public class TypeManager
    *   automatically upgraded if it is not in synch with the packaged data
    *   definitions. 
    */
-  public void setAutoUpgrade(boolean autoUpgrade)
+  void setAutoUpgrade(boolean autoUpgrade)
   { this.autoUpgrade=autoUpgrade;
   }
+  
   /**
    * Called by the SQL store to complete all unspecified mapping details
    *   and review metadata.

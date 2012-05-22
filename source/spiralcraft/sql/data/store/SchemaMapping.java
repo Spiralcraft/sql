@@ -34,6 +34,16 @@ public class SchemaMapping
   private Schema schema;
   private String schemaName;
  
+  public SchemaMapping()
+  {
+  }
+  
+  public SchemaMapping(String schemaName,Schema schema)
+  { 
+    this.schemaName=schemaName;
+    this.schema=schema;
+  }
+  
   public Schema getSchema()
   { return schema;
   }
