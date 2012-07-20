@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Convert an object to a Short
  */
 public class ShortConverter
-	implements Converter<Short,Object>
+	extends Converter<Short,Object>
 {
 	@Override
   public Short toSql(Object value)

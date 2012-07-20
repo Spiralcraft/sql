@@ -22,7 +22,7 @@ import java.math.BigDecimal;
  * Convert an object to a BigDecimal
  */
 public class BigDecimalConverter
-	implements Converter<BigDecimal,Object>
+	extends Converter<BigDecimal,Object>
 {
 	@Override
   public BigDecimal toSql(Object value)

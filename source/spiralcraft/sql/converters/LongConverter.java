@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Convert an object to a Float
  */
 public class LongConverter
-	implements Converter<Long,Object>
+	extends Converter<Long,Object>
 {
 	@Override
   public Long toSql(Object value)

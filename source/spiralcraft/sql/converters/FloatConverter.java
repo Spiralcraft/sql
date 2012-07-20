@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Convert an object to a Float
  */
 public class FloatConverter
-	implements Converter<Float,Object>
+	extends Converter<Float,Object>
 {
 	@Override
   public Float toSql(Object value)

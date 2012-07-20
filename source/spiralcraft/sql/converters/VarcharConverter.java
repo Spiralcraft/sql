@@ -25,7 +25,7 @@ import java.sql.SQLException;
  * Convert an object to a sql Varchar String
  */
 public class VarcharConverter
-	implements Converter<String,Object>
+	extends Converter<String,Object>
 {
 	@Override
   public String toSql(Object value)

@@ -27,7 +27,7 @@ import java.text.ParseException;
  * Convert a representation of a time to a java.sql.Time
  */
 public class TimeConverter
-	implements Converter<Time,Object>
+	extends Converter<Time,Object>
 {
   private static SimpleDateFormat _format
     =new SimpleDateFormat("HH:mm:ss");

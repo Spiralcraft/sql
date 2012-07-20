@@ -20,13 +20,15 @@ import java.sql.SQLException;
  * Represents a type conversion to a SQL "friendly" type from another 
  *   type.
  */
-public interface Converter<Ts,Tj>
+public abstract class Converter<Ts,Tj>
 {
-	public Ts toSql(Tj nativeValue)
+	public abstract Ts toSql(Tj nativeValue)
 		throws SQLException;
   
-  public Tj fromSql(Ts sqlValue)
+  public abstract Tj fromSql(Ts sqlValue)
     throws SQLException;
   
-  public Class<?> getSqlClass();
+  public abstract Class<?> getSqlClass();
+  
+  
 }

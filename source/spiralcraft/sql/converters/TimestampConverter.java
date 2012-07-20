@@ -28,7 +28,7 @@ import java.util.TimeZone;
  * Convert a representation of a timestamp to a java.sql.Timestamp
  */
 public class TimestampConverter
-	implements Converter<Timestamp,Object>
+	extends Converter<Timestamp,Object>
 {
   private static SimpleDateFormat _format
     =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");

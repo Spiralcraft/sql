@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Convert an object to a Byte
  */
 public class ByteConverter
-	implements Converter<Byte,Object>
+	extends Converter<Byte,Object>
 {
 	@Override
   public Byte toSql(Object value)

@@ -26,7 +26,7 @@ import java.text.ParseException;
  * Converts date representations to java.sql.Date objects
  */
 public class DateConverter
-	implements Converter<Date,Object>
+	extends Converter<Date,Object>
 {
   private static SimpleDateFormat _format
     =new SimpleDateFormat("yyyy-MM-dd");
