@@ -36,7 +36,7 @@ public class SetClause
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   { 
     
-    buffer.append(targetColumn);
+    buffer.append("\""+targetColumn+"\"");
     buffer.append("=");
     sourceExpression.write(buffer, indent, parameterCollector);
   }
