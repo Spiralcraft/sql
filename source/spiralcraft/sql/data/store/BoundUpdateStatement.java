@@ -50,6 +50,7 @@ public class BoundUpdateStatement
       PreparedStatement statement=connection.prepareStatement(statementText);
       applyParameters(statement);
       int results=statement.executeUpdate();
+      // log.fine("Closing "+statement);
       statement.close();
       return results;
     }
