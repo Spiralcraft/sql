@@ -18,12 +18,12 @@ package spiralcraft.sql.dml;
 import java.util.List;
 
 
-public class SqlParameterReference
+public class SqlParameterReference<T>
   extends SimpleValueSpecification
 {
-  private Object tag; 
+  private T tag; 
   
-  public SqlParameterReference(Object tag)
+  public SqlParameterReference(T tag)
   { this.tag=tag;
   }
   

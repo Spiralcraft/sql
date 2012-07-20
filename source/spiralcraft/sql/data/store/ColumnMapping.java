@@ -16,6 +16,7 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.data.Field;
 
+import spiralcraft.sql.converters.Converter;
 import spiralcraft.sql.data.mappers.TypeMapper;
 
 import spiralcraft.sql.dml.DerivedColumn;
@@ -55,6 +56,7 @@ public class ColumnMapping
   private String columnName;
   private Column column;
   private Path path;
+  private Converter<?,?> converter;
 
   private boolean flatten;
   private ArrayList <ColumnMapping> flattenedChildren;
@@ -64,7 +66,7 @@ public class ColumnMapping
   private SelectListItem selectListItem;
   private LinkedTree<ColumnMapping> columnMappings;
   private SetClause parameterizedSetClause;
-  private SqlParameterReference parameterReference;
+  private SqlParameterReference<ParameterTag> parameterReference;
   private BooleanCondition parameterizedKeyCondition;
   private SqlStore store;
   private boolean resolved;
@@ -98,6 +100,10 @@ public class ColumnMapping
   
   public String getFieldName()
   { return fieldName;
+  }
+  
+  public Converter<?,?> getConverter()
+  { return converter;
   }
   
   /**
@@ -252,6 +258,7 @@ public class ColumnMapping
         }
             
         typeMapper.specifyColumn(field.getType(),column);
+        converter=typeMapper.getConverter(field.getType());
       }
       return new Column[] {column};
     }
@@ -261,14 +268,20 @@ public class ColumnMapping
     
   }
 
-  public synchronized SqlParameterReference getParameterReference()
+  public synchronized SqlParameterReference<ParameterTag> getParameterReference()
   {
     if (parameterReference==null)
     {
       try
       {
         parameterReference
-          =new SqlParameterReference(Expression.parse(path.format(".")));
+          =new SqlParameterReference<ParameterTag>
+            (new ParameterTag
+              (Expression.parse(path.format("."))
+              ,column.getType()
+              ,converter
+              )
+            );
         
         if (debugLevel.canLog(Level.DEBUG))
         { log.debug("ColumnMapping: "+columnName+" refs "+path.format("."));

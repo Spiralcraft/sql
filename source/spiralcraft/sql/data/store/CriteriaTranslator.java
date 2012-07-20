@@ -145,8 +145,13 @@ public class CriteriaTranslator
     else
     { 
       // A source in something other than the current context. Parameterize it.
-      translation.sql=new SqlParameterReference
-        (Expression.<Object>create(node));
+      translation.sql=new SqlParameterReference<ParameterTag>
+        (new ParameterTag
+          (Expression.<Object>create(node)
+           ,null // Unknown target type
+           ,null
+          )
+        );
     }
     return translation;
   }
@@ -154,8 +159,13 @@ public class CriteriaTranslator
   private Translation<ValueExpression> translateToParameter(Node node)
   { 
     Translation<ValueExpression> translation=new Translation<ValueExpression>();
-    translation.sql=new SqlParameterReference
-      (Expression.<Object>create(node));
+    translation.sql=new SqlParameterReference<ParameterTag>
+      (new ParameterTag
+        (Expression.<Object>create(node)
+        ,null
+        ,null
+        )
+      );
     return translation;
   }
   
