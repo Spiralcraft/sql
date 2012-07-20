@@ -18,6 +18,7 @@ import spiralcraft.lang.Channel;
 import spiralcraft.lang.Expression;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.BindException;
+import spiralcraft.log.ClassLog;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import spiralcraft.data.Field;
 
 import spiralcraft.sql.SqlFragment;
 
+import spiralcraft.sql.converters.Converter;
 import spiralcraft.sql.dml.ValueExpression;
 import spiralcraft.sql.dml.IdentifierChain;
 
@@ -40,8 +42,10 @@ import java.util.ArrayList;
  */
 public abstract class BoundStatement
 {
-  protected ArrayList<Expression<?>> parameterExpressions
-    =new ArrayList<Expression<?>>();
+  protected static final ClassLog log
+    =ClassLog.getInstance(BoundStatement.class);
+  protected ArrayList<ParameterTag> parameterExpressions
+    =new ArrayList<ParameterTag>();
   protected ArrayList<Channel<?>> parameterBindings
     =new ArrayList<Channel<?>>();
   
@@ -50,6 +54,8 @@ public abstract class BoundStatement
   protected final SqlStore store;
   protected SqlBinding<?,?> statementBinding;
   protected FieldSet dataFields;
+  @SuppressWarnings("rawtypes")
+  protected Converter[] converters;
   protected TableMapping primaryTableMapping;
   
   /**
@@ -80,6 +86,7 @@ public abstract class BoundStatement
     parameterExpressions.clear();
     this.sqlFragment=sqlFragment;
     statementText=sqlFragment.generateSQL(parameterExpressions);
+    // log.fine("Statement="+statementText);
   }
   
   /**
@@ -90,6 +97,7 @@ public abstract class BoundStatement
    *    which this statement will be executed, or when a different application
    *    context is to be used.
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void bindParameters(Focus<?> focus)
     throws DataException
   { 
@@ -97,16 +105,23 @@ public abstract class BoundStatement
     {
       
       parameterBindings.clear();
-      for (Expression<?> expression: parameterExpressions)
+      for (ParameterTag tag: parameterExpressions)
       { 
-        System.err.println
-          ("BindParameters "+parameterBindings.size()+"= "
-          +expression.getText()
-          );
+        Expression<?> expression=tag.expression;
         
-        expression.getRootNode().debugTree(System.err);
+//        log.fine
+//          ("BindParameters "+(parameterBindings.size()+1)+"= "
+//          +expression.getText()
+//          );
+//        
+//        expression.getRootNode().debugTree(System.err);
         
-        parameterBindings.add(focus.bind(expression));
+        Channel<?> channel=focus.bind(expression);
+        if (tag.converter!=null)
+        { channel=new ToSqlChannel(channel,tag.converter);
+        }
+        // log.fine(channel.getReflector().getTypeURI().toString());
+        parameterBindings.add(channel);
       }
     }
     catch (BindException x)
@@ -181,7 +196,9 @@ public abstract class BoundStatement
     for (Channel<?> channel: parameterBindings)
     { 
       Object paramValue=channel.get();
-      System.err.println("Apply parameter "+i+" = "+paramValue);
+//      log.fine("Apply parameter "+i+" = "+paramValue
+//        +(paramValue!=null?("type="+paramValue.getClass().getName()):"")
+//        );
       jdbcStatement.setObject(i++,paramValue);
     }
   }

@@ -19,6 +19,7 @@ import spiralcraft.data.spi.AbstractTuple;
 import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.Field;
+import spiralcraft.data.Scheme;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.DataException;
 
@@ -26,6 +27,7 @@ import spiralcraft.util.tree.LinkedTree;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 /**
  * A Tuple that retrieves data from a ResultSet. If the ResultSet is advanced,
@@ -36,45 +38,105 @@ public class ResultSetTuple
   implements Tuple
 {
   private ResultSet resultSet;
-  private final int[] map;
+  private final ResultMapping[] map;
+  @SuppressWarnings("rawtypes")
   private final ResultSetTuple[] subs;
   private int resultColumnCount;
+  @SuppressWarnings("rawtypes")
   
   public ResultSetTuple(FieldSet fieldSet)
   { 
-    super(fieldSet);
-    map=new int[fieldSet.getFieldCount()];
+    super(fieldSet instanceof Scheme?fieldSet:fieldSet.getType().getScheme());
+    map=new ResultMapping[fieldSet.getFieldCount()];
     subs=new ResultSetTuple[fieldSet.getFieldCount()];
     defaultMap();
+    if (fieldSet.getType()!=null)
+    {
+      if (fieldSet.getType().getBaseType()!=null)
+      { 
+        FieldSet baseScheme=fieldSet.getType().getBaseType().getScheme();
+        if (baseScheme!=null)
+        { baseExtent=createBaseExtent(baseScheme);
+        }
+      }
+    }
+    
   }
   
-  public ResultSetTuple(FieldSet fieldSet,LinkedTree<Integer> foldTree)
+  public ResultSetTuple(FieldSet fieldSet,LinkedTree<ResultMapping> foldTree)
   { 
-    super(fieldSet);
-    map=new int[fieldSet.getFieldCount()];
+    super(fieldSet instanceof Scheme?fieldSet:fieldSet.getType().getScheme());
+    map=new ResultMapping[fieldSet.getFieldCount()];
     subs=new ResultSetTuple[fieldSet.getFieldCount()];
+    if (fieldSet.getType()!=null)
+    {
+      if (fieldSet.getType().getBaseType()!=null)
+      { 
+        FieldSet baseScheme=fieldSet.getType().getBaseType().getScheme();
+        if (baseScheme!=null)
+        { baseExtent=createBaseExtent(baseScheme);
+        }
+      }
+    }
+    
+    applyFoldTree(foldTree);
+  }
+
+  private void applyFoldTree(LinkedTree<ResultMapping> foldTree)
+  {
+    if (baseExtent!=null)
+    { ((ResultSetTuple) baseExtent).applyFoldTree(foldTree);
+    }
+    
     if (foldTree!=null)
     {
       
-      int i=(baseExtent!=null)
+      int baseColumnCount=(baseExtent!=null)
             ?((ResultSetTuple) baseExtent).getResultColumnCount():0;
-      for (LinkedTree<Integer> node: foldTree)
-      { 
+      int offset=baseColumnCount;
+      int i=0;
+      Iterator<? extends Field<?>> fieldIterator=fieldSet.fieldIterable().iterator();
+      for (LinkedTree<ResultMapping> node: foldTree)
+      {        
+        if (offset-->0)
+        { 
+          // log.fine("Skipping "+node.get());
+          // Skip base extent nodes
+          continue;
+        }
+        Field<?> field;
+        if (!fieldIterator.hasNext())
+        { break;
+        }
+        else
+        { field=fieldIterator.next();
+        }
+        
+        while (field.isTransient() && fieldIterator.hasNext())
+        { field=fieldIterator.next();
+        }
+        if (field.isTransient())
+        { break;
+        }
+        
+        
+        // log.fine("Mapping "+field+" to "+node.get());
         if (node.get()!=null)
-        { map[i]=node.get()+1;
+        { 
+          map[i]=node.get();
         }
         if (!node.isLeaf())
         { 
           subs[i]
             =new ResultSetTuple
-              (fieldSet.getFieldByIndex(i).getType().getScheme()
+              (field.getType().getScheme()
               ,node
               );
         }
         i++;
         
       }
-      resultColumnCount=i;
+      resultColumnCount=baseColumnCount+i;
     }
     else
     { defaultMap();
@@ -88,7 +150,7 @@ public class ResultSetTuple
   private void defaultMap()
   {
     for (Field<?> field: fieldSet.fieldIterable())
-    { map[field.getIndex()]=field.getIndex()+1;
+    { map[field.getIndex()]=new ResultMapping(field.getIndex()+1);
     }
     resultColumnCount=fieldSet.getFieldCount();
   }
@@ -111,6 +173,7 @@ public class ResultSetTuple
     }
   }
   
+  @SuppressWarnings("unchecked")
   @Override
   public Object get(int index)
     throws DataException
@@ -118,10 +181,30 @@ public class ResultSetTuple
     if (subs[index]!=null)
     { return subs[index];
     }
-    else if (map[index]>0)
+    else if (map[index]!=null && map[index].resultSetColumn>0)
     {
       try
-      { return resultSet.getObject(map[index]);
+      { 
+        Object sqlValue=resultSet.getObject(map[index].resultSetColumn);
+        if (map[index].converter!=null)
+        { 
+          try
+          { return map[index].converter.fromSql(sqlValue);
+          }
+          catch (ClassCastException x)
+          {
+            throw new DataException
+              ("Unexpected data type "
+              +sqlValue.getClass().getName()
+              +" ["+sqlValue+"] applied to "+map[index].converter
+              +" for column "+map[index].resultSetColumn+" ("
+              +resultSet.getMetaData().getColumnName(map[index].resultSetColumn)+")"
+              );
+          }
+        }
+        else
+        { return sqlValue;
+        }
       }
       catch (SQLException x)
       { throw new DataException("Error reading result set: "+x,x);
@@ -153,7 +236,9 @@ public class ResultSetTuple
   
   @Override
   protected AbstractTuple createBaseExtent(FieldSet fieldSet)
-  { return new ResultSetTuple(fieldSet);
+  { 
+    // log.fine(fieldSet.toString());
+    return new ResultSetTuple(fieldSet);
   }
 
   @Override

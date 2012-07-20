@@ -21,6 +21,7 @@ import spiralcraft.data.DataException;
 import spiralcraft.data.query.Scan;
 
 
+import spiralcraft.sql.data.ResultMapping;
 import spiralcraft.sql.data.store.SqlStore;
 import spiralcraft.sql.data.store.TableMapping;
 import spiralcraft.sql.data.store.ColumnMapping;
@@ -76,7 +77,7 @@ public class BoundScan
       );
     
     SelectList selectList=new SelectList();
-    LinkedTree<Integer> foldTree=new LinkedTree<Integer>();
+    LinkedTree<ResultMapping> foldTree=new LinkedTree<ResultMapping>();
     LinkedTree<ColumnMapping> columnTree=tableMapping.getColumnMappingTree();
     int columnCount=0;
     generateSelectList(columnTree,selectList,foldTree,columnCount);
@@ -91,7 +92,7 @@ public class BoundScan
   private int generateSelectList
     (LinkedTree<ColumnMapping> columnTree
     ,SelectList selectList
-    ,LinkedTree<Integer> foldTree
+    ,LinkedTree<ResultMapping> foldTree
     ,int columnCount
     )
   {
@@ -104,7 +105,7 @@ public class BoundScan
   private int generateSelectListItem
     (LinkedTree<ColumnMapping> node
     ,SelectList selectList
-    ,LinkedTree<Integer> foldTree
+    ,LinkedTree<ResultMapping> foldTree
     ,int columnCount
     )
   {
@@ -115,15 +116,18 @@ public class BoundScan
       if (selectListItem!=null)
       { 
         selectList.addItem(selectListItem);
-        foldTree.addChild(new LinkedTree<Integer>(columnCount++));
+        foldTree.addChild
+          (new LinkedTree<ResultMapping>
+            (new ResultMapping( (columnCount++)+1,node.get()))
+            );
       }
       else
-      { foldTree.addChild(new LinkedTree<Integer>());
+      { foldTree.addChild(new LinkedTree<ResultMapping>());
       }
     }
     else
     { 
-      LinkedTree<Integer> child=new LinkedTree<Integer>();
+      LinkedTree<ResultMapping> child=new LinkedTree<ResultMapping>();
       foldTree.addChild(child);
       columnCount=generateSelectList(node,selectList,child,columnCount);
     }

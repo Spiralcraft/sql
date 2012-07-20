@@ -26,7 +26,7 @@ import spiralcraft.data.lang.CursorBinding;
 import spiralcraft.data.spi.ArrayTuple;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Channel;
-
+import spiralcraft.log.ClassLog;
 
 import spiralcraft.util.tree.LinkedTree;
 
@@ -38,6 +38,10 @@ import java.sql.Statement;
 public class SerialResultSetCursor
   implements SerialCursor<Tuple>
 {
+  @SuppressWarnings("unused")
+  private static final ClassLog log
+    =ClassLog.getInstance(SerialResultSetCursor.class);
+  
   protected final FieldSet fieldSet;
   protected final ResultSetTuple tuple;
   protected ResultSet resultSet;
@@ -98,10 +102,11 @@ public class SerialResultSetCursor
     }
   }
   
+  @SuppressWarnings("rawtypes")
   public SerialResultSetCursor
     (FieldSet fieldSet
     ,ResultSet resultSet
-    ,LinkedTree<Integer> foldTree
+    ,LinkedTree<ResultMapping> foldTree
     )
   { 
     this.resultSet=resultSet;
@@ -116,7 +121,9 @@ public class SerialResultSetCursor
    * @param connection
    */
   public void setConnection(Connection connection)
-  { this.connection=connection;
+  { 
+    // log.fine("connection="+connection);
+    this.connection=connection;
   }
   
   @Override
@@ -200,7 +207,9 @@ public class SerialResultSetCursor
     if (statement!=null)
     { 
       try
-      { statement.close();
+      { 
+        // log.fine("Closing "+statement);
+        statement.close();
       }
       catch (SQLException x)
       { throw new DataException("Error closing statement",x);

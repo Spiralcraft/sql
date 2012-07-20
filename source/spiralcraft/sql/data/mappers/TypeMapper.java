@@ -19,6 +19,7 @@ import spiralcraft.data.Type;
 import spiralcraft.sql.SqlType;
 import spiralcraft.sql.Dialect;
 
+import spiralcraft.sql.converters.Converter;
 import spiralcraft.sql.model.Column;
 
 
@@ -65,4 +66,9 @@ public abstract class TypeMapper<T extends Type>
    *   from the specific type.
    */
   public abstract void specifyColumn(T type,Column col);
+  
+  public Converter<?,?> getConverter(T type)
+  { return getSqlType(type).getConverter();
+  }
+
 }

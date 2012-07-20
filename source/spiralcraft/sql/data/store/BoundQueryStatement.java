@@ -21,6 +21,7 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 
+import spiralcraft.sql.data.ResultMapping;
 import spiralcraft.sql.data.SerialResultSetCursor;
 
 import spiralcraft.util.tree.LinkedTree;
@@ -37,7 +38,7 @@ public class BoundQueryStatement
   extends BoundStatement
 {
   
-  private LinkedTree<Integer> foldTree;
+  private LinkedTree<ResultMapping> foldTree;
   
   public BoundQueryStatement(SqlStore store,FieldSet resultFields)
   { super(store,resultFields);
@@ -47,7 +48,7 @@ public class BoundQueryStatement
   /**
    * Specify how the nested Tuple structure of the result maps to the flat resultSet
    */
-  public void setFoldTree(LinkedTree<Integer> foldTree)
+  public void setFoldTree(LinkedTree<ResultMapping> foldTree)
   { this.foldTree=foldTree;
   }
 
@@ -59,7 +60,7 @@ public class BoundQueryStatement
   public SerialCursor<Tuple> execute()
     throws DataException
   {
-    System.err.println("BoundQueryStatement: Preparing "+statementText);
+    // log.fine("BoundQueryStatement: Preparing "+statementText);
     try
     {
     

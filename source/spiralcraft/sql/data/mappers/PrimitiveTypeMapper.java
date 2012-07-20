@@ -16,7 +16,9 @@ package spiralcraft.sql.data.mappers;
 
 import spiralcraft.data.core.PrimitiveTypeImpl;
 
-
+import spiralcraft.log.ClassLog;
+import spiralcraft.sql.converters.Converter;
+import spiralcraft.sql.converters.StringifyConverter;
 import spiralcraft.sql.model.Column;
 
 import spiralcraft.sql.SqlType;
@@ -27,6 +29,9 @@ public class PrimitiveTypeMapper<T>
     extends TypeMapper<PrimitiveTypeImpl>
 {
 
+  protected static final ClassLog log
+    =ClassLog.getInstance(PrimitiveTypeMapper.class);
+  
   @Override
   public Class<PrimitiveTypeImpl> getTypeClass()
   { return PrimitiveTypeImpl.class;
@@ -59,6 +64,29 @@ public class PrimitiveTypeMapper<T>
   {
     SqlType sqlType=getSqlType(type);
     col.setType(sqlType);
+  }
+  
+    @Override
+  public Converter<?,?> getConverter(PrimitiveTypeImpl type)
+  { 
+    Converter<?,?> ret;
+    
+    SqlType sqlType=SqlType.getStandardSqlType(type.getNativeClass());
+    if (sqlType!=null)
+    { ret=sqlType.getConverter();
+    }
+    else if (type.isStringEncodable())
+    { ret=StringifyConverter.getInstance(type);
+    }
+    else
+    {
+      throw new IllegalArgumentException
+        ("Primitive datatype not mapped and not encodable as a String: "
+        +type.getNativeClass()
+        );
+    }
+    // log.fine("Converter for "+type+" to "+sqlType+" is "+ret);
+    return ret;
   }
 
 }
