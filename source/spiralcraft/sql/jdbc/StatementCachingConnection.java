@@ -51,6 +51,6 @@ public class StatementCachingConnection
     { 
       // TODO: Deal with making sure statement is "reset"
     }
-    return statement;
+    return new CachedPreparedStatement(statement);
   }
 }
