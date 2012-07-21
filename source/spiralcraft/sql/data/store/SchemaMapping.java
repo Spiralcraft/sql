@@ -14,7 +14,7 @@
 //
 package spiralcraft.sql.data.store;
 
-import spiralcraft.data.DataException;
+import spiralcraft.common.ContextualException;
 import spiralcraft.data.Type;
 import spiralcraft.data.access.Schema;
 import spiralcraft.data.access.Entity;
@@ -65,7 +65,7 @@ public class SchemaMapping
    * Create table mappings for all the types in the Schema
    */
   public TableMapping[] createTableMappings()
-    throws DataException
+    throws ContextualException
   {
     ArrayList<TableMapping> mappings
       =new ArrayList<TableMapping>();

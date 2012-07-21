@@ -15,6 +15,7 @@
 package spiralcraft.sql.data.store;
 
 
+import spiralcraft.common.ContextualException;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Type;
 
@@ -128,7 +129,7 @@ public class TypeManager
    *   and review metadata.
    */
   public void resolve()
-    throws DataException
+    throws ContextualException
   { 
     if (dialect==null)
     { dialect=new Dialect();
@@ -154,7 +155,7 @@ public class TypeManager
   }
   
   private void resolveLocalDataModel()
-    throws DataException
+    throws ContextualException
   {
     for (TypeMapper<?> mapper: TypeMapper.getStandardTypeMappers())
     { 
