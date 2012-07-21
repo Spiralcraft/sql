@@ -19,6 +19,150 @@
         </revision>
         
         <notes>
+          <scm:Note>dataSourceX property allows for dynamic DataSource
+            resolution.
+          </scm:Note>
+          <scm:Note>Sequence generator is now derived from 
+            AbstractStoreSequence in core.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlStore.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
+        </revision>
+        
+        <notes>
+          <scm:Note>Quote identifiers in "SET" clauses
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/dml/SetClause.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
+        </revision>
+        
+        <notes>
+          <scm:Note>Clean up connection allocation and statement pooling
+            functionality
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>jdbc/CachedPreparedStatement.java
+          </URI>
+          <URI>jdbc/PreparedStatementWrapper.java
+          </URI>
+          <URI>jdbc/StatementCachingConnection.java
+          </URI>
+          <URI>jdbc/StatementWrapper.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
+        </revision>
+        
+        <notes>
+          <scm:Note>Complete implementation of bidirectional type mapping
+            and support for inheritance and hierarchy when reading result 
+            sets.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/
+        </path>
+        
+        <resources>
+          <URI>data/ResultMapping.java
+          </URI>
+          <URI>data/ResultSetTuple.java
+          </URI>
+          <URI>data/SerialResultSetCursor.java
+          </URI>
+          <URI>data/mappers/PrimitiveTypeMapper.java
+          </URI>
+          <URI>data/mappers/TypeMapper.java
+          </URI>
+          <URI>data/query/BoundScan.java
+          </URI>
+          <URI>data/store/BoundQueryStatement.java
+          </URI>
+          <URI>data/store/BoundStatement.java
+          </URI>
+          <URI>data/store/ColumnMapping.java
+          </URI>
+          <URI>data/store/CriteriaTranslator.java
+          </URI>
+          <URI>data/store/ParameterTag.java
+          </URI>
+          <URI>data/store/ToSqlChannel.java
+          </URI>
+          <URI>dml/SqlParameterReference.java
+          </URI>
+          <URI>types/RealType.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
+        </revision>
+        
+        <notes>
+          <scm:Note>Converter is now an abstract class in preparation for
+            future enhancements.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/converters
+        </path>
+        
+        <resources>
+          <URI>BigDecimalConverter.java
+          </URI>
+          <URI>ByteConverter.java
+          </URI>
+          <URI>Converter.java
+          </URI>
+          <URI>DateConverter.java
+          </URI>
+          <URI>DoubleConverter.java
+          </URI>
+          <URI>FloatConverter.java
+          </URI>
+          <URI>IntegerConverter.java
+          </URI>
+          <URI>LongConverter.java
+          </URI>
+          <URI>ShortConverter.java
+          </URI>
+          <URI>StringifyConverter.java
+          </URI>
+          <URI>TimeConverter.java
+          </URI>
+          <URI>TimestampConverter.java
+          </URI>
+          <URI>VarcharConverter.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-1
+        </revision>
+        
+        <notes>
           <scm:Note>Remove need for explicit TypeManager configuration
           </scm:Note>
           <scm:Note>Non-transient fields of non-primitive types will be
@@ -69,6 +213,8 @@
           <URI>data/store/CriteriaTranslator.java
           </URI>
           <URI>data/store/SqlStore.java
+          </URI>
+          <URI>data/store/SchemaMapping.java
           </URI>
           <URI>data/store/TableMapping.java
           </URI>

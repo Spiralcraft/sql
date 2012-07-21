@@ -40,6 +40,27 @@
             </test:Stub>
           </chain>
         </dtask:Fetch>
+        <dtask:Fetch>
+          <debug>true
+          </debug>
+
+          <query>
+            <query:Scan>
+              <type x="[@example:StringNode].type"/>
+            </query:Scan>
+          </query>
+          
+          <chain>
+            <test:Stub>
+              <messageX>""+[example:StringNode.list].@size()+" results"
+              </messageX>
+              <conditionX>[example:StringNode.list].@size()==0
+              </conditionX>
+              <name>Fetch all StringNodes
+              </name>
+            </test:Stub>
+          </chain>
+        </dtask:Fetch>
       </scenarios>
     </task:Sequence>
   </chain>
