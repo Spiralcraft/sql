@@ -428,8 +428,7 @@ public class TableMapping
         ColumnMapping mapping=getMappingForField(field.getName());
         if (mapping==null)
         {
-          System.err.println
-          ("TableMapping: No column in key field '"+field.getName()+"'");
+          log.warning("TableMapping: No column in key field '"+field.getName()+"'");
         }
         
         Column[] fieldCols=mapping.getColumnModels();

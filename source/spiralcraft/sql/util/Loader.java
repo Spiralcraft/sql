@@ -226,7 +226,7 @@ public class Loader
           }
           else
           { 
-            System.err.println("Unknown option '-"+option+"'");
+            log.severe("Unknown option '-"+option+"'");
 //            System.err.println(usage());
             return;
           }

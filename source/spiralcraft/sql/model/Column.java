@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.model;
 
+import spiralcraft.log.ClassLog;
 import spiralcraft.sql.Dialect;
 import spiralcraft.sql.SqlType;
 
@@ -34,6 +35,7 @@ import java.util.List;
 
 public class Column
 {
+  private static final ClassLog log=ClassLog.getInstance(Column.class);
 
   private Table table;
   private String name;
@@ -55,7 +57,7 @@ public class Column
   public Column(ResultSet rs)
     throws SQLException
   {
-    System.err.println("Column: reading "+rs.getString(4));
+    log.fine("Column: reading "+rs.getString(4));
     
     name=rs.getString(4);
     type=SqlType.getSqlType(rs.getInt(5));

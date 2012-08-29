@@ -322,7 +322,7 @@ public class TypeManager
       { 
         StringBuilder buff=new StringBuilder();
         statement.write(buff,"", null);
-        System.err.println(buff.toString());
+        log.fine(buff.toString());
       }
       if (!autoUpgrade)
       {

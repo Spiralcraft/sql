@@ -67,7 +67,7 @@ public class Table
     schemaName=rs.getString(2);
     name=rs.getString(3);
 //    remarks=rs.getString(5);
-    System.err.println("Table: read "+name+": catalog="+catalogName+" schema="+schemaName);
+    log.fine("Table: read "+name+": catalog="+catalogName+" schema="+schemaName);
   }
   
   
