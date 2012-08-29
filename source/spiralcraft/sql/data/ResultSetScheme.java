@@ -22,6 +22,7 @@ import spiralcraft.data.Field;
 import spiralcraft.data.core.FieldImpl;
 import spiralcraft.data.core.SchemeImpl;
 
+import spiralcraft.log.ClassLog;
 import spiralcraft.sql.SqlType;
 
 import java.sql.ResultSetMetaData;
@@ -35,6 +36,7 @@ import java.sql.SQLException;
 public class ResultSetScheme
   extends SchemeImpl
 {
+  private static final ClassLog log=ClassLog.getInstance(ResultSetScheme.class);
   
   @SuppressWarnings({ "unchecked", "rawtypes" }) // Inherently unsafe ops
   public ResultSetScheme(ResultSetMetaData metadata)
@@ -62,7 +64,7 @@ public class ResultSetScheme
         Class<?> typeClass=SqlType.getSqlType(metadata.getColumnType(i)).getSqlClass();
         if (typeClass==null)
         { 
-          System.err.println
+          log.fine
             ("ResultSetScheme: No mapped type for "
                 +SqlType.getSqlType(metadata.getColumnType(i)).getName()
             );

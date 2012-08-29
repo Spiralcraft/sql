@@ -320,7 +320,7 @@ public class SqlStore
     { 
       BoundSelection boundSelection
         =new BoundSelection((Selection) query,focus,this);
-      System.err.println("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+      log.fine("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
       return boundSelection;
     }
     else if (query instanceof Scan)
