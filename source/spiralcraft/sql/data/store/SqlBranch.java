@@ -19,6 +19,8 @@ import spiralcraft.data.DataException;
 import spiralcraft.data.transaction.Branch;
 import spiralcraft.data.transaction.Transaction.State;
 import spiralcraft.data.transaction.TransactionException;
+import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -27,9 +29,15 @@ public class SqlBranch
   implements Branch
 {
 
+  private static final ClassLog log
+    =ClassLog.getInstance(SqlBranch.class);
+  private static Level logLevel
+    =ClassLog.getInitialDebugLevel(SqlBranch.class,Level.INFO);
+  
   private Connection connection;
   private State state;
   private SqlResourceManager resourceManager;
+  
   
   public SqlBranch(SqlResourceManager resourceManager)
     throws TransactionException
@@ -57,7 +65,11 @@ public class SqlBranch
     throws TransactionException
   {
     try
-    { connection.commit();
+    { 
+      connection.commit();
+      if (logLevel.isFine())
+      { log.fine("Committed");
+      }
     }
     catch (SQLException x)
     { throw new TransactionException("Commit failed: "+x,x);
@@ -81,7 +93,11 @@ public class SqlBranch
   {
     
     try
-    { connection.rollback();
+    { 
+      connection.rollback();
+      if (logLevel.isFine())
+      { log.fine("Rollback");
+      }
     }
     catch (SQLException x)
     { throw new TransactionException("Rollback failed: "+x,x);
@@ -92,6 +108,9 @@ public class SqlBranch
   @Override
   public void complete()
   { 
+    if (logLevel.isFine())
+    { log.fine("Completing in state "+state.name());
+    }
     if (connection!=null)
     { resourceManager.deallocateConnection(connection);
     }

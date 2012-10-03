@@ -87,7 +87,9 @@ public class SqlStore
         {
           @Override
           public SqlStoreConnection newConnection(Connection delegate)
-          { return new SqlStoreConnection(delegate);
+            throws SQLException
+          { 
+            return new SqlStoreConnection(delegate);
           }
         }
       );
@@ -105,7 +107,7 @@ public class SqlStore
   
   public SqlStore()
     throws DataException
-  {
+  { 
   }
   
   /**
@@ -241,6 +243,7 @@ public class SqlStore
     if (dataSourceX!=null)
     { dataSource=dataSourceX.get();
     }
+    log.info("Serving SQL data from "+this.getLocalResourceURI());
     connectionPool.setDataSource(dataSource);
     connectionPool.start();
     try
@@ -320,7 +323,11 @@ public class SqlStore
     { 
       BoundSelection boundSelection
         =new BoundSelection((Selection) query,focus,this);
-      log.fine("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+      if (debugLevel.isDebug())
+      { 
+        log.fine
+          ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+      }
       return boundSelection;
     }
     else if (query instanceof Scan)
@@ -384,8 +391,11 @@ public class SqlStore
     { 
       BoundQuery<?,Tuple> boundQuery
         =sequenceTableMapping.query(sequenceQuery,uriFocus);
-      log.fine("Bound sequence query = "+boundQuery);
-      boundQuery.setDebugLevel(Level.FINE);
+      if (debugLevel.isDebug())
+      { 
+        log.fine("Bound sequence query = "+boundQuery);
+        boundQuery.setDebugLevel(Level.FINE);
+      }
       return boundQuery;
     }
     
