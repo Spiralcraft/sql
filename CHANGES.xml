@@ -15,6 +15,26 @@
 
     <detail>
       <scm:Change>
+        <revision>dev-2
+        </revision>
+        
+        <notes>
+          <scm:Note>ConnectionFactory can now throw a SQLException
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/store/SqlStoreConnection.java
+          </URI>
+          <URI>sql/pool/ConnectionFactory.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
         <revision>dev-1
         </revision>
         

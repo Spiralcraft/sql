@@ -15,6 +15,7 @@
 package spiralcraft.sql.model;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.ddl.CreateSchemaStatement;
 import spiralcraft.sql.ddl.DDLStatement;
 
@@ -34,6 +35,8 @@ import java.sql.DatabaseMetaData;
 public class Schema
 {
   private static final ClassLog log=ClassLog.getInstance(Schema.class);
+  private static final Level logLevel
+    =ClassLog.getInitialDebugLevel(Schema.class,Level.INFO);
   
   private final ArrayList<Table> tables=new ArrayList<Table>();
   private final HashMap<String,Table> tableMap
@@ -63,7 +66,9 @@ public class Schema
     if (rs.getMetaData().getColumnCount()>1)
     { catalogName=rs.getString(2);
     }
-    log.debug("From DB: schema="+name+": catalog="+catalogName);
+    if (logLevel.isDebug())
+    { log.debug("From DB: schema="+name+": catalog="+catalogName);
+    }
   }
   
   public void readTables(Dialect dialect,DatabaseMetaData metadata)

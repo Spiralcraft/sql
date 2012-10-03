@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
 
 
@@ -35,6 +36,8 @@ public class KeyConstraint
 {
   
   private static final ClassLog log=ClassLog.getInstance(KeyConstraint.class);  
+  private static final Level logLevel
+    =ClassLog.getInitialDebugLevel(KeyConstraint.class,Level.INFO);
 
   private Column[] columns;
   private boolean primary;
@@ -59,7 +62,9 @@ public class KeyConstraint
       { columns.add(null);
       }
       columns.set(seq, table.getColumn(columnName));
-      log.fine("KeyConstraint: "+columnName+" "+columns.get(seq));
+      if (logLevel.isDebug())
+      { log.fine("KeyConstraint: "+columnName+" "+columns.get(seq));
+      }
     }
     this.columns=columns.toArray(new Column[columns.size()]);
     this.primary=primary;

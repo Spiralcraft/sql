@@ -15,6 +15,7 @@
 package spiralcraft.sql.model;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
 import spiralcraft.sql.SqlType;
 
@@ -36,6 +37,8 @@ import java.util.List;
 public class Column
 {
   private static final ClassLog log=ClassLog.getInstance(Column.class);
+  private static final Level logLevel
+    =ClassLog.getInitialDebugLevel(Column.class,Level.INFO);
 
   private Table table;
   private String name;
@@ -57,7 +60,9 @@ public class Column
   public Column(ResultSet rs)
     throws SQLException
   {
-    log.fine("Column: reading "+rs.getString(4));
+    if (logLevel.isDebug())
+    { log.fine("Column: reading "+rs.getString(4));
+    }
     
     name=rs.getString(4);
     type=SqlType.getSqlType(rs.getInt(5));

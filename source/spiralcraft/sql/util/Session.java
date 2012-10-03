@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.util.ArrayUtil;
 
 /**
@@ -34,9 +35,15 @@ public class Session
 {
 
   protected final ClassLog log=ClassLog.getInstance(getClass());
+  protected Level logLevel 
+    = ClassLog.getInitialDebugLevel(getClass(),Level.INFO);
   
   
   protected Connection connection;
+  
+  public void setLogLevel(Level logLevel)
+  { this.logLevel=logLevel;
+  }
   
   public void start(Connection connection)
   { this.connection=connection;
@@ -47,7 +54,9 @@ public class Session
   public void commit()
     throws SQLException
   { 
-    log.debug("Committing");
+    if (logLevel.isDebug())
+    { log.debug("Committing");
+    }
     this.connection.commit();
   }
   
@@ -63,7 +72,9 @@ public class Session
     ResultSet rs=null;
 
     st=connection.createStatement(); 
-    log.debug("Executing: "+sql);
+    if (logLevel.isDebug())
+    { log.debug("Executing: "+sql);
+    }
     rs=st.executeQuery(sql);
     return rs;
   }
@@ -75,7 +86,9 @@ public class Session
     try
     {
       st=connection.createStatement(); 
-      log.debug("Executing: "+sql);
+      if (logLevel.isDebug())
+      { log.debug("Executing: "+sql);
+      }
       return st.executeUpdate(sql);
     }
     finally
@@ -93,7 +106,9 @@ public class Session
       for (int i=0;i<params.length;i++)
       { st.setObject(i+1, params[i]);
       }
-      log.debug("Executing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+      if (logLevel.isDebug())
+      { log.debug("Executing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+      }
       return st.executeUpdate();
     }
     finally
@@ -105,13 +120,17 @@ public class Session
     throws SQLException
   {
     PreparedStatement st=null;
-    log.debug("Preparing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+    if (logLevel.isDebug())
+    { log.debug("Preparing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+    }
 
     st=connection.prepareStatement(sql); 
     for (int i=0;i<params.length;i++)
     { st.setObject(i+1, params[i]);
     }
-    log.debug("Executing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+    if (logLevel.isDebug())
+    { log.debug("Executing: "+sql+" {"+ArrayUtil.format(params,",","'")+"}");
+    }
     return st.executeQuery();
   }  
 }

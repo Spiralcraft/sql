@@ -15,6 +15,7 @@
 package spiralcraft.sql.model;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
 
 import spiralcraft.sql.ddl.TableElement;
@@ -40,6 +41,8 @@ public class Table
   @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(Table.class);
+  private static final Level logLevel
+    =ClassLog.getInitialDebugLevel(Table.class,Level.INFO);
   
   private String catalogName;
   private String schemaName;
@@ -67,7 +70,9 @@ public class Table
     schemaName=rs.getString(2);
     name=rs.getString(3);
 //    remarks=rs.getString(5);
-    log.fine("Table: read "+name+": catalog="+catalogName+" schema="+schemaName);
+    if (logLevel.isDebug())
+    { log.fine("Table: read "+name+": catalog="+catalogName+" schema="+schemaName);
+    }
   }
   
   
