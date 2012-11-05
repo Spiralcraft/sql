@@ -15,6 +15,20 @@
 
     <detail>
       <scm:Change>
+        <revision>dev-3
+        </revision>
+        
+        <notes>
+          <scm:Note>Refactoring- remove Focus arg for Store.getUpdater()
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlStore.java
+        </path>
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>dev-2
         </revision>
         
