@@ -343,8 +343,8 @@ public class SqlStore
    * @return A DataConsumer which is used to push one or more updates into
    *   this Store. 
    */
-  @Override
-  public DataConsumer<DeltaTuple> getUpdater(Type<?> type,Focus<?> focus)
+  @Override 
+  public DataConsumer<DeltaTuple> getUpdater(Type<?> type)
     throws DataException
   { return assertTableMapping(type).getUpdater();
   }
@@ -404,7 +404,7 @@ public class SqlStore
       throws DataException
     {
       DataConsumer<DeltaTuple> updater
-        =getUpdater(sequenceType,null);
+        =getUpdater(sequenceType);
       updater.dataInitialize(sequenceType.getFieldSet());
             
       updater.dataAvailable(dt);
@@ -416,7 +416,7 @@ public class SqlStore
       throws DataException
     {
       DataConsumer<DeltaTuple> updater
-        =getUpdater(sequenceType,null);
+        =getUpdater(sequenceType);
       updater.dataInitialize(sequenceType.getFieldSet());
             
       updater.dataAvailable(dt);
