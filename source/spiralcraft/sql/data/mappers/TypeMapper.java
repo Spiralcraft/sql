@@ -41,6 +41,7 @@ public abstract class TypeMapper<T extends Type>
     { new PrimitiveTypeMapper()
     , new BigDecimalTypeMapper()
     , new StringTypeMapper()
+    , new TypeTypeMapper()
     };
     
   public static TypeMapper<?>[] getStandardTypeMappers()

@@ -40,6 +40,8 @@ import spiralcraft.util.tree.LinkedTree;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import spiralcraft.data.Type;
+
 
 /**
  * An association between a Field in the Scheme of a Type and a Table column
@@ -181,6 +183,9 @@ public class ColumnMapping
 
     if (!field.isTransient() 
         && !field.getType().isPrimitive() 
+        && (field.getType().getNativeClass()==null 
+             || !Type.class.isAssignableFrom(field.getType().getNativeClass())
+           )
         && field.getType().getScheme()!=null
         )
     { flatten=true;
