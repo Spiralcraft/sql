@@ -14,6 +14,33 @@
     </date>
 
     <detail>
+    
+      <scm:Change>
+        <revision>dev-4
+        </revision>
+        
+        <notes>
+          <scm:Note>Handle spiralcraft.data.Type references properly by
+            storing them as URI strings
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>converters/TypeRefConverter.java
+          </URI>
+          <URI>mappers/TypeMapper.java
+          </URI>
+          <URI>mappers/TypeTypeMapper.java
+          </URI>
+          <URI>data/store/ColumnMapping.java
+          </URI>
+        </resources>
+        
+      </scm:Change>
+          
       <scm:Change>
         <revision>dev-3
         </revision>
