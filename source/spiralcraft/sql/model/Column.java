@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.model;
 
+import spiralcraft.data.DataException;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
@@ -126,7 +127,6 @@ public class Column
   { this.type=type;
   }
   
-  
   /**
    * 
    * @return the maxumum number of characters or digits
@@ -167,7 +167,12 @@ public class Column
    * @param dialect
    */
   public ColumnDefinition generateColumnDefinition(Dialect dialect)
-  { return new ColumnDefinition(name,type.createDDL(dialect,length,decimalDigits));
+    throws DataException
+  {
+    if (type==null)
+    { throw new DataException("No type for "+this.getTable().getName()+"."+this.getName());
+    }
+    return new ColumnDefinition(name,type.createDDL(dialect,length,decimalDigits));
   }
   
   public synchronized ValueExpression getValueExpression()
@@ -179,6 +184,7 @@ public class Column
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,Column storeVersion)
+    throws DataException
   {
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     if (storeVersion==null)

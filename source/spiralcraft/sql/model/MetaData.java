@@ -15,6 +15,7 @@
 package spiralcraft.sql.model;
 
 
+import spiralcraft.data.DataException;
 import spiralcraft.sql.ddl.DDLStatement;
 
 import spiralcraft.sql.Dialect;
@@ -77,6 +78,7 @@ public class MetaData
   } 
 
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,MetaData storeVersion)
+    throws DataException
   { 
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     for (Schema schema: schemas)

@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.model;
 
+import spiralcraft.data.DataException;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
 import spiralcraft.sql.ddl.CreateSchemaStatement;
@@ -112,6 +113,7 @@ public class Schema
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,Schema storeVersion)
+    throws DataException
   {
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     if (storeVersion==null)

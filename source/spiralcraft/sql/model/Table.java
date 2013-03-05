@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.model;
 
+import spiralcraft.data.DataException;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
@@ -178,6 +179,7 @@ public class Table
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,Table storeVersion)
+    throws DataException
   {
     ArrayList<DDLStatement> ret=new ArrayList<DDLStatement>();
     if (storeVersion==null)
