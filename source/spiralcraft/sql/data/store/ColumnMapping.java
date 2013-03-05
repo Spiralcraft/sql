@@ -144,14 +144,16 @@ public class ColumnMapping
     
     for (Field<?> subField : field.getType().getFieldSet().fieldIterable())
     { 
-      ColumnMapping subMapping = new ColumnMapping();
-      subMapping.setField(subField);
-      subMapping.setColumnName(columnName+"_"+subMapping.getColumnName());
-      subMapping.setPath(this.path.append(subField.getName()));
-      flattenedChildren.add(subMapping);
-      childMapByField.put(subMapping.getFieldName(), subMapping);
-      // log.fine(""+field.getURI()+" -> "+subMapping);
-      
+      if (TypeManager.isPersistent(field.getType(),subField))
+      {
+        ColumnMapping subMapping = new ColumnMapping();
+        subMapping.setField(subField);
+        subMapping.setColumnName(columnName+"_"+subMapping.getColumnName());
+        subMapping.setPath(this.path.append(subField.getName()));
+        flattenedChildren.add(subMapping);
+        childMapByField.put(subMapping.getFieldName(), subMapping);
+        // log.fine(""+field.getURI()+" -> "+subMapping);
+      }
     }
     
   }
@@ -186,25 +188,55 @@ public class ColumnMapping
         && (field.getType().getNativeClass()==null 
              || !Type.class.isAssignableFrom(field.getType().getNativeClass())
            )
-        && field.getType().getScheme()!=null
+       
         )
-    { flatten=true;
+    { 
+      if (field.getType().getScheme()!=null)
+      {
+        flatten=true;
+        if (debugLevel.isDebug())
+        { log.fine("Will flatten "+field.getURI());
+        }
+      }
+      else
+      { 
+        if (debugLevel.isDebug())
+        { log.fine("Scheme is null for "+field.getType());
+        }
+      }
     }
     
     if (flatten && field.getType().getScheme()!=null)
     { 
-      log.fine("Flattening "+field.getURI());
+      if (debugLevel.isDebug())
+      { log.fine("Flattening "+field.getURI());
+      }
+      
       flatten();
+      
+      ArrayList<ColumnMapping> missingColumns
+        =new ArrayList<ColumnMapping>();
+      
       for (ColumnMapping subMapping : flattenedChildren)
       { 
         subMapping.setStore(store);
         subMapping.resolve();
+        if (subMapping.getColumnModel()==null
+            && (subMapping.getColumnModels()==null
+                || subMapping.getColumnModels().length==0
+                )
+           )
+        { missingColumns.add(subMapping);
+        }
+            
         // log.fine("Flattened to "+subMapping);
         
       }
+      for (ColumnMapping mc : missingColumns)
+      { flattenedChildren.remove(mc);
+      }
     }
     resolved=true;
-
   }
   
   /**
@@ -245,7 +277,7 @@ public class ColumnMapping
       {
 
         
-        column=new Column();
+        Column column=new Column();
         column.setName(columnName);
 
         TypeMapper typeMapper
@@ -257,13 +289,25 @@ public class ColumnMapping
             log.debug
               ("ColumnMapping.getColumnModels(): No mapper for type "
               +field.getType().getURI()
+              +" ("+field.getType().getClass().getName()+")"
               );
           }
           return new Column[0];
         }
+
             
         typeMapper.specifyColumn(field.getType(),column);
+        if (column.getType()==null)
+        { 
+          log.warning
+            ("Mapper "+typeMapper+" did not map type "+field.getType().getURI()
+            +" for column "+column.getName()
+            );
+          return new Column[0];
+          
+        }
         converter=typeMapper.getConverter(field.getType());
+        this.column=column;
       }
       return new Column[] {column};
     }
@@ -346,6 +390,10 @@ public class ColumnMapping
   
   public SelectListItem getSelectListItem()
   { 
+    if (column==null)
+    { throw new IllegalStateException("Column is null for "+field.getURI());
+    }
+    
     if (selectListItem==null)
     { selectListItem=new DerivedColumn(column.getValueExpression());
     }
