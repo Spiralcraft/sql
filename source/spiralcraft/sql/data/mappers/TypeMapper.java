@@ -15,6 +15,8 @@
 package spiralcraft.sql.data.mappers;
 
 import spiralcraft.data.Type;
+import spiralcraft.data.core.AbstractCollectionType;
+import spiralcraft.data.core.ArrayType;
 
 import spiralcraft.sql.SqlType;
 import spiralcraft.sql.Dialect;
@@ -42,6 +44,7 @@ public abstract class TypeMapper<T extends Type>
     , new BigDecimalTypeMapper()
     , new StringTypeMapper()
     , new TypeTypeMapper()
+    , new ListTypeMapper()
     };
     
   public static TypeMapper<?>[] getStandardTypeMappers()
@@ -49,6 +52,8 @@ public abstract class TypeMapper<T extends Type>
   }
   
   protected Dialect dialect;
+  private TypeMapper arrayMapper;
+  private TypeMapper collectionMapper;
   
   public void setDialect(Dialect dialect)
   { this.dialect=dialect;
@@ -68,8 +73,99 @@ public abstract class TypeMapper<T extends Type>
    */
   public abstract void specifyColumn(T type,Column col);
   
+  public synchronized TypeMapper<?> getArrayMapper()
+  { 
+    if (arrayMapper==null)
+    { arrayMapper=new ArrayMapper(this);
+    }
+    return arrayMapper;
+  }
+
+  public synchronized TypeMapper<?> getCollectionMapper()
+  { 
+    if (collectionMapper==null)
+    { collectionMapper=new CollectionMapper(this);
+    }
+    return collectionMapper;
+  }
+  
   public Converter<?,?> getConverter(T type)
   { return getSqlType(type).getConverter();
+  }
+  
+  class ArrayMapper
+    extends TypeMapper<ArrayType>
+  {
+    private TypeMapper componentMapper;
+    
+    public ArrayMapper(TypeMapper componentMapper)
+    { this.componentMapper=componentMapper;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<ArrayType> getTypeClass()
+    { return ArrayType.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public SqlType<?> getSqlType(
+      ArrayType type)
+    { 
+      return spiralcraft.sql.types.ArrayType.forType
+        (componentMapper.getSqlType(type.getContentType()));
+    }
+
+    @Override
+    public void specifyColumn(
+      ArrayType type,
+      Column col)
+    {
+      SqlType<?> sqlType=getSqlType(type);
+      col.setType(sqlType);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public Converter<Object[],Object[]> getConverter(ArrayType type)
+    { return componentMapper.getConverter(type.getContentType()).arrayConverter();
+    }
+    
+  }
+
+  class CollectionMapper
+    extends TypeMapper<AbstractCollectionType>
+  {
+    private TypeMapper componentMapper;
+    
+    public CollectionMapper(TypeMapper componentMapper)
+    { this.componentMapper=componentMapper;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<AbstractCollectionType> getTypeClass()
+    { return AbstractCollectionType.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public SqlType<?> getSqlType(
+      AbstractCollectionType type)
+    { 
+      return spiralcraft.sql.types.ArrayType.forType
+        (componentMapper.getSqlType(type.getContentType()));
+    }
+
+    @Override
+    public void specifyColumn(
+      AbstractCollectionType type,
+      Column col)
+    {
+      SqlType<?> sqlType=getSqlType(type);
+      col.setType(sqlType);
+    }
   }
 
 }
