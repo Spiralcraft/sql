@@ -22,8 +22,8 @@ import spiralcraft.sql.SqlFragment;
 public class DataType
     extends SqlFragment
 {
-  private String typeName;
-  private Integer length;
+  protected String typeName;
+  protected Integer length;
   private Integer decimals;
   
   public DataType(Dialect dialect,String typeName,Integer length,Integer decimals)

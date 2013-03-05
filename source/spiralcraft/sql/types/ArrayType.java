@@ -14,18 +14,56 @@
 //
 package spiralcraft.sql.types;
 
+import spiralcraft.sql.Dialect;
 import spiralcraft.sql.SqlType;
+import spiralcraft.sql.ddl.ArrayDataType;
+import spiralcraft.sql.ddl.DataType;
 
 import java.sql.Types;
 
 import java.sql.Array;
+import java.util.HashMap;
 
 public class ArrayType
   extends SqlType<Array>
 {
-  public ArrayType()
-  { super(Types.ARRAY,Array.class,"ARRAY");
+  
+  private static final HashMap<SqlType<?>,ArrayType> map
+    =new HashMap<SqlType<?>,ArrayType>();
+
+  
+  public static synchronized ArrayType forType(SqlType<?> type)
+  {
+    ArrayType ret=map.get(type);
+    if (ret==null)
+    {
+      ret=new ArrayType(type);
+      map.put(type,ret);
+    }
+    return ret;
   }
   
+  private final SqlType<?> componentType;
+  
+  public ArrayType()
+  { 
+    super(Types.ARRAY,Array.class,"ARRAY");
+    componentType=null;
+  }
+  
+  protected ArrayType(SqlType<?> componentType)
+  { 
+    super(Types.ARRAY,Array.class,"ARRAY");
+    this.componentType=componentType;
+  }
+  
+  /**
+   * @return The DataType definiton DDL fragment for this Type. Defaults to the
+   *   field name of the java.sql.Types class associated with this type.
+   */
+  @Override
+  public DataType createDDL(Dialect dialect,Integer length,Integer decimals)
+  { return new ArrayDataType(dialect,ddl,length,componentType.createDDL(dialect,null,null));
+  }  
   
 }
