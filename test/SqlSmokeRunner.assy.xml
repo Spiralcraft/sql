@@ -15,10 +15,8 @@
     <test:TestGroup>
       <name>spiralcraft-sql
       </name>
-    </test:TestGroup>
-    
-    <task:Sequence>
-      <scenarios>
+      
+      <sequence>
         <dtask:Fetch>
           <debug>true
           </debug>
@@ -31,7 +29,7 @@
           
           <chain>
             <test:Stub>
-              <messageX>""+[example:Customer.list].@size()+" results"
+              <messageX>""+[example:Customer.list].@log(.).@size()+" results"
               </messageX>
               <conditionX>[example:Customer.list].@size()==3
               </conditionX>
@@ -61,8 +59,28 @@
             </test:Stub>
           </chain>
         </dtask:Fetch>
-      </scenarios>
-    </task:Sequence>
+        
+        <dtask:Session>
+          <transactional>true
+          </transactional>
+          
+          <sequence>
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                @{ .discountCodes=[{"a","b","c"}]
+                }.@log(.)
+              </onInit>
+            </dtask:Edit>
+          </sequence>
+        </dtask:Session>
+      </sequence>
+    </test:TestGroup>
+    
   </chain>
   
 </task:TaskRunner>

@@ -14,7 +14,146 @@
     </date>
 
     <detail>
+      <scm:Change>
+        <revision>dev-5
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix issue where the "WHERE" keyword was included twice,
+            resulting in a SQL syntax error.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/dml/DeleteStatement.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-5
+        </revision>
+        
+        <notes>
+          <scm:Note>Debugging and exception handling enhancements
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/store/BoundStatement.java
+          </URI>
+          <URI>data/store/BoundUpdateStatement.java
+          </URI>
+          <URI>data/store/SqlBranch.java
+          </URI>
+          <URI>data/store/SqlResourceManager.java
+          </URI>
+          <URI>data/store/TableMapping.java
+          </URI>
+          <URI>model/Column.java
+          </URI>
+          <URI>model/MetaData.java
+          </URI>
+          <URI>model/Schema.java
+          </URI>
+          <URI>model/Table.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-5
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix issue where non-persistent fields would break the
+            column mapping logic in ResultSetTuple.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/ResultSetTuple.java
+        </path>
+      </scm:Change>
     
+      <scm:Change>
+        <revision>dev-5
+        </revision>
+        
+        <notes>
+          <scm:Note>Enhancements and fixes to persist arrays and embedded
+            data objects
+          </scm:Note>
+          <scm:Note>Add a default type mapping for a java.util.List
+          </scm:Note>
+          <scm:Note>Converters now provide array conversion instances and 
+            store their default Java class so the
+            appropriately typed array can be instantiated.
+          </scm:Note>
+          <scm:Note>Mappers now provide array mapping instances
+          </scm:Note>
+          <scm:Note>Add better support for fields that are not persisted.
+          </scm:Note>
+          <scm:Note>Support for SQL Arrays
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>SqlType.java
+          </URI>
+          <URI>converters/Converter.java
+          </URI>
+          <URI>converters/BigDecimalConverter.java
+          </URI>
+          <URI>converters/ByteConverter.java
+          </URI>
+          <URI>converters/DateConverter.java
+          </URI>
+          <URI>converters/DoubleConverter.java
+          </URI>
+          <URI>converters/FloatConverter.java
+          </URI>
+          <URI>converters/IntegerConverter.java
+          </URI>
+          <URI>converters/LongConverter.java
+          </URI>
+          <URI>converters/ShortConverter.java
+          </URI>
+          <URI>converters/StringifyConverter.java
+          </URI>
+          <URI>converters/TimeConverter.java
+          </URI>
+          <URI>converters/TimestampConverter.java
+          </URI>
+          <URI>converters/TypeRefConverter.java
+          </URI>
+          <URI>converters/VarcharConverter.java
+          </URI>
+          <URI>data/mappers/ListTypeMapper.java
+          </URI>
+          <URI>data/mappers/TypeMapper.java
+          </URI>
+          <URI>data/store/ColumnMapping.java
+          </URI>
+          <URI>data/store/TableMapping.java
+          </URI>
+          <URI>data/store/SqlUpdater.java
+          </URI>
+          <URI>data/store/TypeMapper.java
+          </URI>
+          <URI>ddl/ArrayDataType.java
+          </URI>
+          <URI>ddl/DataType.java
+          </URI>
+          <URI>sql/types/ArrayType.java
+          </URI>
+        </resources>
+        
+      </scm:Change>
+
       <scm:Change>
         <revision>dev-4
         </revision>
