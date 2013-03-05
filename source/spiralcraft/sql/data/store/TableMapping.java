@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import spiralcraft.lang.Focus;
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import spiralcraft.sql.model.Table;
 import spiralcraft.sql.model.Column;
@@ -54,6 +55,8 @@ public class TableMapping
 {
   private static final ClassLog log
     =ClassLog.getInstance(TableMapping.class);
+  private static Level logLevel
+    =ClassLog.getInitialDebugLevel(TableMapping.class,Level.INFO);
   
   private Type<?> type;
   private String tableName;
@@ -167,9 +170,15 @@ public class TableMapping
   }
 
   public WhereClause getPrimaryKeyWhereClause()
+    throws DataException
   {
+    
     if (primaryKeyWhereClause==null)
     {
+      if (type.getPrimaryKey()==null)
+      { throw new DataException("No primary key for "+type.getURI());
+      }
+      
       BooleanCondition condition=null;
       for (Field<?> field:type.getPrimaryKey().fieldIterable())
       {
@@ -338,12 +347,13 @@ public class TableMapping
   { return lastTransactionId;
   }
   
+  
   private ColumnMapping resolveMappingForField(Field<?> field)
   {
     ColumnMapping columnMapping=getMappingForField(field.getName());
     if (columnMapping==null)
     { 
-      if (!field.isTransient())
+      if (TypeManager.isPersistent(type,field))
       {
         columnMapping=new ColumnMapping();
         columnMapping.setStore(sqlStore);        
@@ -413,7 +423,10 @@ public class TableMapping
       // log.fine("Mapping "+mapping);
       for (Column column: mapping.getColumnModels())
       { 
-        // log.fine(""+column);
+        
+        if (logLevel.isDebug())
+        { log.fine(i+": "+column);
+        }
         column.setPosition(i++);
         tableModel.addColumn(column);
       }
