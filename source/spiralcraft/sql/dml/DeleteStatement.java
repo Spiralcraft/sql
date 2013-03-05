@@ -49,9 +49,7 @@ public class DeleteStatement
     buffer.append(" ");
         
     if (whereClause!=null)
-    { 
-      buffer.append("WHERE ");
-      whereClause.write(buffer,indent, parameterCollector);
+    { whereClause.write(buffer,indent, parameterCollector);
     }
 
   }
