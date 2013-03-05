@@ -19,9 +19,11 @@ import spiralcraft.lang.Expression;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.BindException;
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.FieldSet;
@@ -42,8 +44,11 @@ import java.util.ArrayList;
  */
 public abstract class BoundStatement
 {
-  protected static final ClassLog log
-    =ClassLog.getInstance(BoundStatement.class);
+  protected final ClassLog log
+    =ClassLog.getInstance(getClass());
+  protected Level logLevel
+    =ClassLog.getInitialDebugLevel(getClass(),Level.INFO);
+  
   protected ArrayList<ParameterTag> parameterExpressions
     =new ArrayList<ParameterTag>();
   protected ArrayList<Channel<?>> parameterBindings
@@ -196,10 +201,24 @@ public abstract class BoundStatement
     for (Channel<?> channel: parameterBindings)
     { 
       Object paramValue=channel.get();
-//      log.fine("Apply parameter "+i+" = "+paramValue
-//        +(paramValue!=null?("type="+paramValue.getClass().getName()):"")
-//        );
-      jdbcStatement.setObject(i++,paramValue);
+      if (logLevel.isFine())
+      {
+        log.fine("Apply parameter "+i+" = "+paramValue
+          +(paramValue!=null?("type="+paramValue.getClass().getName()):"")
+          +" statement="+statementText
+          );
+      }
+      try
+      { jdbcStatement.setObject(i++,paramValue);
+      }
+      catch (SQLSyntaxErrorException x)
+      { 
+        throw new SQLSyntaxErrorException
+          ("Error assigning parameter "+i+" = "+paramValue
+            +(paramValue!=null?("type="+paramValue.getClass().getName()):"")
+            +" statement="+statementText
+          );
+      }
     }
   }
   

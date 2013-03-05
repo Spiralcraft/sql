@@ -48,6 +48,9 @@ public class BoundUpdateStatement
     try
     {
       PreparedStatement statement=connection.prepareStatement(statementText);
+      if (logLevel.isFine())
+      { log.fine("Executing "+statementText);
+      }
       applyParameters(statement);
       int results=statement.executeUpdate();
       // log.fine("Closing "+statement);
