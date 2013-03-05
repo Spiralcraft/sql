@@ -34,7 +34,9 @@ public class StringifyConverter<T>
   private final Type<T> type;
 
   protected StringifyConverter(Type<T> type)
-  { this.type=type;
+  { 
+    super(type.getNativeClass());
+    this.type=type;
   }
   
 	@Override

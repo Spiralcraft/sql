@@ -24,6 +24,10 @@ import java.math.BigDecimal;
 public class BigDecimalConverter
 	extends Converter<BigDecimal,Object>
 {
+  public BigDecimalConverter()
+  { super(BigDecimal.class);
+  }
+  
 	@Override
   public BigDecimal toSql(Object value)
 		throws SQLException

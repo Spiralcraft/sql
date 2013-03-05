@@ -23,6 +23,11 @@ import java.sql.SQLException;
 public class IntegerConverter
 	extends Converter<Integer,Object>
 {
+  
+  public IntegerConverter()
+  { super(Integer.class);
+  }
+
 	@Override
   public Integer toSql(Object value)
 		throws SQLException

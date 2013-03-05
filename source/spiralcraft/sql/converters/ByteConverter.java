@@ -23,6 +23,10 @@ import java.sql.SQLException;
 public class ByteConverter
 	extends Converter<Byte,Object>
 {
+  public ByteConverter()
+  { super(Byte.class);
+  }
+  
 	@Override
   public Byte toSql(Object value)
 		throws SQLException

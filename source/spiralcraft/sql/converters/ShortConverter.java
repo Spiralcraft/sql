@@ -23,6 +23,10 @@ import java.sql.SQLException;
 public class ShortConverter
 	extends Converter<Short,Object>
 {
+  public ShortConverter()
+  { super(Short.class);
+  }
+
 	@Override
   public Short toSql(Object value)
 		throws SQLException

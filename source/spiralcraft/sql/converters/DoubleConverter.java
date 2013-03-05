@@ -23,6 +23,11 @@ import java.sql.SQLException;
 public class DoubleConverter
 	extends Converter<Double,Object>
 {
+  
+  public DoubleConverter()
+  { super(Double.class);
+  }
+  
 	@Override
   public Double toSql(Object value)
 		throws SQLException

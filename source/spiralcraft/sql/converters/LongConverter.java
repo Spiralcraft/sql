@@ -23,6 +23,10 @@ import java.sql.SQLException;
 public class LongConverter
 	extends Converter<Long,Object>
 {
+  public LongConverter()
+  { super(Long.class);
+  }
+
 	@Override
   public Long toSql(Object value)
 		throws SQLException

@@ -23,6 +23,10 @@ import java.sql.SQLException;
 public class FloatConverter
 	extends Converter<Float,Object>
 {
+  public FloatConverter()
+  { super(Float.class);
+  }
+
 	@Override
   public Float toSql(Object value)
 		throws SQLException

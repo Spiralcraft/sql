@@ -35,6 +35,11 @@ public class TypeRefConverter
   { return instance;
   }
   
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public TypeRefConverter()
+  { super((Class<Type<?>>) (Class) Type.class);
+  }
+  
 	@Override
   public String toSql(Type<?> value)
 		throws SQLException

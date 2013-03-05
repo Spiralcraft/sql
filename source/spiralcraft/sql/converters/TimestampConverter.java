@@ -35,6 +35,10 @@ public class TimestampConverter
   { _format.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
+  public TimestampConverter()
+  { super(Timestamp.class);
+  }
+  
 	@Override
   public Timestamp toSql(Object value)
 		throws SQLException

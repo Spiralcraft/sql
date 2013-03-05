@@ -32,6 +32,10 @@ public class TimeConverter
   private static SimpleDateFormat _format
     =new SimpleDateFormat("HH:mm:ss");
 
+  public TimeConverter()
+  { super(Time.class);
+  }
+  
 	@Override
   public Time toSql(Object value)
 		throws SQLException

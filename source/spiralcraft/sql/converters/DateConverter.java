@@ -28,6 +28,10 @@ import java.text.ParseException;
 public class DateConverter
 	extends Converter<Date,Object>
 {
+  public DateConverter()
+  { super(java.util.Date.class);
+  }
+
   private static SimpleDateFormat _format
     =new SimpleDateFormat("yyyy-MM-dd");
 

@@ -27,6 +27,10 @@ import java.sql.SQLException;
 public class VarcharConverter
 	extends Converter<String,Object>
 {
+  public VarcharConverter()
+  { super(String.class);
+  }
+
 	@Override
   public String toSql(Object value)
 		throws SQLException
