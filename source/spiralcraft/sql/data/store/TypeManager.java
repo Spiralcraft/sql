@@ -17,7 +17,10 @@ package spiralcraft.sql.data.store;
 
 import spiralcraft.common.ContextualException;
 import spiralcraft.data.DataException;
+import spiralcraft.data.Field;
 import spiralcraft.data.Type;
+import spiralcraft.data.reflect.ReflectionField;
+import spiralcraft.data.reflect.ReflectionType;
 
 import spiralcraft.log.ClassLog;
 
@@ -34,6 +37,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,6 +51,20 @@ public class TypeManager
   @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(TypeManager.class);
+
+  
+  public static boolean isPersistent(Type<?> type,Field<?> field)
+  {
+    return !field.isTransient()
+         && !( type instanceof ReflectionType && field.getName().equals("class"))
+         && !( field instanceof ReflectionField 
+               && ( ((ReflectionField<?>) field).getWriteMethod()==null
+                    || ((ReflectionField<?>) field).getReadMethod()==null
+                  )
+             )
+         ;
+  }
+
   
   private TypeMapper<?>[] typeMappers;
   
@@ -220,14 +238,36 @@ public class TypeManager
    */
   public TypeMapper<?> getTypeMapperForType(Type<?> type)
   { 
-    TypeMapper<?> mapper=null;
-    Class<?> clazz=type.getClass();
-    while (mapper==null && clazz!=null)
-    { 
-      mapper=typeMappersByTypeClass.get(clazz);
-      clazz=clazz.getSuperclass();
+    if (!type.isAggregate())
+    {
+      TypeMapper<?> mapper=null;
+      Class<?> clazz=type.getClass();
+      while (mapper==null && clazz!=null)
+      { 
+        mapper=typeMappersByTypeClass.get(clazz);
+        clazz=clazz.getSuperclass();
+      }
+      return mapper;
     }
-    return mapper;
+    else
+    {
+      TypeMapper<?> contentMapper=getTypeMapperForType(type.getContentType());
+      if (contentMapper!=null)
+      { 
+        if (type.getNativeClass().isArray())
+        { return contentMapper.getArrayMapper();
+        }
+        else if (Collection.class.isAssignableFrom(type.getNativeClass()))
+        { return contentMapper.getCollectionMapper();
+        }
+        else
+        { return null;
+        }
+      }
+      else
+      { return null;
+      }
+    }
   }
   
   /**
@@ -309,6 +349,7 @@ public class TypeManager
   }
   
   private List<DDLStatement> generateUpdateDDL()
+    throws DataException
   { return localMetaData.generateUpdateDDL(dialect,storeMetaData);
   }
   
