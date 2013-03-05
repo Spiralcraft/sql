@@ -20,6 +20,7 @@ import spiralcraft.sql.ddl.DataType;
 
 import java.sql.Types;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class SqlType<T>
 {
@@ -83,6 +84,8 @@ public abstract class SqlType<T>
     mapConversion(float.class,Types.REAL);
     mapConversion(double.class,Types.DOUBLE);
     mapConversion(byte[].class,Types.VARBINARY);
+    
+    mapConversion(List.class,Types.ARRAY);
     
   }
   
