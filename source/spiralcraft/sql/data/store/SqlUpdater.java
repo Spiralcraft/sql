@@ -118,6 +118,7 @@ public class SqlUpdater
    *   of dirty fields in the specified DeltaTuple
    */
   synchronized UpdateStatement getUpdateStatement(DeltaTuple tuple)
+    throws DataException
   {
     ArrayList<Path> paths=new ArrayList<Path>();
     buildDirtyPaths(tuple,paths,new Path());
@@ -146,6 +147,7 @@ public class SqlUpdater
    * Retrieve or build a DELETE statement for this Type/Table
    */
   synchronized DeleteStatement getDeleteStatement()
+    throws DataException
   { 
     if (deleteStatement==null)
     {
@@ -165,26 +167,34 @@ public class SqlUpdater
       Path subPath=parentPath.append(field.getName());
       ColumnMapping mapping
         =tableMapping.getMappingForPath(subPath);
-      
-      if (mapping.isFlattened())
+      if (mapping!=null)
       {
-        DeltaTuple subDelta=null;
-        try
-        { 
-          subDelta
-            =(DeltaTuple) field.getValue(tuple);
+        if (mapping.isFlattened())
+        {
+          DeltaTuple subDelta=null;
+          try
+          { 
+            subDelta
+              =(DeltaTuple) field.getValue(tuple);
+          }
+          catch (DataException x)
+          { 
+            x.printStackTrace();
+            continue;
+          }
+          if (subDelta.isDirty())
+          { buildDirtyPaths(subDelta,paths,subPath);
+          }
         }
-        catch (DataException x)
-        { 
-          x.printStackTrace();
-          continue;
-        }
-        if (subDelta.isDirty())
-        { buildDirtyPaths(subDelta,paths,subPath);
+        else
+        { paths.add(subPath);
         }
       }
       else
-      { paths.add(subPath);
+      { 
+        if (debug)
+        { log.info("Field "+field.getURI()+" is dirty but has no mapping exists fpr "+subPath);
+        }
       }
     }
     
