@@ -15,6 +15,7 @@
 package spiralcraft.sql.data;
 
 import spiralcraft.data.spi.AbstractTuple;
+import spiralcraft.data.spi.ArrayTuple;
 
 import spiralcraft.data.DeltaTuple;
 import spiralcraft.data.FieldSet;
@@ -112,10 +113,17 @@ public class ResultSetTuple
         { field=fieldIterator.next();
         }
         
-        while (field.isTransient() && fieldIterator.hasNext())
-        { field=fieldIterator.next();
+        while ( (node.get()!=null 
+                 && field!=node.get().columnMapping.getField()
+                ) 
+                &&  fieldIterator.hasNext()
+              )
+        { 
+          // Skip fields that are not in the db
+          field=fieldIterator.next();
+          i++;
         }
-        if (field.isTransient())
+        if (node.get()!=null && field!=node.get().columnMapping.getField() )
         { break;
         }
         
@@ -199,6 +207,7 @@ public class ResultSetTuple
               +" ["+sqlValue+"] applied to "+map[index].converter
               +" for column "+map[index].resultSetColumn+" ("
               +resultSet.getMetaData().getColumnName(map[index].resultSetColumn)+")"
+              ,x
               );
           }
         }
@@ -250,5 +259,12 @@ public class ResultSetTuple
   protected AbstractTuple createDeltaBaseExtent(DeltaTuple tuple) 
       throws DataException
   { throw new UnsupportedOperationException("A ResultSetTuple cannot be written to");
+  }
+
+  @Override
+  protected AbstractTuple copyTupleField(
+    Tuple fieldValue)
+    throws DataException
+  { return new ArrayTuple(fieldValue);
   }
 }
