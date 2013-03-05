@@ -121,4 +121,8 @@ public class SqlBranch
   { return false;
   }
 
+  @Override
+  public String toString()
+  { return super.toString()+": "+resourceManager.toString();
+  }
 }

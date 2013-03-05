@@ -65,4 +65,8 @@ public class SqlResourceManager
   { return new SqlBranch(this);
   }
 
+  @Override
+  public String toString()
+  { return super.toString()+": store="+sqlStore.getName();
+  }
 }
