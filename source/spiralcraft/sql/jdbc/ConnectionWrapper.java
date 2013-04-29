@@ -269,13 +269,22 @@ public abstract class ConnectionWrapper
   @Override
   public boolean isWrapperFor(Class<?> clazz)
     throws SQLException
-  { return connection.isWrapperFor(clazz);
+  { 
+    if (clazz.isAssignableFrom(getClass()))
+    { return true;
+    }
+    return connection.isWrapperFor(clazz);
   }
   
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T unwrap(Class<T> iface)
     throws SQLException
-  { return connection.unwrap(iface);
+  { 
+    if (iface.isAssignableFrom(getClass()))
+    { return (T) this;
+    }
+    return connection.unwrap(iface);
   }
   
   @Override

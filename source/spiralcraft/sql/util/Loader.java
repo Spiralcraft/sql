@@ -60,7 +60,10 @@ import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.ResultSet;
 
+import javax.sql.CommonDataSource;
 import javax.sql.DataSource;
+import javax.sql.XAConnection;
+import javax.sql.XADataSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -86,9 +89,10 @@ public class Loader
 
   private static final ClassLog log=ClassLog.getInstance(Loader.class);
   private Resource _schemaResource;
-  private DataSource dataSource;
+  private CommonDataSource dataSource;
   private String _tableName;
   private Connection _connection;
+  private XAConnection _xaConnection;
   private PreparedStatement _statement;
   private int _count;
   private int _transactionSize=1000;
@@ -425,10 +429,14 @@ public class Loader
     { log.info("Queried "+_count);
     }
     _connection.close();
+    if (_xaConnection!=null)
+    { _xaConnection.close();
+    }
+    
   }
   
   
-  public void setDataSource(DataSource dataSource)
+  public void setDataSource(CommonDataSource dataSource)
   { this.dataSource=dataSource;
   }
 
@@ -605,6 +613,8 @@ public class Loader
       
       initializeSql();
       
+      
+      
     }
 
 
@@ -643,7 +653,16 @@ public class Loader
 		{ 
       try
       {
-        _connection=dataSource.getConnection();
+        if (dataSource instanceof XADataSource)
+        {
+          _xaConnection=((XADataSource) dataSource).getXAConnection();
+          _connection=_xaConnection.getConnection();
+        }
+        else
+        {
+          _connection=((DataSource) dataSource).getConnection();
+        }
+        
         if (_connectionSetupSql!=null)
         { _connection.createStatement().execute(_connectionSetupSql);
         }
@@ -807,7 +826,7 @@ public class Loader
 
       }
       catch (SQLException x)
-      { throw new RuntimeException(x.toString());
+      { throw new RuntimeException(x);
       }
 		}
 

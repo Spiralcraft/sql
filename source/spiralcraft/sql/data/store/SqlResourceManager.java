@@ -19,6 +19,8 @@ import spiralcraft.data.DataException;
 import spiralcraft.data.transaction.ResourceManager;
 import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.transaction.TransactionException;
+import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -27,6 +29,11 @@ public class SqlResourceManager
   extends ResourceManager<SqlBranch>
 {
 
+  private static final ClassLog log
+    =ClassLog.getInstance(SqlResourceManager.class);
+  private Level logLevel
+    =ClassLog.getInitialDebugLevel(SqlResourceManager.class,Level.INFO);
+  
   private SqlStore sqlStore;
   
   public SqlResourceManager(SqlStore sqlStore)
@@ -36,7 +43,11 @@ public class SqlResourceManager
   public void deallocateConnection(Connection connection)
   {
     try
-    { connection.close();
+    { 
+      if (logLevel.isFine())
+      { log.fine("Deallocating "+connection);
+      }
+      connection.close();
     }
     catch (SQLException x)
     { x.printStackTrace();
@@ -50,6 +61,9 @@ public class SqlResourceManager
     {
       Connection connection=sqlStore.checkoutConnection();
       connection.setAutoCommit(false);
+      if (logLevel.isFine())
+      { log.fine("Allocated "+connection);
+      }
       return connection;
     }
     catch (SQLException x)
@@ -62,7 +76,7 @@ public class SqlResourceManager
   @Override
   public SqlBranch createBranch(Transaction transaction)
     throws TransactionException
-  { return new SqlBranch(this);
+  { return new SqlBranch(this,transaction);
   }
 
   @Override

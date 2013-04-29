@@ -4,6 +4,7 @@
   
   <target name="smoke-tests">
     <ant antfile="hsqldb/test.ant.xml" useNativeBasedir="true"/>
+    <ant antfile="hsqldbxa/test.ant.xml" useNativeBasedir="true"/>
   </target>
 	
 </project>

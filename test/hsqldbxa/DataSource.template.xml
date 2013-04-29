@@ -1,0 +1,6 @@
+<hsqlj:JDBCDataSource
+  xmlns:hsqlj="class:/org/hsqldb/jdbc/"
+  >
+  <url>jdbc:file:../out/hsqldb
+  </url>
+</hsqlj:JDBCDataSource>		

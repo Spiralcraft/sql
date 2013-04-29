@@ -17,13 +17,19 @@ package spiralcraft.sql.data.store;
 import spiralcraft.data.DataException;
 
 import spiralcraft.data.transaction.Branch;
+import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.transaction.Transaction.State;
 import spiralcraft.data.transaction.TransactionException;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
+import spiralcraft.sql.util.SQLUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 public class SqlBranch
   implements Branch
@@ -35,19 +41,54 @@ public class SqlBranch
     =ClassLog.getInitialDebugLevel(SqlBranch.class,Level.INFO);
   
   private Connection connection;
+  private Connection userConnection;
   private State state;
   private SqlResourceManager resourceManager;
+  private final XAResource xar;
+  private final Xid xid;
   
   
-  public SqlBranch(SqlResourceManager resourceManager)
+  public SqlBranch(SqlResourceManager resourceManager,Transaction tx)
     throws TransactionException
   {
     state=State.STARTED;
+    xid=tx.nextXid();
+    
     this.resourceManager=resourceManager;
     try
     { 
       
       connection=resourceManager.allocateConnection();
+      userConnection=new TransactionScopedConnection(connection);
+      if (logLevel.isFine())
+      { log.fine("Connection: "+connection);
+      }
+      try
+      { 
+        SqlStoreConnection ssc
+          =SQLUtil.tryUnwrap
+            (connection,SqlStoreConnection.class);
+        if (ssc!=null)
+        {
+          xar=ssc.getXAResource();
+          if (xar!=null)
+          { xar.start(xid,XAResource.TMNOFLAGS);
+          }
+        }
+        else
+        { xar=null;
+        }
+      }
+      catch (SQLException x)
+      { 
+        throw new TransactionException
+          ("Error associating connection with transaction",x);
+      }
+      catch (XAException e)
+      {
+        throw new TransactionException
+          ("Error associating connection with transaction",e);
+      }
     }
     catch (DataException x)
     { throw new TransactionException("Error allocating connection: "+x,x);
@@ -55,9 +96,7 @@ public class SqlBranch
   }
   
   public Connection getConnection()
-  { 
-    // XXX Return a fascade that won't close the real connection on close()
-    return connection;
+  { return userConnection;
   }
   
   @Override
@@ -66,7 +105,26 @@ public class SqlBranch
   {
     try
     { 
-      connection.commit();
+      
+      if (xar!=null)
+      {
+        try
+        { 
+          if (logLevel.isFine())
+          { log.fine("Calling xar.commit("+xid+")");
+          }
+          xar.commit(xid,false);
+        }
+        catch (XAException e)
+        { throw new TransactionException("Error preparing XA resource",e);
+        }
+        
+      }
+      else
+      { 
+        // Only commit the connection if no global transaction
+        connection.commit();
+      }
       if (logLevel.isFine())
       { log.fine("Committed");
       }
@@ -84,7 +142,23 @@ public class SqlBranch
 
   @Override
   public void prepare()
-  { state=State.PREPARED;    
+    throws TransactionException
+  { 
+    if (xar!=null)
+    { 
+      try
+      { 
+        xar.end(xid,XAResource.TMSUCCESS);
+        if (logLevel.isFine())
+        { log.fine("Calling xar.prepare("+xid+")");
+        }
+        xar.prepare(xid);
+      }
+      catch (XAException e)
+      { throw new TransactionException("Error preparing XA resource",e);
+      }
+    }
+    state=State.PREPARED;    
   }
 
   @Override
@@ -94,7 +168,18 @@ public class SqlBranch
     
     try
     { 
-      connection.rollback();
+      if (xar!=null)
+      { 
+        try
+        { xar.rollback(xid);
+        }
+        catch (XAException e)
+        { throw new TransactionException("Error rolling back XA resource",e);
+        }
+      }
+      else
+      { connection.rollback();
+      }
       if (logLevel.isFine())
       { log.fine("Rollback");
       }
@@ -106,11 +191,13 @@ public class SqlBranch
   }
   
   @Override
-  public void complete()
+  public void complete() 
+    throws TransactionException 
   { 
     if (logLevel.isFine())
     { log.fine("Completing in state "+state.name());
     }
+   
     if (connection!=null)
     { resourceManager.deallocateConnection(connection);
     }
@@ -118,7 +205,7 @@ public class SqlBranch
   
   @Override
   public boolean is2PC()
-  { return false;
+  { return xar!=null;
   }
 
   @Override

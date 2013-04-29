@@ -17,8 +17,13 @@ package spiralcraft.sql.pool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.XAConnection;
+
 public interface ConnectionFactory<T extends Connection>
 {
   T newConnection(Connection delegate)
+    throws SQLException;
+  
+  T newConnection(Connection delegate,XAConnection xa)
     throws SQLException;
 }

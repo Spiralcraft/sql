@@ -60,7 +60,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
+import javax.sql.CommonDataSource;
+import javax.sql.XAConnection;
 
 import java.util.List;
 
@@ -76,8 +77,8 @@ public class SqlStore
   extends AbstractStore
 {
   
-  private DataSource dataSource;
-  private Binding<DataSource> dataSourceX;
+  private CommonDataSource dataSource;
+  private Binding<CommonDataSource> dataSourceX;
   private ConnectionPool<SqlStoreConnection> connectionPool
     =new ConnectionPool<SqlStoreConnection>();
   
@@ -89,8 +90,17 @@ public class SqlStore
           public SqlStoreConnection newConnection(Connection delegate)
             throws SQLException
           { 
+            log.fine("Creating connection from "+delegate);
             return new SqlStoreConnection(delegate);
           }
+          
+          @Override
+          public SqlStoreConnection newConnection(Connection delegate,XAConnection xa)
+            throws SQLException
+          { 
+            log.fine("Creating XA connection from "+delegate);
+            return new SqlStoreConnection(delegate,xa);
+          }          
         }
       );
   }
@@ -113,11 +123,11 @@ public class SqlStore
   /**
    * Specify the dataSource that will supply JDBC connections 
    */
-  public void setDataSource(DataSource dataSource)
+  public void setDataSource(CommonDataSource dataSource)
   { this.dataSource=dataSource;
   }
   
-  public void setDataSourceX(Binding<DataSource> dataSourceX)
+  public void setDataSourceX(Binding<CommonDataSource> dataSourceX)
   { this.dataSourceX=dataSourceX;
   }
   
@@ -142,7 +152,7 @@ public class SqlStore
   /**
    * Obtain a direct reference to the DataSource that supplies JDBC connections
    */
-  public DataSource getDataSource()
+  public CommonDataSource getDataSource()
   { return dataSource;
   }
 
@@ -241,11 +251,14 @@ public class SqlStore
     throws LifecycleException
   { 
     if (dataSourceX!=null)
-    { dataSource=dataSourceX.get();
+    { setDataSource(dataSourceX.get());
     }
     log.info("Serving SQL data from "+this.getLocalResourceURI());
-    connectionPool.setDataSource(dataSource);
-    connectionPool.start();
+    if (dataSource!=null)
+    { 
+      connectionPool.setDataSource(dataSource);
+      connectionPool.start();
+    }
     try
     { onAttach(); // XXX Waiting for auto-recovery implementation
     }
@@ -269,47 +282,66 @@ public class SqlStore
   public void executeDDL(List<DDLStatement> statements)
     throws DataException
   {
-    Connection conn=null;
-    boolean autoCommit=false;
-    Statement sqlStatement=null;
-    
+    Transaction tx
+      =Transaction.startContextTransaction(Transaction.Nesting.PROPOGATE);
+    tx.setDebug(debugLevel.isDebug());
+    SqlBranch branch=resourceManager.branch(tx);
     try
-    { 
+    {
+      Connection conn=null;
+      boolean autoCommit=false;
+      Statement sqlStatement=null;
       
-      conn=getContextConnection();
-      autoCommit=conn.getAutoCommit();
-      conn.setAutoCommit(false);
-      sqlStatement=conn.createStatement();
-      
-      for (DDLStatement statement: statements)
-      {
-        StringBuilder buff=new StringBuilder();
-        statement.write(buff,"", null);
-        sqlStatement.execute(buff.toString());
-      }
-      conn.commit();
-      conn.setAutoCommit(autoCommit);
-      sqlStatement.close();
-      conn.close();
-    }
-    catch (SQLException x)
-    { 
-      if (conn!=null)
+      try
       { 
-        try
+        
+        conn=getContextConnection();
+        log.fine("Connection: "+conn);
+        autoCommit=conn.getAutoCommit();
+        if (!branch.is2PC())
+        { conn.setAutoCommit(false);
+        }
+        sqlStatement=conn.createStatement();
+        
+        for (DDLStatement statement: statements)
         {
-          conn.rollback();
+          StringBuilder buff=new StringBuilder();
+          statement.write(buff,"", null);
+          sqlStatement.executeUpdate(buff.toString());
+          log.fine("Executed "+buff.toString());
+        }
+        sqlStatement.close();
+        if (!branch.is2PC())
+        {
+          conn.commit();
           conn.setAutoCommit(autoCommit);
-          if (sqlStatement!=null)
-          { sqlStatement.close();
-          }
+          sqlStatement.close();
           conn.close();
         }
-        catch (SQLException y)
-        { throw new DataException("Error '"+y+"' recovering from error '"+x+"'",y);
-        }
+        tx.commit();
       }
-      throw new DataException("Error running DDL "+x,x);
+      catch (SQLException x)
+      { 
+        if (conn!=null && !branch.is2PC())
+        { 
+          try
+          {
+            conn.rollback();
+            conn.setAutoCommit(autoCommit);
+            if (sqlStatement!=null)
+            { sqlStatement.close();
+            }
+            conn.close();
+          }
+          catch (SQLException y)
+          { throw new DataException("Error '"+y+"' recovering from error '"+x+"'",y);
+          }
+        }
+        throw new DataException("Error running DDL "+x,x);
+      }
+    }
+    finally
+    { tx.complete();
     }
   }
   

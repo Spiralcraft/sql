@@ -4,7 +4,10 @@ package spiralcraft.sql.pool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.CommonDataSource;
 import javax.sql.DataSource;
+import javax.sql.XAConnection;
+import javax.sql.XADataSource;
 
 import spiralcraft.common.callable.Sink;
 import spiralcraft.log.Level;
@@ -12,7 +15,6 @@ import spiralcraft.pool.Pool;
 import spiralcraft.pool.ResourceFactory;
 import spiralcraft.sql.jdbc.ConnectionWrapper;
 import spiralcraft.sql.jdbc.StatementCachingConnection;
-import spiralcraft.time.Scheduler;
 
 
 /**
@@ -25,19 +27,29 @@ public class ConnectionPool<T extends Connection>
   implements ResourceFactory<ConnectionPool<T>.PooledConnection>
 {
 
-  private DataSource dataSource;
+  private CommonDataSource dataSource;
+  private boolean xa;
   private ConnectionFactory<T> connectionFactory
     =new ConnectionFactory<T>()
     {
       @SuppressWarnings("unchecked")
       @Override
       public T newConnection(Connection delegate)
+        throws SQLException
+      { return (T) delegate;
+      }
+      
+      @SuppressWarnings("unchecked")
+      @Override
+      public T newConnection(Connection delegate,XAConnection ca)
+        throws SQLException
       { return (T) delegate;
       }
     };
   
   
   { 
+    fastCheckin=true;
     setResourceFactory(this);
     setOnCheckout
       (new Sink<PooledConnection>()
@@ -48,10 +60,31 @@ public class ConnectionPool<T extends Connection>
           }
         }
       );
+    setOnCheckin
+      (new Sink<PooledConnection>()
+        { 
+          @Override
+          public void accept(PooledConnection connection) 
+          { 
+            try
+            { connection.reset();
+            }
+            catch (SQLException e)
+            {
+              // TODO Auto-generated catch block
+              log.log(Level.WARNING,"Error resetting connection "+connection,e);
+              ConnectionPool.this.discard(connection);
+            }
+          }
+        }
+      );
+    
   }
 
-  public void setDataSource(DataSource dataSource)
-  { this.dataSource=dataSource;
+  public void setDataSource(CommonDataSource dataSource)
+  { 
+    this.dataSource=dataSource;
+    this.xa=dataSource instanceof XADataSource;
   }
 
   @Override
@@ -89,8 +122,26 @@ public class ConnectionPool<T extends Connection>
     private Connection newConnection()
       throws SQLException
     {
-      Connection ret=new StatementCachingConnection(dataSource.getConnection());
-      return connectionFactory.newConnection(ret);
+      if (!xa)
+      {
+        Connection nativeConn=((DataSource) dataSource).getConnection();
+        if (logLevel.isFine())
+        { log.fine("Connected: "+nativeConn);
+        }
+        Connection ret=new StatementCachingConnection(nativeConn);
+        return connectionFactory.newConnection(ret);
+      }
+      else
+      { 
+        XAConnection xa
+          =((XADataSource) dataSource).getXAConnection();
+        Connection nativeConn=xa.getConnection();
+        if (logLevel.isFine())
+        { log.fine("Connected: "+xa+" : "+nativeConn);
+        }
+        Connection ret=new StatementCachingConnection(nativeConn);
+        return connectionFactory.newConnection(ret,xa);
+      }
     }
     
     public Connection getConnection()
@@ -127,36 +178,14 @@ public class ConnectionPool<T extends Connection>
     @Override
     public void close()
     { 
+      if (logLevel.isFine())
+      { log.fine("Connection Closed: "+toString());
+      }
       if (!checkedIn)
       { 
         checkedIn=true;
-      
-        Scheduler.instance().scheduleNow
-          (new Runnable()
-          {
-            @Override
-            public void run()
-            { 
-              try
-              {
-                // Cleanup
-                reset();
-                ConnectionPool.this.checkin(PooledConnection.this);
-              }
-              catch (SQLException x)
-              { 
-                log.log
-                  (Level.WARNING
-                  ,"Could not reset or re-establish connection- "
-                  +" discarding PooledConnection"
-                  ,x
-                  );
-                ConnectionPool.this.discard(PooledConnection.this);
-              }
-            }
-          
-          }
-          );
+        ConnectionPool.this.checkin(PooledConnection.this);
+     
       }
     }
   }

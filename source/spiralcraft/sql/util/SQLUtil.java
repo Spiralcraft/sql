@@ -17,6 +17,7 @@ package spiralcraft.sql.util;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Wrapper;
 
 public class SQLUtil
 {
@@ -49,5 +50,19 @@ public class SQLUtil
     }
     buf.append("\r\n");
     return buf.toString();
+  }
+  
+  public static <T> T tryUnwrap(Wrapper wrapper,Class<T> iface)
+  {
+    try
+    { 
+      if (!wrapper.isWrapperFor(iface))
+      { return null;
+      }
+      return wrapper.unwrap(iface);
+    }
+    catch (SQLException x)
+    { return null;
+    }
   }
 }
