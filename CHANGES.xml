@@ -15,6 +15,46 @@
 
     <detail>
       <scm:Change>
+        <revision>dev-6
+        </revision>
+        
+        <notes>
+          <scm:Note>Changes to support JDBC XA mode and 2-phase commit for
+            SQL Stores
+          </scm:Note>
+
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/store/SqlBranch.java
+          </URI>
+          <URI>data/store/SqlResourceManager.java
+          </URI>
+          <URI>data/store/SqlStore.java
+          </URI>
+          <URI>data/store/SqlStoreConnection.java
+          </URI>
+          <URI>data/store/TransactionScopedConnection.java
+          </URI>
+          <URI>jdbc/ConnectionWrapper.java
+          </URI>
+          <URI>jdbc/XATransactionalConnection.java
+          </URI>
+          <URI>pool/ConnectionFactory.java
+          </URI>
+          <URI>pool/ConnectionPool.java
+          </URI>
+          <URI>util/Loader.java
+          </URI>
+          <URI>util/SQLUtil.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
         <revision>dev-5
         </revision>
         
