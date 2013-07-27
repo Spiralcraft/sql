@@ -23,6 +23,9 @@ import spiralcraft.lang.parser.EqualityNode;
 import spiralcraft.lang.parser.RelationalNode;
 import spiralcraft.lang.parser.ContextIdentifierNode;
 import spiralcraft.lang.parser.CurrentFocusNode;
+import spiralcraft.lang.parser.ResolveNode;
+import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 
 import spiralcraft.sql.SqlFragment;
@@ -46,7 +49,11 @@ import spiralcraft.util.Path;
  */
 public class CriteriaTranslator
 {
-
+  private static final ClassLog log
+    =ClassLog.getInstance(CriteriaTranslator.class);
+  private static Level logLevel
+    =ClassLog.getInitialDebugLevel(CriteriaTranslator.class,Level.INFO);
+  
   private Expression<Boolean> filterExpression;
   private WhereClause whereClause;
   private BoundStatement statementContext;
@@ -56,6 +63,9 @@ public class CriteriaTranslator
     ,BoundStatement statementContext
     )
   {
+    if (logLevel.isFine())
+    { log.fine("Translating "+criteria);
+    }
     this.statementContext=statementContext;
     Node root=criteria.getRootNode();
     Translation<BooleanCondition> result=translateBooleanCondition(root);
@@ -93,6 +103,9 @@ public class CriteriaTranslator
     }
     else
     {
+      if (logLevel.isFine())
+      { log.fine("Could not translate "+node);
+      }
       Translation<BooleanCondition> result=new Translation<BooleanCondition>();
       result.remainder=node;
       return result;
@@ -101,23 +114,28 @@ public class CriteriaTranslator
   
   private Translation<ValueExpression> translateValueExpression(Node node)
   {
-
-    if (node instanceof ContextIdentifierNode)
-    { return translateContextIdentifier((ContextIdentifierNode) node);
+    if (logLevel.isFine())
+    { log.fine("Translating "+node);
     }
+    if (node instanceof ResolveNode)
+    { return translateResolveNode((ResolveNode<?>) node);
+    }
+//    else if (node instanceof ContextIdentifierNode)
+//    { return translateContextIdentifier((ContextIdentifierNode) node);
+//    }
     else
     { 
       // Anything we don't recognize becomes a parameter
       return translateToParameter(node);
     }
-    // TODO: There are other options- deal with ResolveNode,
-    //   especially the case where the Field Type is a Tuple that
-    //   is 'rolled up' into the parent table- ie. address.city
   }
   
   private Translation<ValueExpression>
-    translateContextIdentifier(ContextIdentifierNode node)
+    translateResolveNode(ResolveNode<?> node)
   { 
+    if (logLevel.isFine())
+    { log.fine("Translating "+node);
+    }
     // Determine if this refers to a name on the server side or on the client 
     //   side.
     
@@ -130,20 +148,30 @@ public class CriteriaTranslator
 
       ValueExpression expr
         =statementContext.createColumnValueExpression
-          (new Path(new String[] {node.getIdentifier()},false));
+          (new Path(new String[] {node.getIdentifierName()},false));
       if (expr!=null)
       { 
+        if (logLevel.isFine())
+        { log.fine(node.getIdentifierName()+" is a DB field");
+        }
         // We are referencing a DB field
         translation.sql=expr;
       }
       else
       { 
+        if (logLevel.isFine())
+        { log.fine(node.getIdentifierName()+" is not a DB field");
+        }
         // We are referencing a derived field not in the DB
         translation.remainder=node;
       }
     }
     else
     { 
+      
+      if (logLevel.isFine())
+      { log.fine("Parameterizing node with source="+node.getSource());
+      }
       // A source in something other than the current context. Parameterize it.
       translation.sql=new SqlParameterReference<ParameterTag>
         (new ParameterTag
@@ -156,8 +184,64 @@ public class CriteriaTranslator
     return translation;
   }
 
+//  private Translation<ValueExpression>
+//    translateContextIdentifier(ContextIdentifierNode node)
+//  { 
+//    if (logLevel.isFine())
+//    { log.fine("Translating "+node);
+//    }
+//    // Determine if this refers to a name on the server side or on the client 
+//    //   side.
+//    
+//    Translation<ValueExpression> translation=new Translation<ValueExpression>();
+//    
+//    if (node.getSource()==null || node.getSource() instanceof CurrentFocusNode)
+//    { 
+//      // The name refers to the local context. Map it to a column.
+//      
+//
+//      ValueExpression expr
+//        =statementContext.createColumnValueExpression
+//          (new Path(new String[] {node.getIdentifier()},false));
+//      if (expr!=null)
+//      { 
+//        if (logLevel.isFine())
+//        { log.fine(node.getIdentifier()+" is a DB field");
+//        }
+//        // We are referencing a DB field
+//        translation.sql=expr;
+//      }
+//      else
+//      { 
+//        if (logLevel.isFine())
+//        { log.fine(node.getIdentifier()+" is not a DB field");
+//        }
+//        // We are referencing a derived field not in the DB
+//        translation.remainder=node;
+//      }
+//    }
+//    else
+//    { 
+//      if (logLevel.isFine())
+//      { log.fine("Parameterizing node with source="+node.getSource());
+//      }
+//      // A source in something other than the current context. Parameterize it.
+//      translation.sql=new SqlParameterReference<ParameterTag>
+//        (new ParameterTag
+//          (Expression.<Object>create(node)
+//           ,null // Unknown target type
+//           ,null
+//          )
+//        );
+//    }
+//    return translation;
+//  }
+
   private Translation<ValueExpression> translateToParameter(Node node)
   { 
+    if (logLevel.isFine())
+    { log.fine("Translating "+node);
+    }
     Translation<ValueExpression> translation=new Translation<ValueExpression>();
     translation.sql=new SqlParameterReference<ParameterTag>
       (new ParameterTag
@@ -220,6 +304,9 @@ public class CriteriaTranslator
   @SuppressWarnings("rawtypes")
   private Translation<BooleanCondition> translateEquals(EqualityNode node)
   {
+    if (logLevel.isFine())
+    { log.fine("Translating "+node);
+    }
     Node lhs=node.getLeftOperand();
     Node rhs=node.getRightOperand();
 
