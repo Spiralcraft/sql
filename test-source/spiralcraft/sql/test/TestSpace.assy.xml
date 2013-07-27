@@ -8,6 +8,9 @@
   <stores>
   
     <store:SqlStore>
+      <name>example
+      </name>
+      
       <schema 
         dataURI="example:Example.schema.xml"
       />
@@ -26,6 +29,9 @@
 
       <connectionPool.maxCheckoutMs>1000
       </connectionPool.maxCheckoutMs>
+      
+      <statementLogLevel>FINE
+      </statementLogLevel>
     </store:SqlStore>
 
   </stores>

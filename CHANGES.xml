@@ -14,6 +14,161 @@
     </date>
 
     <detail>
+
+
+      <scm:Change>
+        <revision>dev-7
+        </revision>
+        
+        <notes>
+          <scm:Note>Add toString() for DML constructs for easier debugging
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/dml
+        </path>
+        
+        <resources>
+          <URI>BooleanFactor.java
+          </URI>
+          <URI>BooleanTerm.java
+          </URI>
+          <URI>SelectStatement.java
+          </URI>
+          <URI>SqlParameterReference.java
+          </URI>
+          <URI>UpdateStatement.java
+          </URI>
+          <URI>WhereClause.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-7
+        </revision>
+        
+        <notes>
+          <scm:Note>SqlStore.restore() restores a SQL database from a set of 
+            XML files 
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/SqlStore.java
+        </path>
+        
+      </scm:Change>
+      
+      <scm:Change>
+        <revision>dev-7
+        </revision>
+        
+        <notes>
+          <scm:Note>Refactor how result set mappings are represented in order
+            to avoid excessive recomputation. 
+          </scm:Note>
+          <scm:Note>Streamline statement execution logging w/parameters
+          </scm:Note>
+          <scm:Note>Fix issues solving parameterized queries against base types
+            that span multiple stores.
+          </scm:Note>
+          <scm:Note>Get Select criteria analysis and parameter binding in-sync
+             with standard usage
+          </scm:Note>
+          <scm:Note>Add EquiJoin binding.
+          </scm:Note>
+          <scm:Note>Fix issues mapping complex types where subtypes hide 
+            fields in base-types
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/ResultColumnMapping.java
+          </URI>
+          <URI>data/ResultMapping.java
+          </URI>
+          <URI>data/ResultSetMapping.java
+          </URI>
+          <URI>data/ResultSetTuple.java
+          </URI>
+          <URI>data/SerialResultSetCursor.java
+          </URI>
+          <URI>data/TableMapping.java
+          </URI>
+          <URI>data/query/BoundEquiJoin.java
+          </URI>
+          <URI>data/query/BoundScan.java
+          </URI>
+          <URI>data/query/BoundSelection.java
+          </URI>
+          <URI>data/query/BoundSqlQuery.java
+          </URI>
+          <URI>data/store/CriteriaTranslator.java
+          </URI>
+          <URI>data/store/BoundQueryStatement.java
+          </URI>
+          <URI>data/store/BoundStatement.java
+          </URI>
+          <URI>data/store/BoundUpdateStatement.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-7
+        </revision>
+        
+        <notes>
+          <scm:Note>Handle data that contains Type references
+          </scm:Note>
+
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>converters/TypeConverter.java
+          </URI>
+          <URI>converters/TypeRefConverter.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-7
+        </revision>
+        
+        <notes>
+          <scm:Note>Add dialect-specific conversion for when HSQLDB returns 
+            java.lang.Double for JDBC REAL when a Float is expected in the data
+            model.
+          </scm:Note>
+
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>converters/FloatToSqlDoubleConverter.java
+          </URI>
+          <URI>data/mappers/PrimitiveTypeMapper.java
+          </URI>
+          <URI>types/RealAsDoubleType.java
+          </URI>
+          <URI>types/RealType.java
+          </URI>
+          <URI>vendor/hsqldb/HsqldbDialect.java
+          </URI>
+        </resources>
+      </scm:Change>
+
       <scm:Change>
         <revision>dev-6
         </revision>

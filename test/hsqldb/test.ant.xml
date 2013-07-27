@@ -47,10 +47,6 @@
       exec = "--log out/spiralcraft --consoleLog ../LoadDDL"
     />
       	
-    <devtask
-      codebase="../.."
-      exec = "--log out/spiralcraft --consoleLog ../Loader"
-    />
   </target>
 	
   <target name="all-tests" 

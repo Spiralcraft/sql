@@ -38,6 +38,30 @@
             </test:Stub>
           </chain>
         </dtask:Fetch>
+        <test:Assertion>
+          <name>EquiJoin
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],[{`id:=1`}] }].()
+          </subjectX>
+          <testX>.id==1
+          </testX>
+        </test:Assertion>
+        <test:Assertion>
+          <name>Criteria select
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==1` }].()
+          </subjectX>
+          <testX>.id==1
+          </testX>
+        </test:Assertion>
+        <test:Assertion>
+          <name>Base type select
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Node.list],`.nodeId=="1"` }].()
+          </subjectX>
+          <testX>[.][0].nodeId=="1"
+          </testX>
+        </test:Assertion>
         <dtask:Fetch>
           <debug>true
           </debug>
@@ -52,7 +76,7 @@
             <test:Stub>
               <messageX>""+[example:StringNode.list].@size()+" results"
               </messageX>
-              <conditionX>[example:StringNode.list].@size()==0
+              <conditionX>[example:StringNode.list].@size()==3
               </conditionX>
               <name>Fetch all StringNodes
               </name>

@@ -4,6 +4,9 @@
   xmlns:ctest="class:/spiralcraft/test/"
   xmlns:query="class:/spiralcraft/data/query/"
   xmlns:example="class:/spiralcraft/data/test/example/"
+  xmlns:data="class:/spiralcraft/data/"
+  xmlns:sql="class:/spiralcraft/sql/data/store/"
+  xmlns:jnet="class:/java/net/"
   >
   <service>
     <test:TestSpace>
@@ -11,7 +14,11 @@
   </service>
   
   <chain>
-    <ctest:Stub/>
+    <task:Eval>
+      <x>[data:Space].getStore("example").@cast([@sql:SqlStore])
+        .restore([*jnet:URI{"class:/spiralcraft/data/test/example/"}])
+      </x>
+    </task:Eval>
   </chain>
   
 </task:TaskRunner>
