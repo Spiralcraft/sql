@@ -48,10 +48,11 @@ public class BoundUpdateStatement
     try
     {
       PreparedStatement statement=connection.prepareStatement(statementText);
+      Object[] parameters=makeParameters();
       if (logLevel.isFine())
-      { log.fine("Executing "+statementText);
+      { log.fine(toString()+": Executing "+statementText+"\r\n"+formatParameters(parameters));
       }
-      applyParameters(statement);
+      applyParameters(statement,parameters);
       int results=statement.executeUpdate();
       // log.fine("Closing "+statement);
       statement.close();

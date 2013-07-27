@@ -76,6 +76,12 @@ public abstract class BoundStatement
   protected BoundStatement(SqlStore store,FieldSet dataFields)
   { 
     this.store=store;
+    this.logLevel
+      =store.getStatementLogLevel().canLog(logLevel)
+      ?store.getStatementLogLevel()
+      :logLevel
+      ;
+      
     this.dataFields=dataFields;
   }
   
@@ -91,7 +97,9 @@ public abstract class BoundStatement
     parameterExpressions.clear();
     this.sqlFragment=sqlFragment;
     statementText=sqlFragment.generateSQL(parameterExpressions);
-    // log.fine("Statement="+statementText);
+    if (logLevel.isFine())
+    { log.fine(toString()+": Creating "+statementText);
+    }
   }
   
   /**
@@ -145,6 +153,22 @@ public abstract class BoundStatement
   { primaryTableMapping=mapping;
   }
   
+  
+  public ColumnMapping getColumnMapping(Path fieldPath)
+  {
+    if (primaryTableMapping!=null)
+    {
+      return primaryTableMapping.getMappingForPath(fieldPath);
+    }
+    else
+    { 
+      throw new IllegalArgumentException
+        ("No column mapping for "+fieldPath);
+    }
+    
+    
+  }
+  
   /**
    * Map a Field name to a SQL ValueExpression in terms of the SQL objects this
    *   query is accessing.
@@ -186,30 +210,57 @@ public abstract class BoundStatement
     }
   }
   
+  
+  protected Object[] makeParameters()
+  {
+    Object[] params=new Object[parameterBindings.size()];
+    int i=0;
+    for (Channel<?> channel: parameterBindings)
+    { params[i++]=channel.get();
+    }
+    return params;
+  }
+  
+  protected String formatParameters(Object[] parameters)
+  {
+    StringBuilder buf=new StringBuilder();
+    for (Object parameter: parameters)
+    {
+      if (parameter==null)
+      { buf.append("[null]");
+      }
+      else
+      { 
+        buf
+          .append("[")
+          .append(parameter.toString())
+          .append("]")
+          .append(" ")
+          .append(parameter.getClass().getName())
+          .append("\r\n");
+      }
+    }
+    return buf.toString();
+  }
+  
   /**
    * <P>Applies a new set of parameter values to a JDBC PreparedStatement.
    * 
    * <P>Called each time the statement is executed, immediately before
    *   execution
    */
-  protected void applyParameters(PreparedStatement jdbcStatement)
+  protected void applyParameters
+    (PreparedStatement jdbcStatement,Object[] parameters)
     throws SQLException
   {
     jdbcStatement.clearParameters();
     
+    
     int i=1;
-    for (Channel<?> channel: parameterBindings)
+    for (Object paramValue : parameters)
     { 
-      Object paramValue=channel.get();
-      if (logLevel.isFine())
-      {
-        log.fine("Apply parameter "+i+" = "+paramValue
-          +(paramValue!=null?("type="+paramValue.getClass().getName()):"")
-          +" statement="+statementText
-          );
-      }
       try
-      { jdbcStatement.setObject(i++,paramValue);
+      { jdbcStatement.setObject(i,paramValue);
       }
       catch (SQLSyntaxErrorException x)
       { 
@@ -219,6 +270,7 @@ public abstract class BoundStatement
             +" statement="+statementText
           );
       }
+      i++;
     }
   }
   
