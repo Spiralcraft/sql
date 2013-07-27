@@ -21,10 +21,10 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 
-import spiralcraft.sql.data.ResultMapping;
+import spiralcraft.sql.data.ResultSetMapping;
 import spiralcraft.sql.data.SerialResultSetCursor;
+import spiralcraft.time.Clock;
 
-import spiralcraft.util.tree.LinkedTree;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,7 +38,7 @@ public class BoundQueryStatement
   extends BoundStatement
 {
   
-  private LinkedTree<ResultMapping> foldTree;
+  private ResultSetMapping resultSetMapping;
   
   public BoundQueryStatement(SqlStore store,FieldSet resultFields)
   { super(store,resultFields);
@@ -48,8 +48,8 @@ public class BoundQueryStatement
   /**
    * Specify how the nested Tuple structure of the result maps to the flat resultSet
    */
-  public void setFoldTree(LinkedTree<ResultMapping> foldTree)
-  { this.foldTree=foldTree;
+  public void setResultSetMapping(ResultSetMapping mapping)
+  { this.resultSetMapping=mapping;
   }
 
   
@@ -67,16 +67,29 @@ public class BoundQueryStatement
       Connection connection=store.getContextConnection();
     
       PreparedStatement statement=connection.prepareStatement(statementText);
-      applyParameters(statement);
+      Object[] parameters=makeParameters();
+      long time=0;
+      if (logLevel.isFine())
+      { 
+        log.fine(toString()+": Executing "+statementText+"\r\n"
+          +formatParameters(parameters));
+        time=Clock.instance().timeNanos();
+      }
+      applyParameters(statement,parameters);
       ResultSet rs=statement.executeQuery();
       SerialResultSetCursor result=null;
       if (dataFields!=null)
-      { result=new SerialResultSetCursor(dataFields,rs,foldTree);
+      { result=new SerialResultSetCursor(dataFields,rs,resultSetMapping);
       }
       else
       { result=new SerialResultSetCursor(rs);
       }
       result.setConnection(connection);
+      result.setLogLevel(logLevel);
+      result.setStatementInfo(statementText);
+      if (logLevel.isFine())
+      { log.fine("Duration="+ (Clock.instance().timeNanos()-time)/1000000.0+"ms");
+      }
       return result;
     }
     catch (SQLException x)
