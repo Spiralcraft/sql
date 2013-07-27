@@ -15,7 +15,7 @@
 package spiralcraft.sql.converters;
 
 import spiralcraft.data.DataException;
-import spiralcraft.data.Tuple;
+import spiralcraft.data.Type;
 import spiralcraft.data.TypeResolver;
 
 
@@ -24,36 +24,34 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 /**
- * Convert an intermediate type reference Tuple to a URI type reference
+ * Convert an Type object to a URI reference
  */
-public class TypeRefConverter
-	extends Converter<String,Tuple>
+public class TypeConverter
+	extends Converter<String,Type<?>>
 {
-  private static final TypeRefConverter instance=new TypeRefConverter();
+  private static final TypeConverter instance=new TypeConverter();
   
-  public static final TypeRefConverter getInstance()
+  public static final TypeConverter getInstance()
   { return instance;
   }
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public TypeRefConverter()
-  { super(Tuple.class);
+  public TypeConverter()
+  { super((Class<Type<?>>) (Class) Type.class);
   }
   
 	@Override
-  public String toSql(Tuple value)
+  public String toSql(Type<?> value)
 		throws SQLException
-	{ return value.getType().getURI().toString();
+	{ return value.getURI().toString();
 	}
   
   @Override
-  public Tuple fromSql(String value)
+  public Type<?> fromSql(String value)
     throws SQLException
   { 
     try
-    { 
-      return TypeResolver.getTypeResolver().resolve(new URI(value))
-        .getReference();
+    { return TypeResolver.getTypeResolver().resolve(new URI(value));
     }
     catch (URISyntaxException x)
     { throw new SQLException("Invalid URI syntax: "+value,x);
@@ -65,7 +63,7 @@ public class TypeRefConverter
   }
   
   @Override
-  public Class<Tuple> getSqlClass()
-  { return Tuple.class;
+  public Class<URI> getSqlClass()
+  { return URI.class;
   }
 }
