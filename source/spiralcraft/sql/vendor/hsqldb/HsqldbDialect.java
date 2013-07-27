@@ -15,11 +15,16 @@
 package spiralcraft.sql.vendor.hsqldb;
 
 import spiralcraft.sql.Dialect;
+import spiralcraft.sql.SqlType;
+import spiralcraft.sql.types.RealAsDoubleType;
 
 public class HsqldbDialect
   extends Dialect
 {
 
+  { setExtendedTypes(new SqlType<?>[] { new RealAsDoubleType() });
+  }
+  
   /**
    * The default schema name to use for application tables if no specific
    *   schema name is specified.
@@ -30,6 +35,6 @@ public class HsqldbDialect
   public String getDefaultSchemaName()
   { return "PUBLIC";
   }
-  
+
 
 }

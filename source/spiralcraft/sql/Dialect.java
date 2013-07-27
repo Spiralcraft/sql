@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 import spiralcraft.sql.model.KeyConstraint;
 import spiralcraft.sql.model.Table;
 
@@ -33,6 +34,8 @@ public class Dialect
   
   protected final ClassLog log
     =ClassLog.getInstance(getClass());
+  
+  private Level logLevel=ClassLog.getInitialDebugLevel(getClass(),Level.INFO);
   
   public static final Dialect DEFAULT
     =new Dialect();
@@ -65,12 +68,13 @@ public class Dialect
   public SqlType<?> getSqlType(int sqlTypeId)
   { 
     SqlType<?> type=typeMap.get(sqlTypeId);
-    if (type!=null)
-    { return type;
+    if (type==null)
+    { return type=SqlType.getSqlType(sqlTypeId);
     }
-    else
-    { return SqlType.getSqlType(sqlTypeId);
+    if (logLevel.isFine())
+    { log.fine(this+" mapped "+sqlTypeId+" to "+type);
     }
+    return type;
   }
   
   /**

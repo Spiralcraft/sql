@@ -53,10 +53,7 @@ public class PrimitiveTypeMapper<T>
         );
     }
     
-    return dialect.getSqlType
-       (sqlType
-       .getTypeId()
-       );
+    return dialect.getSqlType(sqlType.getTypeId());
   }
   
   @Override
@@ -73,7 +70,9 @@ public class PrimitiveTypeMapper<T>
     
     SqlType sqlType=SqlType.getStandardSqlType(type.getNativeClass());
     if (sqlType!=null)
-    { ret=sqlType.getConverter();
+    { 
+      sqlType=dialect.getSqlType(sqlType.getTypeId());
+      ret=sqlType.getConverter();
     }
     else if (type.isStringEncodable())
     { ret=StringifyConverter.getInstance(type);

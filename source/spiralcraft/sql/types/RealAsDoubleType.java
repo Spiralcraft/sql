@@ -15,17 +15,17 @@
 package spiralcraft.sql.types;
 
 import spiralcraft.sql.SqlType;
-import spiralcraft.sql.converters.FloatConverter;
+import spiralcraft.sql.converters.FloatToSqlDoubleConverter;
 
 import java.sql.Types;
 
-public class RealType
-  extends SqlType<Float>
+public class RealAsDoubleType
+  extends SqlType<Double>
 {
-  public RealType()
+  public RealAsDoubleType()
   { 
-    super(Types.REAL,Float.class,"REAL");
-    converter=new FloatConverter();
+    super(Types.REAL,Double.class,"REAL");
+    converter=new FloatToSqlDoubleConverter();
   }
   
   
