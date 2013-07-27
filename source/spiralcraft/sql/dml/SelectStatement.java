@@ -58,4 +58,11 @@ public class SelectStatement
     { whereClause.write(buffer,indent, parameterCollector);
     }
   }
+  
+  @Override
+  public String toString()
+  { return "SELECT "+(selectList!=null?selectList:"")
+      +" "+(fromClause!=null?fromClause:"")
+      +" "+(whereClause!=null?whereClause:"");
+  }
 }

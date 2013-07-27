@@ -47,5 +47,16 @@ public class BooleanFactor
   public int getPrecedence()
   { return 3;
   }
+  
+  @Override
+  public String toString()
+  { 
+    if (not)
+    { return " NOT "+booleanTest;
+    }
+    else
+    { return booleanTest.toString();
+    }
+  }
 
 }

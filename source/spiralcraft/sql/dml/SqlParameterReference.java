@@ -41,4 +41,9 @@ public class SqlParameterReference<T>
         ("parameterCollector List cannot be null writing SqlParameterReference");
     }
   }
+  
+  @Override
+  public String toString()
+  { return "[?"+tag+"?]";
+  }
 }

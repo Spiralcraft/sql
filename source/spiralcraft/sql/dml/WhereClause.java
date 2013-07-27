@@ -35,4 +35,9 @@ public class WhereClause
     indent=indent+"  ";
     searchCondition.write(buffer,indent, parameterCollector);
   }
+  
+  @Override
+  public String toString()
+  { return "WHERE "+searchCondition;
+  }
 }

@@ -71,7 +71,6 @@ public class UpdateStatement
         { buffer.append(",");
         }
         setClause.write(buffer,indent, parameterCollector);
-        buffer.append("\r\n").append(indent);
       }
     }
         

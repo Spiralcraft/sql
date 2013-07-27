@@ -42,6 +42,12 @@ public class BooleanTerm
   }
   
   @Override
+  public String toString()
+  { return booleanTerm+" AND "+booleanFactor;
+  }
+  
+  
+  @Override
   public int getPrecedence()
   { return 2;
   }
