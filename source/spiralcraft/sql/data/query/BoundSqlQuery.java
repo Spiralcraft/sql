@@ -17,37 +17,53 @@ package spiralcraft.sql.data.query;
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
 
-import spiralcraft.data.lang.TupleFocus;
+import spiralcraft.data.lang.CursorBinding;
 
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
+import spiralcraft.data.spi.ManualCursor;
 
 import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.SqlStore;
 
+import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 
 public abstract class BoundSqlQuery<Tq extends Query>
   extends BoundQuery<Tq,Tuple>
 {
-  protected final TupleFocus<?> focus;
+  protected final Focus<?> focus;
   protected final SqlStore store;
   protected boolean resolved;
   protected BoundQueryStatement statement;
   
+  @SuppressWarnings({ "unchecked", "rawtypes"
+    })
   public BoundSqlQuery(Tq query,Focus<?> parentFocus,SqlStore store)
     throws DataException
   { 
     super(query,parentFocus);
-    focus=TupleFocus.<Tuple>create(parentFocus,query.getFieldSet());
+    try
+    {
+      focus=parentFocus.telescope
+        (new CursorBinding
+          (new ManualCursor(query.getFieldSet()))
+        );
+    }
+    catch (BindException x)
+    { throw new DataException("Error",x);
+    }
+        
     this.store=store;
   }
   
-  public abstract BoundQueryStatement composeStatement()
+  protected abstract BoundQueryStatement composeStatement()
     throws DataException;
 
+
+  
   @Override
   public void resolve()
     throws DataException

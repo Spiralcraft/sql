@@ -21,18 +21,12 @@ import spiralcraft.data.DataException;
 import spiralcraft.data.query.Scan;
 
 
-import spiralcraft.sql.data.ResultMapping;
 import spiralcraft.sql.data.store.SqlStore;
 import spiralcraft.sql.data.store.TableMapping;
-import spiralcraft.sql.data.store.ColumnMapping;
 import spiralcraft.sql.data.store.BoundQueryStatement;
 
 import spiralcraft.sql.dml.SelectStatement;
-import spiralcraft.sql.dml.FromClause;
-import spiralcraft.sql.dml.SelectList;
-import spiralcraft.sql.dml.SelectListItem;
 
-import spiralcraft.util.tree.LinkedTree;
 
 /**
  * A SQL implementatin of the basic Scan Query. 
@@ -41,98 +35,51 @@ public class BoundScan
   extends BoundSqlQuery<Scan>
 {
     
-  public BoundScan(Scan query,Focus<?> parentFocus,SqlStore store)
+  private final TableMapping tableMapping;
+  
+  public BoundScan
+    (Scan query
+    ,Focus<?> parentFocus
+    ,SqlStore store
+    ,TableMapping table
+    )
     throws DataException
-  { super(query,parentFocus,store);
+  { 
+    super(query,parentFocus,store);
+    this.tableMapping=table;
+  }
+  
+  public TableMapping getTableMapping()
+  { return tableMapping;
   }
   
   @Override
-  public BoundQueryStatement composeStatement()
+  protected BoundQueryStatement composeStatement()
     throws DataException
   {
     BoundQueryStatement statement
-      =new BoundQueryStatement(store,getQuery().getFieldSet());
+      =new BoundQueryStatement(store,tableMapping.getType().getFieldSet());
     
     Scan scan=getQuery();
     
-    SelectStatement select=new SelectStatement();
     
     if (scan.getType()==null)
-    { throw new DataException("Scan Query must specify a Type when executed against a SqlStore");
-    }
-    
-    TableMapping tableMapping=store.getTypeManager().getTableMapping(scan.getType());
-    if (tableMapping==null)
     { 
       throw new DataException
-        ("This store does not handle data for Type "+scan.getType().getURI());
+        ("Scan Query must specify a Type when executed against a SqlStore");
     }
+    
     statement.setPrimaryTableMapping(tableMapping);
 
-    select.setFromClause
-      (new FromClause
-          (tableMapping.getSchemaName()
-          ,tableMapping.getTableName()
-          )
-      );
-    
-    SelectList selectList=new SelectList();
-    LinkedTree<ResultMapping> foldTree=new LinkedTree<ResultMapping>();
-    LinkedTree<ColumnMapping> columnTree=tableMapping.getColumnMappingTree();
-    int columnCount=0;
-    generateSelectList(columnTree,selectList,foldTree,columnCount);
-    
-    select.setSelectList(selectList);
+    SelectStatement select=new SelectStatement();
+    select.setFromClause(tableMapping.getFromClause());
+
+    select.setSelectList(tableMapping.getSelectList());
     
     statement.setSqlFragment(select);
-    statement.setFoldTree(foldTree);
+    statement.setResultSetMapping(tableMapping.getResultSetMapping());
     return statement;
   }
   
-  private int generateSelectList
-    (LinkedTree<ColumnMapping> columnTree
-    ,SelectList selectList
-    ,LinkedTree<ResultMapping> foldTree
-    ,int columnCount
-    )
-  {
-    for (LinkedTree<ColumnMapping> mapping : columnTree)
-    { columnCount=generateSelectListItem(mapping,selectList,foldTree,columnCount);
-    }
-    return columnCount;    
-  }
-  
-  private int generateSelectListItem
-    (LinkedTree<ColumnMapping> node
-    ,SelectList selectList
-    ,LinkedTree<ResultMapping> foldTree
-    ,int columnCount
-    )
-  {
-    if (node.isLeaf())
-    {
-      SelectListItem selectListItem=node.get().getSelectListItem();
-      // Single field
-      if (selectListItem!=null)
-      { 
-        selectList.addItem(selectListItem);
-        foldTree.addChild
-          (new LinkedTree<ResultMapping>
-            (new ResultMapping( (columnCount++)+1,node.get()))
-            );
-      }
-      else
-      { foldTree.addChild(new LinkedTree<ResultMapping>());
-      }
-    }
-    else
-    { 
-      LinkedTree<ResultMapping> child=new LinkedTree<ResultMapping>();
-      foldTree.addChild(child);
-      columnCount=generateSelectList(node,selectList,child,columnCount);
-    }
-    
-    return columnCount;
-  }
-  
+ 
 }
