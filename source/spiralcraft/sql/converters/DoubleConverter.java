@@ -18,7 +18,7 @@ package spiralcraft.sql.converters;
 import java.sql.SQLException;
 
 /**
- * Convert an object to a Float
+ * Convert an object to a Double
  */
 public class DoubleConverter
 	extends Converter<Double,Object>
