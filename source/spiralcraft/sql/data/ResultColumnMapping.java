@@ -3,7 +3,7 @@ package spiralcraft.sql.data;
 import spiralcraft.sql.converters.Converter;
 import spiralcraft.sql.data.store.ColumnMapping;
 
-public class ResultMapping
+public class ResultColumnMapping
 {
   
   public final int resultSetColumn;
@@ -11,14 +11,14 @@ public class ResultMapping
   public final Converter converter;
   public final ColumnMapping columnMapping;
   
-  public ResultMapping(int resultSetColumn)
+  public ResultColumnMapping(int resultSetColumn)
   { 
     this.resultSetColumn=resultSetColumn;
     this.converter=null;
     this.columnMapping=null;
   }
   
-  public ResultMapping(int resultSetColumn,ColumnMapping column)
+  public ResultColumnMapping(int resultSetColumn,ColumnMapping column)
   { 
     this.resultSetColumn=resultSetColumn;
     this.converter=column.getConverter();
@@ -31,7 +31,8 @@ public class ResultMapping
     return super.toString()
       +"[resultSetColumn="+resultSetColumn
       +", converter="+converter
-      +", columnMapping="+columnMapping.getColumnName()+"->"+columnMapping.getFieldName()
+      +", columnMapping="
+        +(columnMapping!=null?(columnMapping.getColumnName()+"->"+columnMapping.getFieldName()):"NULL")
       +"]"
       ;
   }

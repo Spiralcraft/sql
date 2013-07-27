@@ -27,8 +27,8 @@ import spiralcraft.data.spi.ArrayTuple;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Channel;
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
-import spiralcraft.util.tree.LinkedTree;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -51,6 +51,7 @@ public class SerialResultSetCursor
   private static CursorBinding<Tuple,?> binding;
   protected Statement statement;
   protected Connection connection;
+  private Level logLevel=Level.INFO;
   
   
   /**
@@ -106,15 +107,19 @@ public class SerialResultSetCursor
   public SerialResultSetCursor
     (FieldSet fieldSet
     ,ResultSet resultSet
-    ,LinkedTree<ResultMapping> foldTree
+    ,ResultSetMapping resultSetMapping
     )
   { 
     this.resultSet=resultSet;
     this.fieldSet=fieldSet;
-    tuple=new ResultSetTuple(fieldSet,foldTree);
+    tuple=new ResultSetTuple(fieldSet,resultSetMapping);
     tuple.setResultSet(resultSet);
   }
 
+  public void setLogLevel(Level logLevel)
+  { this.logLevel=logLevel;
+  }
+  
   /**
    * The Connection that should be closed when this cursor is closed
    * 
@@ -124,6 +129,10 @@ public class SerialResultSetCursor
   { 
     // log.fine("connection="+connection);
     this.connection=connection;
+  }
+  
+  public void setStatementInfo(String statementInfo)
+  { tuple.setStatementInfo(statementInfo);
   }
   
   @Override
@@ -178,7 +187,11 @@ public class SerialResultSetCursor
     { 
       boolean val=resultSet.next();
       if (val==false && autoClose)
-      { resultSet.close();
+      {
+        if (logLevel.isFine())
+        { log.debug("AutoClosing result set");
+        }
+        resultSet.close();
       }
       return val;
     }
