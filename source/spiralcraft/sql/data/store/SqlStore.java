@@ -38,8 +38,6 @@ import spiralcraft.data.Tuple;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Queryable;
-import spiralcraft.data.query.Selection;
-import spiralcraft.data.query.Scan;
 
 import spiralcraft.data.spi.EditableArrayListAggregate;
 import spiralcraft.data.spi.EditableArrayTuple;
@@ -47,14 +45,20 @@ import spiralcraft.data.transaction.Transaction;
 import spiralcraft.data.types.standard.AnyType;
 
 import spiralcraft.sql.Dialect;
-import spiralcraft.sql.data.query.BoundSelection;
-import spiralcraft.sql.data.query.BoundScan;
 
 import spiralcraft.sql.ddl.DDLStatement;
 import spiralcraft.sql.pool.ConnectionFactory;
 import spiralcraft.sql.pool.ConnectionPool;
+import spiralcraft.util.Path;
+import spiralcraft.vfs.Container;
+import spiralcraft.vfs.Resolver;
+import spiralcraft.vfs.Resource;
+import spiralcraft.vfs.Session;
+import spiralcraft.vfs.file.FileResource;
+import spiralcraft.vfs.jar.JarFileResource;
 
 
+import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -114,6 +118,7 @@ public class SqlStore
   
   private Dialect dialect;
   private boolean autoUpgrade;
+  private Level statementLogLevel=Level.INFO;
   
   public SqlStore()
     throws DataException
@@ -274,11 +279,26 @@ public class SqlStore
   public void stop()
     throws LifecycleException
   {
+    log.info
+      ("Stopping SqlStore "+(getName()!=null?getName():"")+": "
+      +(this.getLocalResourceURI()!=null?this.getLocalResourceURI():"")
+      );
     super.stop();
     connectionPool.stop();
-    // log.fine("Stopped SqlStore");
+    log.info
+      ("Stopped SqlStore "+(getName()!=null?getName():"")+": "
+      +(this.getLocalResourceURI()!=null?this.getLocalResourceURI():"")
+      );
   }
   
+  public void setStatementLogLevel(Level level)
+  { this.statementLogLevel=level;
+  }
+    
+  public Level getStatementLogLevel()
+  { return statementLogLevel;
+  }
+
   public void executeDDL(List<DDLStatement> statements)
     throws DataException
   {
@@ -307,8 +327,14 @@ public class SqlStore
         {
           StringBuilder buff=new StringBuilder();
           statement.write(buff,"", null);
-          sqlStatement.executeUpdate(buff.toString());
-          log.fine("Executed "+buff.toString());
+          try
+          {
+            sqlStatement.executeUpdate(buff.toString());
+            log.fine("Executed "+buff.toString());
+          }
+          catch (SQLException x)
+          { throw new SQLException("Failed to execute DDL: "+buff,x);
+          }
         }
         sqlStatement.close();
         if (!branch.is2PC())
@@ -342,31 +368,6 @@ public class SqlStore
     }
     finally
     { tx.complete();
-    }
-  }
-  
-
-  
-  @Override
-  public BoundQuery<?,Tuple> query(Query query,Focus<?> focus)
-    throws DataException
-  { 
-    if (query instanceof Selection)
-    { 
-      BoundSelection boundSelection
-        =new BoundSelection((Selection) query,focus,this);
-      if (debugLevel.isDebug())
-      { 
-        log.fine
-          ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
-      }
-      return boundSelection;
-    }
-    else if (query instanceof Scan)
-    { return new BoundScan((Scan) query,focus,this);
-    }
-    else
-    { return super.query(query,focus);
     }
   }
   
@@ -538,6 +539,79 @@ public class SqlStore
     }
   }
 
+  /**
+   * Restore data from a backup. Replaces all data with the backup copy stored
+   *   in the specified URI.
+   * 
+   * @param uri
+   */
+  public void restore(URI uri)
+    throws IOException,DataException
+  { 
+
+    Session session=new Session();
+    try
+    {
+      Resource resource=Resolver.getInstance().resolve(uri);
+      Container container;
+      if (resource.getLocalName().endsWith(".zip") 
+          || resource.getLocalName().endsWith(".jar")
+         )
+      {
+        FileResource localResource=session.asLocalResource(resource);
+        JarFileResource jarResource
+          =new JarFileResource(localResource.getFile(),Path.ROOT_PATH);
+        container=jarResource.asContainer();
+      }
+      else
+      { container=resource.asContainer();
+      }
+      if (container==null)
+      { throw new IOException("Not a container "+resource.getURI());
+      }
+
+      Transaction tx
+        =Transaction.startContextTransaction(Transaction.Nesting.PROPOGATE);
+      tx.setDebug(debugLevel.isDebug());
+      try
+      {
+        for (TableMapping mapping: typeManager.getTableMappings())
+        {
+          if (mapping.getTableName()!=null)
+          { 
+            Resource xmlData
+              =container.getChild(mapping.getTableName()+".data.xml");
+            if (xmlData.exists())
+            { log.fine(xmlData.getURI()+" exists");
+            }
+            else 
+            { 
+              log.fine(xmlData.getURI()+" not found");            
+              xmlData=container.getChild(mapping.getTableName()+".xml");
+              if (xmlData.exists())
+              { log.fine(xmlData.getURI()+" exists");
+              }
+              else
+              { log.fine(xmlData.getURI()+" not found");
+              }
+            }
+            
+            if (xmlData.exists())
+            { mapping.restore(xmlData);
+            }
+          }
+        }
+        tx.commit();
+      }
+      finally
+      { tx.complete();
+      }
+    }
+    finally
+    { session.release();
+    }
+  }
+  
   @Override
   public URI getLocalResourceURI()
   { return localResourceURI;
