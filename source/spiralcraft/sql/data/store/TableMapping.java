@@ -14,8 +14,12 @@
 //
 package spiralcraft.sql.data.store;
 
+import spiralcraft.common.ContextualException;
 import spiralcraft.data.Aggregate;
+import spiralcraft.data.DataConsumer;
 import spiralcraft.data.DataException;
+import spiralcraft.data.DeltaTuple;
+import spiralcraft.data.FieldSet;
 import spiralcraft.data.Tuple;
 import spiralcraft.data.Type;
 import spiralcraft.data.Field;
@@ -24,16 +28,31 @@ import spiralcraft.data.Key;
 import spiralcraft.data.access.CursorAggregate;
 import spiralcraft.data.access.EntityAccessor;
 import spiralcraft.data.query.BoundQuery;
+import spiralcraft.data.query.EquiJoin;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.query.Scan;
+import spiralcraft.data.query.Selection;
+import spiralcraft.data.sax.DataReader;
+import spiralcraft.data.spi.ArrayDeltaTuple;
 
+import spiralcraft.sql.data.ResultColumnMapping;
+import spiralcraft.sql.data.ResultSetMapping;
+import spiralcraft.sql.data.query.BoundEquiJoin;
 import spiralcraft.sql.data.query.BoundScan;
+import spiralcraft.sql.data.query.BoundSelection;
+import spiralcraft.sql.dml.FromClause;
+import spiralcraft.sql.dml.SelectList;
+import spiralcraft.sql.dml.SelectListItem;
 import spiralcraft.sql.dml.TableName;
 import spiralcraft.sql.dml.WhereClause;
 import spiralcraft.sql.dml.BooleanCondition;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.xml.sax.SAXException;
 
 import spiralcraft.lang.Focus;
 import spiralcraft.log.ClassLog;
@@ -45,6 +64,7 @@ import spiralcraft.sql.model.KeyConstraint;
 
 import spiralcraft.util.Path;
 import spiralcraft.util.tree.LinkedTree;
+import spiralcraft.vfs.Resource;
 
 
 /**
@@ -70,7 +90,11 @@ public class TableMapping
   private SqlStore sqlStore;
   private boolean resolved;
   private volatile long lastTransactionId;
-
+  private FromClause fromClause;
+  private SelectList selectList;
+  private ResultSetMapping resultSetMapping;
+  private BoundScan boundScan;
+  private Focus<?> focus;
 
   private HashMap<String,ColumnMapping> columnFieldMap
     =new HashMap<String,ColumnMapping>();
@@ -104,7 +128,12 @@ public class TableMapping
   
   @Override
   public Focus<?> bind(Focus<?> context)
-  { return context;
+    throws ContextualException
+  { 
+    this.focus=context;
+    boundScan=new BoundScan(getScan(),focus,this.sqlStore,this);
+    boundScan.resolve();    
+    return context;
   }
   
   @Override
@@ -121,10 +150,48 @@ public class TableMapping
   
   @Override
   public BoundQuery<?,Tuple> solve(Query query,Focus<?> focus)
+    throws DataException
   {
+    if (logLevel.isFine())
+    { log.fine("Solving "+query);
+    }
+    if (query.getSources().size()==1 
+        && (query.getSources().get(0) instanceof Scan)
+       )
+    {
+      if (query instanceof Selection)
+      { 
+        BoundSelection boundSelection
+          =new BoundSelection((Selection) query,focus,this.sqlStore,this);
+        if (logLevel.isFine())
+        { 
+          log.fine
+            ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+        }
+        boundSelection.resolve();
+        return boundSelection;
+      }
+      else if (query instanceof EquiJoin)
+      {
+        BoundEquiJoin boundEquiJoin
+          =new BoundEquiJoin((EquiJoin) query,focus,this.sqlStore,this);
+        boundEquiJoin.resolve();
+        return boundEquiJoin;
+      }
+    }
+    else if (query instanceof Scan)
+    { return getBoundScan();
+    } 
+    if (logLevel.isFine())
+    { log.fine("Couldn't solve "+query);
+    }
     return null;
   }
   
+  private BoundScan getBoundScan()
+  { return boundScan;
+  }
+
   public void setType(Type<?> type)
   { this.type=type;
   }
@@ -243,7 +310,7 @@ public class TableMapping
     throws DataException
   {
     if (this.type==type)
-    { return new BoundScan(getScan(),null,sqlStore);
+    { return boundScan;
     }
     else
     { return null;
@@ -300,6 +367,10 @@ public class TableMapping
 
   }
   
+  public ResultSetMapping getResultSetMapping()
+  { return resultSetMapping;
+  }
+  
   public Table getTableModel()
   { return tableModel;
   }
@@ -338,6 +409,59 @@ public class TableMapping
   {
   }
   
+  public void restore(Resource xmlData)
+    throws DataException,IOException
+  { 
+    DataReader reader=new DataReader();
+    final SqlUpdater updater=getUpdater();
+    DataConsumer<? super Tuple> restoreConsumer
+      =new DataConsumer<Tuple>()
+    {
+
+      @Override
+      public void dataInitialize(
+        FieldSet fieldSet)
+        throws DataException
+      { updater.dataInitialize(type.getFieldSet());
+      }
+
+      @Override
+      public void dataAvailable(
+        Tuple tuple)
+        throws DataException
+      { 
+        DeltaTuple dt=new ArrayDeltaTuple(null,tuple);
+        try
+        { updater.dataAvailable(dt);
+        }
+        catch (Exception x)
+        { log.warning("Error updating \r\n"+tuple+" : \r\n"+dt);
+        }
+      }
+
+      @Override
+      public void dataFinalize()
+        throws DataException
+      { updater.dataFinalize();
+      }
+
+      @Override
+      public void setDebug(
+        boolean debug)
+      { 
+      }
+    };
+    reader.setDataConsumer(restoreConsumer);
+    
+    try
+    { reader.readFromResource(xmlData,Type.getAggregateType(type));
+    }
+    catch (SAXException e)
+    { throw new DataException("XML Error reading data for table "+tableName,e);
+    }
+    
+  }
+  
   public Aggregate<Tuple> snapshot()
     throws DataException
   { return new CursorAggregate<Tuple>(getAll(type).execute());
@@ -347,6 +471,13 @@ public class TableMapping
   { return lastTransactionId;
   }
   
+  public FromClause getFromClause()
+  { return fromClause;
+  }
+  
+  public SelectList getSelectList()
+  { return selectList;
+  }
   
   private ColumnMapping resolveMappingForField(Field<?> field)
   {
@@ -395,14 +526,27 @@ public class TableMapping
    * Fill in missing details, publish interface
    */
   public void resolve()
+    throws DataException
   { 
+    if (resolved)
+    { return;
+    }
     
+    if (logLevel.isDebug())
+    { log.debug("Resolving mapping for "+type.getURI());
+    }
     ArrayList<ColumnMapping> orderedColumns
       =new ArrayList<ColumnMapping>();
     
+    HashSet<String> seen=new HashSet<String>();
     for (Field<?> field: type.getFieldSet().fieldIterable())
     {
-        
+      // Skip base type fields hidden by subtype fields
+      if (seen.contains(field.getName()))
+      { continue;
+      }
+      seen.add(field.getName());
+      
       ColumnMapping columnMapping=resolveMappingForField(field);
       if (columnMapping!=null)
       { orderedColumns.add(columnMapping);
@@ -440,8 +584,11 @@ public class TableMapping
       { 
         ColumnMapping mapping=getMappingForField(field.getName());
         if (mapping==null)
-        {
-          log.warning("TableMapping: No column in key field '"+field.getName()+"'");
+        { 
+          // Unmapped columns happen when a relative field is based on
+          //   a non-persistent key field 
+          continue;
+          
         }
         
         Column[] fieldCols=mapping.getColumnModels();
@@ -453,17 +600,84 @@ public class TableMapping
           }
         }
       }
+      
+      if (keyCols.size()>0)
+      {
 
-      constraint.setColumns(keyCols.toArray(new Column[keyCols.size()]));
-      constraint.setPrimary(key.isPrimary());
-      constraint.setUnique(key.isUnique());
+        constraint.setColumns(keyCols.toArray(new Column[keyCols.size()]));
+        constraint.setPrimary(key.isPrimary());
+        constraint.setUnique(key.isUnique());
 
-      tableModel.addKeyConstraint(constraint);
+        tableModel.addKeyConstraint(constraint);
+      }
+      
       
     }
     tableNameSqlFragment=new TableName(schemaName,tableName);
 
     updater=new SqlUpdater(sqlStore,this);
+    
+    fromClause
+      =new FromClause
+        (getSchemaName()
+        ,getTableName()
+        );
+    
+    selectList=new SelectList();
+    LinkedTree<ResultColumnMapping> foldTree=new LinkedTree<ResultColumnMapping>();
+    int columnCount=0;
+    generateSelectList(getColumnMappingTree(),selectList,foldTree,columnCount);
+    resultSetMapping=new ResultSetMapping(type.getFieldSet(),foldTree);
+    
+
+
     resolved=true;
   }
+  
+  private int generateSelectList
+    (LinkedTree<ColumnMapping> columnMapping
+    ,SelectList selectList
+    ,LinkedTree<ResultColumnMapping> foldTree
+    ,int columnCount
+    )
+  {
+    for (LinkedTree<ColumnMapping> mapping : columnMapping)
+    { columnCount=generateSelectListItem(mapping,selectList,foldTree,columnCount);
+    }
+    return columnCount;    
+  }
+  
+  private int generateSelectListItem
+    (LinkedTree<ColumnMapping> node
+    ,SelectList selectList
+    ,LinkedTree<ResultColumnMapping> foldTree
+    ,int columnCount
+    )
+  {
+    if (node.isLeaf())
+    {
+      SelectListItem selectListItem=node.get().getSelectListItem();
+      // Single field
+      if (selectListItem!=null)
+      { 
+        selectList.addItem(selectListItem);
+        foldTree.addChild
+          (new LinkedTree<ResultColumnMapping>
+            (new ResultColumnMapping( (columnCount++)+1,node.get()))
+            );
+      }
+      else
+      { foldTree.addChild(new LinkedTree<ResultColumnMapping>());
+      }
+    }
+    else
+    { 
+      LinkedTree<ResultColumnMapping> child=new LinkedTree<ResultColumnMapping>();
+      foldTree.addChild(child);
+      columnCount=generateSelectList(node,selectList,child,columnCount);
+    }
+    
+    return columnCount;
+  }
+   
 }
