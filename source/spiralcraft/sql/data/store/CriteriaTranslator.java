@@ -21,7 +21,7 @@ import spiralcraft.lang.parser.LogicalAndNode;
 import spiralcraft.lang.parser.LogicalOrNode;
 import spiralcraft.lang.parser.EqualityNode;
 import spiralcraft.lang.parser.RelationalNode;
-import spiralcraft.lang.parser.ContextIdentifierNode;
+//import spiralcraft.lang.parser.ContextIdentifierNode;
 import spiralcraft.lang.parser.CurrentFocusNode;
 import spiralcraft.lang.parser.ResolveNode;
 import spiralcraft.log.ClassLog;
