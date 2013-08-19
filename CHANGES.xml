@@ -15,6 +15,35 @@
 
     <detail>
 
+      <scm:Change>
+        <revision>dev-8
+        </revision>
+        
+        <notes>
+          <scm:Note>Add caching functionality (currently non-transactional)
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data
+        </path>
+        
+        <resources>
+          <URI>query/BoundEquiJoin.java
+          </URI>
+          <URI>query/BoundSqlQuery.java
+          </URI>
+          <URI>store/BoundQueryStatement.java
+          </URI>
+          <URI>store/BoundStatement.java
+          </URI>
+          <URI>store/BoundUpdateStatement.java
+          </URI>
+          <URI>store/SqlUpdater.java
+          </URI>
+          <URI>store/TableMapping.java
+          </URI>
+        </resources>
+      </scm:Change>
 
       <scm:Change>
         <revision>dev-7

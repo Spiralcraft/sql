@@ -96,12 +96,81 @@
               </autoSave>
               
               <onInit>
-                @{ .discountCodes=[{"a","b","c"}]
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry Hundred"
                 }.@log(.)
               </onInit>
             </dtask:Edit>
           </sequence>
         </dtask:Session>
+        
+        <test:Assertion>
+          <name>New customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==100` }].()
+          </subjectX>
+          <testX>.id==100
+          </testX>
+        </test:Assertion>        
+
+        <dtask:Session>
+          <transactional>true
+          </transactional>
+          
+          <sequence>
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==100` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .displayName="Harry Hundred (edited)"
+                }
+              </onInit>
+            </dtask:Edit>
+          </sequence>
+        </dtask:Session>
+
+        <test:Assertion>
+          <name>Updated customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==100` }].()
+          </subjectX>
+          <testX>.displayName=="Harry Hundred (edited)"
+          </testX>
+        </test:Assertion>        
+
+        <dtask:Session>
+          <transactional>true
+          </transactional>
+          
+          <sequence>
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==100` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .@tuple.delete()
+                }
+              </onInit>
+            </dtask:Edit>
+          </sequence>
+        </dtask:Session>
+
+        <test:Assertion>
+          <name>Deleted customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==100` }].()
+          </subjectX>
+          <testX>.==null
+          </testX>
+        </test:Assertion>        
+        
       </sequence>
     </test:TestGroup>
     
