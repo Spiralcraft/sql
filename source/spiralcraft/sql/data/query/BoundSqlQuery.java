@@ -25,6 +25,7 @@ import spiralcraft.data.spi.ManualCursor;
 
 import spiralcraft.data.access.SerialCursor;
 
+import spiralcraft.sql.data.SerialResultSetCursor;
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.SqlStore;
 
@@ -77,8 +78,14 @@ public abstract class BoundSqlQuery<Tq extends Query>
   }
   
   @Override
-  public SerialCursor<Tuple> doExecute()
+  protected SerialCursor<Tuple> doExecute()
     throws DataException
-  { return statement.execute(); 
+  { 
+    
+    Object[] parameterKey=statement.makeParameterKey();
+
+    SerialResultSetCursor cursor
+        =statement.execute(parameterKey); 
+    return cursor;
   }
 }

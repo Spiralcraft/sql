@@ -51,6 +51,8 @@ public abstract class BoundStatement
   
   protected ArrayList<ParameterTag> parameterExpressions
     =new ArrayList<ParameterTag>();
+  protected ArrayList<Converter<?,?>> parameterConverters
+    =new ArrayList<Converter<?,?>>();
   protected ArrayList<Channel<?>> parameterBindings
     =new ArrayList<Channel<?>>();
   
@@ -130,11 +132,8 @@ public abstract class BoundStatement
 //        expression.getRootNode().debugTree(System.err);
         
         Channel<?> channel=focus.bind(expression);
-        if (tag.converter!=null)
-        { channel=new ToSqlChannel(channel,tag.converter);
-        }
-        // log.fine(channel.getReflector().getTypeURI().toString());
         parameterBindings.add(channel);
+        parameterConverters.add(tag.converter);
       }
     }
     catch (BindException x)
@@ -210,13 +209,34 @@ public abstract class BoundStatement
     }
   }
   
-  
-  protected Object[] makeParameters()
+  /**
+   * The parameters in native form to use for cache lookup
+   * 
+   * @return
+   */
+  public Object[] makeParameterKey()
   {
-    Object[] params=new Object[parameterBindings.size()];
+    Object[] key=new Object[parameterBindings.size()];
     int i=0;
     for (Channel<?> channel: parameterBindings)
-    { params[i++]=channel.get();
+    { key[i++]=channel.get();
+    }
+    return key;
+  }
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private Object[] convertParameters(Object[] rawParameters)
+    throws SQLException
+  {
+    Object[] params=new Object[rawParameters.length];
+    int i=0;
+    for (Converter converter: parameterConverters)
+    { 
+      params[i]
+        =(converter!=null && rawParameters[i]!=null)
+        ?converter.toSql(rawParameters[i])
+        :rawParameters[i];
+      i++;
     }
     return params;
   }
@@ -254,8 +274,7 @@ public abstract class BoundStatement
     throws SQLException
   {
     jdbcStatement.clearParameters();
-    
-    
+    parameters=convertParameters(parameters);
     int i=1;
     for (Object paramValue : parameters)
     { 

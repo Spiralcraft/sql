@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.data.query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import spiralcraft.lang.Focus;
@@ -22,10 +23,17 @@ import spiralcraft.lang.parser.ResolveNode;
 import spiralcraft.lang.parser.ContextIdentifierNode;
 
 import spiralcraft.data.DataException;
+import spiralcraft.data.KeyTuple;
+import spiralcraft.data.Projection;
+import spiralcraft.data.Tuple;
 
+import spiralcraft.data.access.SerialCursor;
+import spiralcraft.data.access.cache.CacheIndex;
+import spiralcraft.data.access.cache.KeyedDataProvider;
 import spiralcraft.data.query.EquiJoin;
 import spiralcraft.data.query.Query;
 
+import spiralcraft.sql.data.SerialResultSetCursor;
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.ParameterTag;
 import spiralcraft.sql.data.store.SqlStore;
@@ -43,9 +51,12 @@ import spiralcraft.util.Path;
  */
 public class BoundEquiJoin
   extends BoundSqlQuery<EquiJoin>
+  implements KeyedDataProvider
 {
   
   private final TableMapping mapping;
+  private Projection<Tuple> projection;
+  private CacheIndex cacheIndex;
   
   public BoundEquiJoin
     (EquiJoin query,Focus<?> parentFocus,SqlStore store,TableMapping mapping)
@@ -63,6 +74,17 @@ public class BoundEquiJoin
     { throw new DataException(getClass().getName()+": Can't bind to more than one source");
     }
 
+    ArrayList<Expression<?>> lhsExpressions=query.getLHSExpressions();
+
+      // TODO: Check keys here: This should really be 
+      //   getResultType().getProjection
+      //       (lhsExpressions.toArray(new Expression[0]))
+      
+    projection
+      =mapping.getType().getScheme().getProjection
+        (lhsExpressions.toArray(new Expression<?>[0]));
+    cacheIndex=mapping.getCache().getIndex(projection);
+    
   }
     
 
@@ -134,5 +156,34 @@ public class BoundEquiJoin
     
   }
   
-
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
+  protected SerialCursor<Tuple> doExecute()
+    throws DataException
+  { 
+    
+    Object[] parameterKey=statement.makeParameterKey();
+    
+    if (cacheIndex!=null)
+    {
+      return (SerialCursor) cacheIndex.fetch
+        (new KeyTuple(projection,parameterKey,true)
+        ,this
+        );
+    }
+    else
+    {
+      SerialResultSetCursor cursor
+          =statement.execute(parameterKey); 
+      return cursor;
+    }
+  }
+  
+  @Override
+  public SerialCursor<Tuple> fetch(KeyTuple tuple)
+    throws DataException
+  {
+    return statement.execute(tuple.getData());
+  }
+  
 }

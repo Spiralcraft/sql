@@ -23,6 +23,7 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.lang.DataReflector;
 
 import spiralcraft.data.access.Updater;
+import spiralcraft.data.access.cache.EntityCache;
 
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
@@ -50,8 +51,9 @@ public class SqlUpdater
   extends Updater<DeltaTuple>
 {
 
-  private TableMapping tableMapping;
-  private SqlStore store;
+  private final TableMapping tableMapping;
+  private final SqlStore store;
+  private final EntityCache cache;
 
   private HashMap<ArrayList<Path>,UpdateStatement> updateStatements
     =new HashMap<ArrayList<Path>,UpdateStatement>();
@@ -74,6 +76,7 @@ public class SqlUpdater
     this.tableMapping=tableMapping;
     this.store=store;
     setFieldSet(tableMapping.getType().getFieldSet());
+    this.cache=tableMapping.getCache();
   }
 
 
@@ -259,6 +262,9 @@ public class SqlUpdater
     }
     else
     { batch.get().execute(getUpdateStatement(deltaTuple));
+    }
+    if (cache!=null)
+    { cache.update(deltaTuple);
     }
     
   }

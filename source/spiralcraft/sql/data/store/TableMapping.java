@@ -27,6 +27,7 @@ import spiralcraft.data.Key;
 
 import spiralcraft.data.access.CursorAggregate;
 import spiralcraft.data.access.EntityAccessor;
+import spiralcraft.data.access.cache.EntityCache;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.EquiJoin;
 import spiralcraft.data.query.Query;
@@ -95,6 +96,7 @@ public class TableMapping
   private ResultSetMapping resultSetMapping;
   private BoundScan boundScan;
   private Focus<?> focus;
+  private EntityCache cache;
 
   private HashMap<String,ColumnMapping> columnFieldMap
     =new HashMap<String,ColumnMapping>();
@@ -124,6 +126,10 @@ public class TableMapping
   
   public void setStore(SqlStore store)
   { this.sqlStore=store;
+  }
+  
+  public EntityCache getCache()
+  { return cache;
   }
   
   @Override
@@ -161,15 +167,41 @@ public class TableMapping
     {
       if (query instanceof Selection)
       { 
-        BoundSelection boundSelection
-          =new BoundSelection((Selection) query,focus,this.sqlStore,this);
-        if (logLevel.isFine())
-        { 
-          log.fine
-            ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+        
+        Query factor=query.factor();
+        if (factor==null)
+        {
+          BoundSelection boundSelection
+            =new BoundSelection((Selection) query,focus,this.sqlStore,this);
+          if (logLevel.isFine())
+          { 
+            log.fine
+              ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
+          }
+          boundSelection.resolve();
+          return boundSelection;
         }
-        boundSelection.resolve();
-        return boundSelection;
+        else if (factor instanceof EquiJoin)
+        { 
+          if (logLevel.isFine())
+          { 
+            log.fine("Factored selection "
+              +((Selection) query).getConstraints().getText()+" to EquiJoin");
+          }
+          BoundEquiJoin boundEquiJoin
+            =new BoundEquiJoin((EquiJoin) factor,focus,this.sqlStore,this);
+          boundEquiJoin.resolve();
+          return boundEquiJoin;
+        }
+        else
+        { 
+          if (logLevel.isFine())
+          { 
+            log.fine("Factored selection "
+              +((Selection) query).getConstraints().getText()+" to "+factor);
+          }
+          factor.solve(focus,this);
+        }
       }
       else if (query instanceof EquiJoin)
       {
@@ -535,6 +567,7 @@ public class TableMapping
     if (logLevel.isDebug())
     { log.debug("Resolving mapping for "+type.getURI());
     }
+    this.cache=new EntityCache(type);
     ArrayList<ColumnMapping> orderedColumns
       =new ArrayList<ColumnMapping>();
     

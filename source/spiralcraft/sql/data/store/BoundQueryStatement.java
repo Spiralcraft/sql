@@ -15,11 +15,9 @@
 package spiralcraft.sql.data.store;
 
 
-import spiralcraft.data.access.SerialCursor;
 
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.DataException;
-import spiralcraft.data.Tuple;
 
 import spiralcraft.sql.data.ResultSetMapping;
 import spiralcraft.sql.data.SerialResultSetCursor;
@@ -57,7 +55,7 @@ public class BoundQueryStatement
    * Execute the Query by allocating a PreparedStatement from the SqlStore,
    *   applying parameters, and delivering the result via a SerialCursor.
    */
-  public SerialCursor<Tuple> execute()
+  public SerialResultSetCursor execute(Object[] rawParameters)
     throws DataException
   {
     // log.fine("BoundQueryStatement: Preparing "+statementText);
@@ -67,15 +65,14 @@ public class BoundQueryStatement
       Connection connection=store.getContextConnection();
     
       PreparedStatement statement=connection.prepareStatement(statementText);
-      Object[] parameters=makeParameters();
       long time=0;
       if (logLevel.isFine())
       { 
         log.fine(toString()+": Executing "+statementText+"\r\n"
-          +formatParameters(parameters));
+          +formatParameters(rawParameters));
         time=Clock.instance().timeNanos();
       }
-      applyParameters(statement,parameters);
+      applyParameters(statement,rawParameters);
       ResultSet rs=statement.executeQuery();
       SerialResultSetCursor result=null;
       if (dataFields!=null)
