@@ -170,12 +170,25 @@ public class SqlBranch
     { 
       if (xar!=null)
       { 
+        
+        try
+        { xar.end(xid,XAResource.TMFAIL); 
+        }
+        catch (XAException e)
+        { log.log(Level.WARNING,"Error ending transaction "+xid);
+        }
+        
+        if (logLevel.isFine())
+        { log.fine("Calling xar.rollback("+xid+")");
+        }
+        
         try
         { xar.rollback(xid);
         }
         catch (XAException e)
-        { throw new TransactionException("Error rolling back XA resource",e);
+        { log.log(Level.WARNING,"Error rolling back transaction "+xid,e);
         }
+
       }
       else
       { connection.rollback();
