@@ -21,6 +21,9 @@ import spiralcraft.data.FieldSet;
 
 
 import spiralcraft.data.lang.DataReflector;
+import spiralcraft.data.session.BufferTuple;
+import spiralcraft.data.spi.ArrayDeltaTuple;
+import spiralcraft.data.spi.ArrayJournalTuple;
 
 import spiralcraft.data.access.Updater;
 import spiralcraft.data.access.cache.EntityCache;
@@ -246,10 +249,11 @@ public class SqlUpdater
   
   
   @Override
-  public void dataAvailable(DeltaTuple deltaTuple)
+  public void dataAvailable(DeltaTuple buffer)
     throws DataException
   {
-    super.dataAvailable(deltaTuple);
+    super.dataAvailable(buffer);
+    DeltaTuple deltaTuple=checkBuffer(buffer);
     tuple.set(deltaTuple);
     if (!deltaTuple.isDirty())
     { return;
@@ -263,13 +267,30 @@ public class SqlUpdater
     else
     { batch.get().execute(getUpdateStatement(deltaTuple));
     }
+    
     if (cache!=null)
-    { cache.update(deltaTuple);
+    { 
+      ArrayJournalTuple newOriginal=cache.update(deltaTuple);
+      if (buffer instanceof BufferTuple)
+      { ((BufferTuple) buffer).updateOriginal(newOriginal);
+      } 
     }
     
   }
   
 
+  private DeltaTuple checkBuffer(DeltaTuple tuple)
+    throws DataException
+  {
+    if (tuple.isMutable())
+    { 
+      DeltaTuple newTuple=ArrayDeltaTuple.copy(tuple);
+      // bufferMap.put(newTuple.getId(),tuple);
+      tuple=newTuple;
+    }
+    return tuple;
+    
+  }
   
   
   
