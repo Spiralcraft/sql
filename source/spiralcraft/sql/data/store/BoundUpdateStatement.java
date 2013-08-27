@@ -53,13 +53,24 @@ public class BoundUpdateStatement
       { log.fine(toString()+": Executing "+statementText+"\r\n"+formatParameters(parameters));
       }
       applyParameters(statement,parameters);
-      int results=statement.executeUpdate();
-      // log.fine("Closing "+statement);
-      statement.close();
-      return results;
+      try
+      { 
+        int results=statement.executeUpdate();
+        // log.fine("Closing "+statement);
+        statement.close();
+        return results;
+      }
+      catch (SQLException x)
+      { 
+        throw new DataException
+          ("Error executing "
+          +statementText+"\r\n"+formatParameters(parameters)
+          ,x
+          );
+      }
     }
     catch (SQLException x)
-    { throw new DataException("Error executing "+statementText+": "+x,x);
+    { throw new DataException("Error executing "+statementText+": ",x);
     }
     finally
     { 
