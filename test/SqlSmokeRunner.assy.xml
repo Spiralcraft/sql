@@ -5,6 +5,7 @@
   xmlns:query="class:/spiralcraft/data/query/"
   xmlns:dtask="class:/spiralcraft/data/task/"
   xmlns:example="class:/spiralcraft/data/test/example/"
+  xmlns:tx="class:/spiralcraft/data/transaction/"
   >
   <service>
     <stest:TestSpace>
@@ -171,7 +172,263 @@
           </testX>
         </test:Assertion>        
         
+        
+        <dtask:Session>
+        
+          <transactional>true
+          </transactional>
+        
+          <sequence>
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry HundredOne"
+                }
+              </onInit>
+            </dtask:Edit>
+
+            <test:Assertion>
+              <name>In TX: New customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+              </subjectX>
+              <testX>.id==101
+              </testX>
+            </test:Assertion>        
+
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <preSave>
+                []{ .displayName="Harry HundredOne *edited*"
+                }
+              </preSave>
+            </dtask:Edit>
+          
+            <test:Assertion>
+              <name>In TX: Updated customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+              </subjectX>
+              <testX>.displayName=="Harry HundredOne *edited*"
+              </testX>
+            </test:Assertion>        
+            
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+              </onInit>
+              
+              <preSave>
+                []{ .@tuple.delete()
+                }
+              </preSave>
+            </dtask:Edit>
+            
+            <test:Assertion>
+              <name>In TX: Deleted customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+              </subjectX>
+              <testX>.==null
+              </testX>
+            </test:Assertion>        
+
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry HundredTwo"
+                }
+              </onInit>
+            </dtask:Edit>
+
+          </sequence>
+        </dtask:Session>
+          
+        <test:Assertion>
+          <name>Post TX: Deleted customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==101` }].()
+          </subjectX>
+          <testX>.==null
+          </testX>
+        </test:Assertion>
+      
+        <test:Assertion>
+          <name>Post TX: New customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==102` }].()
+          </subjectX>
+          <testX>.displayName=="Harry HundredTwo"
+          </testX>
+        </test:Assertion>
+
+        <dtask:Session>
+        
+          <transactional>true
+          </transactional>
+          
+          <sequence>
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry HundredThree"
+                }
+              </onInit>
+            </dtask:Edit>
+
+            <test:Assertion>
+              <name>In TX: New customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==103` }].()
+              </subjectX>
+              <testX>.id==103
+              </testX>
+            </test:Assertion>        
+
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==103` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <preSave>
+                []{ .displayName="Harry HundredThree *edited*"
+                }
+              </preSave>
+            </dtask:Edit>
+          
+            <test:Assertion>
+              <name>In TX: Updated customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==103` }].()
+              </subjectX>
+              <testX>.displayName=="Harry HundredThree *edited*"
+              </testX>
+            </test:Assertion>        
+            
+            <dtask:Edit>
+              <x>[*dtask:Fetch{[@example:Customer],`.id==103` }].()
+              </x>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+              </onInit>
+              
+              <preSave>
+                []{ .@tuple.delete()
+                }
+              </preSave>
+            </dtask:Edit>
+            
+            <test:Assertion>
+              <name>In TX: Deleted customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==103` }].()
+              </subjectX>
+              <testX>.==null
+              </testX>
+            </test:Assertion>        
+
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              <autoSave>true
+              </autoSave>
+              
+              <onInit>
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry HundredFour"
+                }
+              </onInit>
+            </dtask:Edit>
+            <test:Assertion>
+              <name>Pre Rollback: New customer
+              </name>
+              <subjectX>[*dtask:Fetch{[@example:Customer],`.id==104` }].()
+              </subjectX>
+              <testX>.displayName=="Harry HundredFour"
+              </testX>
+            </test:Assertion>        
+
+            <task:Eval>
+              <x>[@tx:Transaction].@getContextTransaction().rollbackOnComplete()
+              </x>
+            </task:Eval>
+          </sequence>
+        </dtask:Session>
+
+        <test:Assertion>
+          <name>Post Rollback: New customer
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==104` }].()
+          </subjectX>
+          <testX>.==null
+          </testX>
+        </test:Assertion>        
+        
+        
+        <dtask:Session>
+        
+          <transactional>true
+          </transactional>
+          
+          <sequence>
+            <dtask:Edit>
+              <type x="[@example:Customer].type"/>
+              
+              
+              <onInit>
+                []{ .discountCodes=[{"a","b","c"}]
+                  ,.displayName="Harry HundredFive"
+                  ,@tuple.save()
+                  ,.displayName="Harry HundredFive (edited)"
+                  ,@tuple.save()
+                }
+              </onInit>
+            </dtask:Edit>
+          </sequence>
+        </dtask:Session>
+
+        <test:Assertion>
+          <name>New customer multi edit
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer],`.id==105` }].()
+          </subjectX>
+          <testX>.displayName=="Harry HundredFive (edited)"
+          </testX>
+        </test:Assertion>        
+        
       </sequence>
+      
+      
     </test:TestGroup>
     
   </chain>

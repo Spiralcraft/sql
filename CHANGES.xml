@@ -16,6 +16,47 @@
     <detail>
 
       <scm:Change>
+        <revision>dev-9
+        </revision>
+        
+        <notes>
+          <scm:Note>Update edit Buffer with a new original when data is written
+            to the backing store.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlUpdater.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-9
+        </revision>
+        
+        <notes>
+          <scm:Note>Deal with scenario where an exception causes XA driver
+            to roll back and forget about the transaction.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlBranch.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-9
+        </revision>
+        
+        <notes>
+          <scm:Note>Log applied parameters on exception
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/BoundUpdateStatement.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>dev-8
         </revision>
         
