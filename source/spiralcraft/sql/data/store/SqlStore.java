@@ -223,6 +223,7 @@ public class SqlStore
   public Focus<?> bind(Focus<?> focus)
     throws ContextualException
   {
+    super.preBind(focus);
     try
     { resolve();
     }
