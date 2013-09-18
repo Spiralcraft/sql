@@ -16,6 +16,34 @@
     <detail>
 
       <scm:Change>
+        <revision>dev-10
+        </revision>
+        
+        <notes>
+          <scm:Note>Call preBind() in the base class before binding to
+            resolve the Space.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlStore.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>dev-10
+        </revision>
+        
+        <notes>
+          <scm:Note>Don't map entities declared as abstract in the schema to
+            database tables.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SchemaMapping.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>dev-9
         </revision>
         
