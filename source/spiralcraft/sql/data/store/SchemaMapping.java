@@ -78,14 +78,17 @@ public class SchemaMapping
     for (Entity entity: schema.getEntities())
     {
       Type<?> type=entity.getType();
-      TableMapping mapping=new TableMapping();
-      mapping.setSchemaName(schemaName);
-      mapping.setType(type);
-      mapping.setTableName(entity.getName());
-      if (mapping.getTableName()==null)
-      { log.warning("Table name is null for "+type);
+      if (!entity.isAbstract())
+      {
+        TableMapping mapping=new TableMapping();
+        mapping.setSchemaName(schemaName);
+        mapping.setType(type);
+        mapping.setTableName(entity.getName());
+        if (mapping.getTableName()==null)
+        { log.warning("Table name is null for "+type);
+        }
+        mappings.add(mapping);
       }
-      mappings.add(mapping);
     }
     return mappings.toArray(new TableMapping[mappings.size()]);
   }
