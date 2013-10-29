@@ -44,6 +44,7 @@ import spiralcraft.util.Path;
 
 
 import java.util.HashMap;
+import java.util.List;
 
 import java.util.ArrayList;
 
@@ -74,15 +75,51 @@ public class SqlUpdater
   private HashMap<SqlFragment,BoundUpdateStatement> boundStatements
     =new HashMap<SqlFragment,BoundUpdateStatement>();
   
+  private List<Path> derivedStoredFields;
+  
   public SqlUpdater(SqlStore store,TableMapping tableMapping)
   { 
     this.tableMapping=tableMapping;
     this.store=store;
     setFieldSet(tableMapping.getType().getFieldSet());
     this.cache=tableMapping.getCache();
+    computeDerivedStoredFields();
   }
 
+  private void computeDerivedStoredFields()
+  {
+    ArrayList<Path> paths=new ArrayList<Path>();
+    computeDerivedStoredFields(paths,tableMapping.getType().getFieldSet(),Path.EMPTY_PATH);
+    derivedStoredFields=paths;
+    
+  }
 
+  private void computeDerivedStoredFields
+    (ArrayList<Path> paths,FieldSet fieldSet,Path parentPath)
+  {
+    
+    for (Field<?> field: fieldSet.fieldIterable())
+    { 
+      Path subPath=parentPath.append(field.getName());
+      ColumnMapping mapping
+        =tableMapping.getMappingForPath(subPath);
+      if (mapping!=null)
+      { 
+        if (mapping.isFlattened())
+        { computeDerivedStoredFields(paths,field.getType().getFieldSet(),subPath);
+        }
+        else
+        { 
+          // Non-transient derived fields = stored calculated fields- always update
+          if (!field.isTransient() && field.isDerived()) 
+          { paths.add(subPath);
+          }
+        }
+      }
+
+    }
+  }
+  
   
   /**
    * Retrieve from the cache or build an INSERT statement for a particular combination
@@ -91,7 +128,8 @@ public class SqlUpdater
   synchronized InsertStatement getInsertStatement(DeltaTuple tuple)
   {
     ArrayList<Path> paths=new ArrayList<Path>();
-    buildDirtyPaths(tuple,paths,new Path());
+    buildDirtyPaths(tuple,paths,Path.EMPTY_PATH);
+    paths.addAll(derivedStoredFields);
     if (paths.size()==0)
     { return null;
     }
@@ -127,7 +165,8 @@ public class SqlUpdater
     throws DataException
   {
     ArrayList<Path> paths=new ArrayList<Path>();
-    buildDirtyPaths(tuple,paths,new Path());
+    buildDirtyPaths(tuple,paths,Path.EMPTY_PATH);
+    paths.addAll(derivedStoredFields);
     if (paths.size()==0)
     { return null;
     }
@@ -199,11 +238,11 @@ public class SqlUpdater
       else
       { 
         if (debug)
-        { log.info("Field "+field.getURI()+" is dirty but has no mapping exists fpr "+subPath);
+        { log.info("Field "+field.getURI()+" is dirty but has no mapping exists for "+subPath);
         }
       }
     }
-    
+
   }
 
 
