@@ -1,0 +1,37 @@
+<store:SqlStore
+  xmlns:store="class:/spiralcraft/sql/data/store/"
+  xmlns:data="class:/spiralcraft/data/"
+  xmlns:hsqlj="class:/org/hsqldb/jdbc/pool/"  
+  >
+  
+  <debugLevel>INFO
+  </debugLevel>
+  
+  <dataSourceX>
+    [*hsqlj:JDBCXADataSource
+      {url:=("jdbc:hsqldb:file:"
+            +[store:SqlStore].localResourceURI.path
+            +"/hsqldb/"
+            +";sql.enforce_size=false;shutdown=true"
+            +";hsqldb.default_table_type=cached"
+            )
+      }
+    ]
+  </dataSourceX>
+      
+  <dialect>
+    <hsql:HsqldbDialect
+      xmlns:hsql="class:/spiralcraft/sql/vendor/hsqldb/"
+    />
+  </dialect>        
+      
+  <autoUpgrade>true
+  </autoUpgrade>
+      
+  <connectionPool.maxStartupMs>1000
+  </connectionPool.maxStartupMs>
+
+  <connectionPool.maxCheckoutMs>1000
+  </connectionPool.maxCheckoutMs>
+  
+</store:SqlStore>
