@@ -16,7 +16,33 @@
     <detail>
 
       <scm:Change>
-        <revision>dev-10
+        <revision>-dev11
+        </revision>
+        
+        <notes>
+          <scm:Note>Add a base HSQLDB SqlStore assembly.
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/vendor/hsqldb/BasicEmbeddedStore.assy.xml
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
+          <scm:Note>Store non-transient derived fields
+          </scm:Note>
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/SqlUpdater.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev10
         </revision>
         
         <notes>
@@ -30,7 +56,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-10
+        <revision>-dev10
         </revision>
         
         <notes>
@@ -44,7 +70,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-9
+        <revision>-dev9
         </revision>
         
         <notes>
@@ -58,7 +84,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-9
+        <revision>-dev9
         </revision>
         
         <notes>
@@ -72,7 +98,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-9
+        <revision>-dev9
         </revision>
         
         <notes>
@@ -85,7 +111,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-8
+        <revision>-dev8
         </revision>
         
         <notes>
@@ -115,7 +141,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-7
+        <revision>-dev7
         </revision>
         
         <notes>
@@ -143,7 +169,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-7
+        <revision>-dev7
         </revision>
         
         <notes>
@@ -158,7 +184,7 @@
       </scm:Change>
       
       <scm:Change>
-        <revision>dev-7
+        <revision>-dev7
         </revision>
         
         <notes>
@@ -216,7 +242,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-7
+        <revision>-dev7
         </revision>
         
         <notes>
@@ -237,7 +263,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-7
+        <revision>-dev7
         </revision>
         
         <notes>
@@ -268,7 +294,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-6
+        <revision>-dev6
         </revision>
         
         <notes>
@@ -308,7 +334,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-5
+        <revision>-dev5
         </revision>
         
         <notes>
@@ -322,7 +348,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-5
+        <revision>-dev5
         </revision>
         
         <notes>
@@ -356,7 +382,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-5
+        <revision>-dev5
         </revision>
         
         <notes>
@@ -370,7 +396,7 @@
       </scm:Change>
     
       <scm:Change>
-        <revision>dev-5
+        <revision>-dev5
         </revision>
         
         <notes>
@@ -448,7 +474,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-4
+        <revision>-dev4
         </revision>
         
         <notes>
@@ -474,7 +500,7 @@
       </scm:Change>
           
       <scm:Change>
-        <revision>dev-3
+        <revision>-dev3
         </revision>
         
         <notes>
@@ -488,7 +514,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-2
+        <revision>-dev2
         </revision>
         
         <notes>
@@ -508,7 +534,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -525,7 +551,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -538,7 +564,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -563,7 +589,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -609,7 +635,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -652,7 +678,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
@@ -679,7 +705,7 @@
       </scm:Change>
 
       <scm:Change>
-        <revision>dev-1
+        <revision>-dev1
         </revision>
         
         <notes>
