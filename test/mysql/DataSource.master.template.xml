@@ -1,0 +1,16 @@
+<myo:MysqlDataSource
+  xmlns:myo="class:/com/mysql/jdbc/jdbc2/optional/"
+  >
+  <serverName>localhost
+  </serverName>
+
+  <databaseName>mysql
+  </databaseName>
+  		
+  <user>root
+  </user>
+  		
+  <password>
+  </password>
+
+</myo:MysqlDataSource>		

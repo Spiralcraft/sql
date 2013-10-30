@@ -20,6 +20,104 @@
         </revision>
         
         <notes>
+          <scm:Note>Mysql integration
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/vendor/mysql
+        </path>
+        
+        <resources>
+          <URI>MysqlAdminSession.java
+          </URI>
+          <URI>MysqlDialect.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
+          <scm:Note>Support databases with no differentiated concept of 
+            a "schema"
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/model/Schema.java
+        </path>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
+          <scm:Note>The Dialect now participates in initializing the
+            Connection.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>data/store/SqlStore.java
+          </URI>
+          <URI>pool/ConnectionPool.java
+          </URI>
+          <URI>util/AbstractSqlTool.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
+          <scm:Note>Deal with dialects that require a VARCHAR size by having
+            the Dialect participate in the specifyColumn operation
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>data/mappers/BigDecimalTypeMapper.java
+          </URI>
+          <URI>data/mappers/ListTypeMapper.java
+          </URI>
+          <URI>data/mappers/PrimitiveTypeMapper.java
+          </URI>
+          <URI>data/mappers/StringTypeMapper.java
+          </URI>
+          <URI>data/mappers/TypeTypeMapper.java
+          </URI>
+          <URI>model/Column.java
+          </URI>
+          <URI>types/ArrayType.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
           <scm:Note>Add a base HSQLDB SqlStore assembly.
           </scm:Note>
         </notes>

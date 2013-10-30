@@ -1,0 +1,3 @@
+<my:MysqlDialect
+  xmlns:my="class:/spiralcraft/sql/vendor/mysql/"
+/>

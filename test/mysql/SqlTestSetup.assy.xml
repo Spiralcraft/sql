@@ -1,0 +1,25 @@
+<test:SqlTestSetup
+  xmlns:my="class:/spiralcraft/sql/vendor/mysql/"
+  xmlns:test="class:/spiralcraft/sql/test/"
+  >
+  
+  <dataSource dataURI="DataSource.master.xml">
+  </dataSource>
+
+  <targetUsername>_sc_sql_test
+  </targetUsername>
+  
+  <targetPassword>_sc_sql_test
+  </targetPassword>
+  
+  <targetDatabase>_sc_sql_test
+  </targetDatabase>
+  
+  <adminSession>
+    <my:MysqlAdminSession/>
+  </adminSession>
+  
+  <dialect>
+    <my:MysqlDialect/>
+  </dialect>
+</test:SqlTestSetup>
