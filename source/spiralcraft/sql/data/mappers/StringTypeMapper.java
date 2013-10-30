@@ -55,6 +55,10 @@ public class StringTypeMapper
     if (type.getMaxLength()>0)
     { col.setLength(type.getMaxLength());
     }
+    else if (dialect.isVarcharSizeRequired())
+    { col.setLength(dialect.getDefaultVarcharSize());
+    }
+    dialect.specifyColumn(type,col);
 
   }
 

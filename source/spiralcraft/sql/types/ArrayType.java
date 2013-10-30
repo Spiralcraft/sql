@@ -51,6 +51,10 @@ public class ArrayType
     componentType=null;
   }
   
+  public SqlType<?> getComponentType()
+  { return componentType;
+  }
+  
   protected ArrayType(SqlType<?> componentType)
   { 
     super(Types.ARRAY,Array.class,"ARRAY");

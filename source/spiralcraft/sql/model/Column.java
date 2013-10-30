@@ -129,10 +129,14 @@ public class Column
   
   /**
    * 
-   * @return the maxumum number of characters or digits
+   * @return the maximum number of characters or digits
    */
   public int getLength()
   { return length;
+  }
+  
+  public boolean hasLength()
+  { return length!=null;
   }
   
   public void setLength(int length)

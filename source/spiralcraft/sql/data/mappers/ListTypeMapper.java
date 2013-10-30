@@ -44,7 +44,7 @@ public class ListTypeMapper
 
     SqlType<?> sqlType=getSqlType(type);
     col.setType(sqlType);
-
+    dialect.specifyColumn(type,col);
     
   }
 
