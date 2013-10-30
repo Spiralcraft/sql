@@ -121,9 +121,10 @@ public class Schema
       if (name!=null)
       { ret.add(new CreateSchemaStatement(name));
       }
-      else
+      else if (dialect.getDefaultSchemaName()!=null)
       { ret.add(new CreateSchemaStatement(dialect.getDefaultSchemaName()));
       }
+      
     }
     
     for (Table table: tables)
