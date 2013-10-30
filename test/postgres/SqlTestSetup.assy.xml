@@ -3,7 +3,7 @@
   xmlns:test="class:/spiralcraft/sql/test/"
   >
   
-  <dataSource dataURI="DataSource.master.local.xml">
+  <dataSource dataURI="DataSource.master.xml">
   </dataSource>
 
   <targetUsername>_test
