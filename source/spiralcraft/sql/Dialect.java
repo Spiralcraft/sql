@@ -17,11 +17,14 @@ package spiralcraft.sql;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import spiralcraft.data.Type;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
+import spiralcraft.sql.model.Column;
 import spiralcraft.sql.model.KeyConstraint;
 import spiralcraft.sql.model.Table;
 
@@ -61,15 +64,38 @@ public class Dialect
   { return 2048;
   }
   
+  public int getDefaultVarcharSize()
+  { return 2048;
+  }
+  
+  public boolean isVarcharSizeRequired()
+  { return false;
+  }
+  
+  public void specifyColumn(Type<?> type,Column column)
+  { 
+    if (isVarcharSizeRequired())
+    {
+      SqlType<?> sqlType=column.getType();
+      if (sqlType.getTypeId()==Types.VARCHAR
+          && !column.hasLength()
+          )
+      { column.setLength(getDefaultVarcharSize());
+      }
+    }
+    
+  }
+  
+  
   /**
    *@return an appropriate SqlType for this JDBC type id. Will consult the extended types
    *  set up for this Dialect before using a default association.
    */
   public SqlType<?> getSqlType(int sqlTypeId)
   { 
-    SqlType<?> type=typeMap.get(sqlTypeId);
+    SqlType<?> type=typeMap.get(sqlTypeId);    
     if (type==null)
-    { return type=SqlType.getSqlType(sqlTypeId);
+    { return SqlType.getSqlType(sqlTypeId);
     }
     if (logLevel.isFine())
     { log.fine(this+" mapped "+sqlTypeId+" to "+type);
@@ -86,6 +112,18 @@ public class Dialect
   public String getDefaultSchemaName()
   { return null;
   }
+ 
+  /**
+   * Initialize the connection to conform to normalized behavior (e.g. setting
+   *   autocommit off, quoted identifier form to use double quotes, etc)
+   * 
+   * @param connection
+   */
+  public void initConnection(Connection connection)
+    throws SQLException
+  { 
+  }
+  
   
   public String getQualifiedTableName(String catalog,String schema,String table)
   { 
