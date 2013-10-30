@@ -3,7 +3,7 @@
   xmlns:util="class:/spiralcraft/sql/util/"
   >
   
-  <dataSource dataURI="DataSource.local.xml">
+  <dataSource dataURI="DataSource.xml">
   </dataSource>
 
   <inputResource>${spiralcraft.builder.dir}/in/Customer.csv

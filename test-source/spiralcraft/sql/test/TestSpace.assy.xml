@@ -15,7 +15,7 @@
         dataURI="example:Example.schema.xml"
       />
       
-      <dataSource dataURI="DataSource.local.xml"/>
+      <dataSource dataURI="DataSource.xml"/>
       
       <dialect>
         <config:Dialect/>

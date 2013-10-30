@@ -7,26 +7,6 @@
 
   <import file="../../build/build-spiralcraft-common.xml"/>
     
-  <target name="build" depends="init,build-common.build"/>
-      
-  <target name="init" if="configMissing">
-    <echo>Creating file test/DataSource.local.xml...
-    </echo>
-    <echo>Creating file test/DataSource.master.local.xml...
-    </echo>
         
-    <copy
-      tofile="test/hsqldb/DataSource.local.xml" 
-      file="test/hsqldb/DataSource.template.xml"
-    />
-  </target>
-        
-  <condition property="configMissing">
-    <or>
-      <not>
-        <available file="test/hsqldb/DataSource.local.xml"/>
-      </not>
-    </or>
-  </condition>        
 </project>
 
