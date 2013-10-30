@@ -13,6 +13,7 @@ import spiralcraft.common.callable.Sink;
 import spiralcraft.log.Level;
 import spiralcraft.pool.Pool;
 import spiralcraft.pool.ResourceFactory;
+import spiralcraft.sql.Dialect;
 import spiralcraft.sql.jdbc.ConnectionWrapper;
 import spiralcraft.sql.jdbc.StatementCachingConnection;
 
@@ -28,6 +29,7 @@ public class ConnectionPool<T extends Connection>
 {
 
   private CommonDataSource dataSource;
+  private Dialect dialect;
   private boolean xa;
   private ConnectionFactory<T> connectionFactory
     =new ConnectionFactory<T>()
@@ -86,6 +88,10 @@ public class ConnectionPool<T extends Connection>
     this.dataSource=dataSource;
     this.xa=dataSource instanceof XADataSource;
   }
+  
+  public void setDialect(Dialect dialect)
+  { this.dialect=dialect;
+  }
 
   @Override
   public ConnectionPool<T>.PooledConnection createResource()
@@ -128,6 +134,9 @@ public class ConnectionPool<T extends Connection>
         if (logLevel.isFine())
         { log.fine("Connected: "+nativeConn);
         }
+        if (dialect!=null)
+        { dialect.initConnection(nativeConn);
+        }
         Connection ret=new StatementCachingConnection(nativeConn);
         return connectionFactory.newConnection(ret);
       }
@@ -138,6 +147,9 @@ public class ConnectionPool<T extends Connection>
         Connection nativeConn=xa.getConnection();
         if (logLevel.isFine())
         { log.fine("Connected: "+xa+" : "+nativeConn);
+        }
+        if (dialect!=null)
+        { dialect.initConnection(nativeConn);
         }
         Connection ret=new StatementCachingConnection(nativeConn);
         return connectionFactory.newConnection(ret,xa);

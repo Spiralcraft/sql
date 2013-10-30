@@ -263,6 +263,7 @@ public class SqlStore
     if (dataSource!=null)
     { 
       connectionPool.setDataSource(dataSource);
+      connectionPool.setDialect(dialect);
       connectionPool.start();
     }
     try

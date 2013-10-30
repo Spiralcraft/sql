@@ -18,6 +18,7 @@ import spiralcraft.exec.Executable;
 import spiralcraft.exec.ExecutionContext;
 import spiralcraft.log.ClassLog;
 
+import spiralcraft.sql.Dialect;
 import spiralcraft.sql.data.SerialResultSetCursor;
 
 
@@ -56,6 +57,7 @@ public abstract class AbstractSqlTool
   private DataSource dataSource;
   private URI dataSourceURI;
   private int fetchSize=1000;
+  private Dialect dialect;
  
   
   public void setDataSourceURI(URI dataSourceURI)
@@ -64,6 +66,10 @@ public abstract class AbstractSqlTool
   
   public void setDataSource(DataSource ds)
   { dataSource=ds;
+  }
+  
+  public void setDialect(Dialect dialect)
+  { this.dialect=dialect;
   }
   
     
@@ -153,6 +159,9 @@ public abstract class AbstractSqlTool
   { 
     connection=dataSource.getConnection();
     connection.setAutoCommit(false);
+    if (dialect!=null)
+    { dialect.initConnection(connection);
+    }
 
   }
 
