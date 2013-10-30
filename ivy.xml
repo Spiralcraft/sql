@@ -10,5 +10,6 @@
     <dependency org="spiralcraft" name="distrib-common" rev="[0.4.17-dev1,0.5-dev["/>
     <dependency org="hsqldb" name="hsqldb" rev="[2.2.8,)"/>
     <dependency org="postgresql" name="jdbc4" rev="latest.integration"/>
+    <dependency org="mysql" name="connector-java" rev="latest.integration"/>
   </dependencies>
 </ivy-module>
