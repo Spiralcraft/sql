@@ -87,6 +87,7 @@ public class SchemaMapping
         if (mapping.getTableName()==null)
         { log.warning("Table name is null for "+type);
         }
+        mapping.setEntity(entity);
         mappings.add(mapping);
       }
     }

@@ -26,7 +26,9 @@ import spiralcraft.data.Field;
 import spiralcraft.data.Key;
 
 import spiralcraft.data.access.CursorAggregate;
+import spiralcraft.data.access.Entity;
 import spiralcraft.data.access.EntityAccessor;
+import spiralcraft.data.access.EntityField;
 import spiralcraft.data.access.cache.EntityCache;
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.EquiJoin;
@@ -82,6 +84,7 @@ public class TableMapping
   private Type<?> type;
   private String tableName;
   private String schemaName;
+  private Entity entity;
   private ArrayList<ColumnMapping> columnMappings
     =new ArrayList<ColumnMapping>();
   private Scan scan;
@@ -110,6 +113,11 @@ public class TableMapping
   private WhereClause primaryKeyWhereClause;
   private TableName tableNameSqlFragment;
   
+  public TableMapping()
+  {
+  
+  }
+  
   public Type<?> getType()
   { return type;
   }
@@ -130,6 +138,10 @@ public class TableMapping
   
   public EntityCache getCache()
   { return cache;
+  }
+  
+  public void setEntity(Entity entity)
+  { this.entity=entity;
   }
   
   @Override
@@ -521,7 +533,14 @@ public class TableMapping
         columnMapping=new ColumnMapping();
         columnMapping.setStore(sqlStore);        
         columnMapping.setField(field);
-        columnMapping.setPath(new Path().append(field.getName()));        
+        columnMapping.setPath(new Path().append(field.getName()));   
+        if (entity!=null)
+        {
+          EntityField storeField=entity.getField(field);
+          if (storeField!=null)
+          { columnMapping.setEntityField(storeField);
+          }
+        }
         columnMapping.resolve();
         
         // Check to make sure the type is resolvable
@@ -544,7 +563,15 @@ public class TableMapping
       // Mapping has been manually specified
       columnMapping.setStore(sqlStore);
       columnMapping.setField(field);
+
       columnMapping.setPath(new Path().append(field.getName()));
+      if (entity!=null)
+      {
+        EntityField storeField=entity.getField(field);
+        if (storeField!=null)
+        { columnMapping.setEntityField(storeField);
+        }
+      }
       columnMapping.resolve();
       
     }

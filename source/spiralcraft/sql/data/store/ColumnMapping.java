@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import spiralcraft.data.Type;
+import spiralcraft.data.access.EntityField;
 
 
 /**
@@ -72,6 +73,7 @@ public class ColumnMapping
   private BooleanCondition parameterizedKeyCondition;
   private SqlStore store;
   private boolean resolved;
+  private EntityField entityField;
   
   public ColumnMapping()
   {
@@ -106,6 +108,14 @@ public class ColumnMapping
   
   public Converter<?,?> getConverter()
   { return converter;
+  }
+  
+  public void setEntityField(EntityField entityField)
+  { 
+    this.entityField=entityField;
+    if (entityField.getStoreName()!=null)
+    { this.columnName=entityField.getStoreName();
+    }
   }
   
   /**

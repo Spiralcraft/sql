@@ -118,6 +118,7 @@ public class SqlStore
   
   private Dialect dialect;
   private boolean autoUpgrade;
+  private boolean checkSchema=true;
   private Level statementLogLevel=Level.INFO;
   
   public SqlStore()
@@ -165,6 +166,10 @@ public class SqlStore
   { this.autoUpgrade=autoUpgrade;
   }
   
+  public void setCheckSchema(boolean checkSchema)
+  { this.checkSchema=checkSchema;
+  }
+  
   /**
    * Obtain a direct reference to the TypeManager that maps 
    *   metadata objects to SQL objects
@@ -195,6 +200,7 @@ public class SqlStore
     { typeManager.setDialect(dialect);
     }
     typeManager.setAutoUpgrade(autoUpgrade);
+    typeManager.setCheckSchema(checkSchema);
     typeManager.resolve();
 
   }

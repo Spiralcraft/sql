@@ -90,6 +90,7 @@ public class TypeManager
   private String schemaName;
   
   private boolean autoUpgrade;
+  private boolean checkSchema=true;
   
   public SchemaMapping[] getSchemaMappings()
   { return schemaMappings;
@@ -140,6 +141,15 @@ public class TypeManager
    */
   void setAutoUpgrade(boolean autoUpgrade)
   { this.autoUpgrade=autoUpgrade;
+  }
+
+  /**
+   * Specify whether the database schema on the database server will be 
+   *   automatically upgraded if it is not in synch with the packaged data
+   *   definitions. 
+   */
+  void setCheckSchema(boolean checkSchema)
+  { this.checkSchema=checkSchema;
   }
   
   /**
@@ -356,6 +366,10 @@ public class TypeManager
   public void ensureDataVersion()
     throws DataException
   {
+    if (!checkSchema)
+    { return;
+    }
+    
     List<DDLStatement> upgrades=generateUpdateDDL();
     if (upgrades.size()>0)
     { 
