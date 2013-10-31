@@ -20,6 +20,34 @@
         </revision>
         
         <notes>
+          <scm:Note>Respect EntityField storeName mappings when naming columns
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/
+        </path>
+        
+        <resources>
+          <URI>ColumnMapping.java
+          </URI>
+          <URI>SchemaMapping.java
+          </URI>
+          <URI>SqlStore.java
+          </URI>
+          <URI>TableMapping.java
+          </URI>
+          <URI>TypeManager.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
           <scm:Note>Mysql integration
           </scm:Note>
           
