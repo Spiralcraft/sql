@@ -114,7 +114,7 @@ public class ColumnMapping
   { 
     this.entityField=entityField;
     if (this.entityField.getStoreName()!=null)
-    { this.columnName=entityField.getStoreName();
+    { this.columnName=this.entityField.getStoreName();
     }
   }
   
