@@ -20,6 +20,29 @@
         </revision>
         
         <notes>
+          <scm:Note>Fix issue where scale field of numeric type did not
+            make it into the DDL.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/mappers/BigDecimalTypeMapper.java
+          </URI>
+          <URI>model/Column.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev11
+        </revision>
+        
+        <notes>
           <scm:Note>Respect EntityField storeName mappings when naming columns
           </scm:Note>
           
