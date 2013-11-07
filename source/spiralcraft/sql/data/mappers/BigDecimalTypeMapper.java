@@ -47,7 +47,7 @@ public class BigDecimalTypeMapper
     { col.setLength(type.getPrecision());
     }
     if (type.getScale()>0)
-    { col.setLength(type.getScale());
+    { col.setDecimalDigits(type.getScale());
     }
     dialect.specifyColumn(type,col);
     

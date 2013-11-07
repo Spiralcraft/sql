@@ -201,7 +201,9 @@ public class Column
           );
       ret.add(statement);
     }
-    else if (length!=null && storeVersion.getLength()!=length)
+    else if (length!=null && storeVersion.getLength()!=length
+             || decimalDigits!=null && storeVersion.getDecimalDigits()!=decimalDigits
+             )
     {
       // Alter column here
       AlterTableStatement statement
