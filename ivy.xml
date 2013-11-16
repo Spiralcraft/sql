@@ -2,14 +2,20 @@
 <ivy-module version="2.0">
   <info organisation="spiralcraft" module="sql">
   </info>
+  
+  <configurations defaultconf="runtime">
+    <conf name="runtime" />
+    <conf name="all"/>
+  </configurations>
+  
   <publications>
     <artifact name="spiralcraft-sql" type="jar" ext="jar"/>
     <artifact name="spiralcraft-sql-test" type="jar" ext="jar"/>
   </publications> 
   <dependencies>
-    <dependency org="spiralcraft" name="distrib-common" rev="[0.4.17-dev1,0.5-dev["/>
-    <dependency org="hsqldb" name="hsqldb" rev="[2.2.8,)"/>
-    <dependency org="postgresql" name="jdbc4" rev="latest.integration"/>
-    <dependency org="mysql" name="connector-java" rev="latest.integration"/>
+    <dependency org="spiralcraft" name="distrib-common" rev="[0.4.17-dev1,0.5-dev[" conf="*"/>
+    <dependency org="hsqldb" name="hsqldb" rev="[2.2.8,)" conf="*"/>
+    <dependency org="postgresql" name="jdbc4" rev="latest.integration" conf="all->default"/>
+    <dependency org="mysql" name="connector-java" rev="latest.integration" conf="all->default"/>
   </dependencies>
 </ivy-module>
