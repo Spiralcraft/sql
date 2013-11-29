@@ -16,6 +16,84 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev12
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix issue where entity attributes were not being read
+            and triggers were not being run.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store
+        </path>
+        
+        <resources>
+          <URI>SqlStore.java
+          </URI>
+          <URI>SqlUpdater.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev12
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix issue where keys defined in base types were not
+            translated into SQL constraints
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/TableMapping.java
+        </path>
+
+      </scm:Change>
+
+
+      <scm:Change>
+        <revision>-dev12
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix NPE when there is no parameter/parent Focus for 
+            query. 
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/query/BoundSqlQuery.java
+        </path>
+
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev12
+        </revision>
+        
+        <notes>
+          <scm:Note>Suppress log messages
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/ResultSetMapping.java
+          </URI>
+          <URI>data/store/TypeManager.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev11
         </revision>
         

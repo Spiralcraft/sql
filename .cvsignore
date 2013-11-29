@@ -2,3 +2,4 @@ out
 bin
 test-out
 build-local.properties
+packages
