@@ -237,13 +237,20 @@ public class SqlStore
     { throw new BindException("Error resolving data model",x);
     }
     
+    typeManager.setLogLevel(debugLevel);
     TableMapping[] mappings=typeManager.getTableMappings();
     for (TableMapping mapping: mappings) 
     { 
-      EntityBinding binding=createEntityBinding(new Entity(mapping.getType()));
+      
+      EntityBinding binding=createEntityBinding
+        (mapping.getEntity()!=null
+          ?mapping.getEntity()
+          :new Entity(mapping.getType())
+        );
+      // log.fine("Binding: "+binding.getEntity().getName());
       binding.setAuthoritative(true);
       binding.setAccessor(mapping);
-      binding.setUpdater(mapping.getUpdater());   
+      binding.setUpdater(mapping.getUpdater());
       addEntityBinding(binding);
       
     }
@@ -256,7 +263,19 @@ public class SqlStore
     }
     return focus;
   }
-
+  
+  /**
+   * Indicates that this Store represents the authoritative copy of the data
+   *   for the specified Type, and should be used to handle data updates.
+   */
+  @Override
+  public boolean isAuthoritative(Type<?> type)
+  { 
+    if (debugLevel.isFine())
+    { log.fine(super.isAuthoritative(type)+" "+type+" "+getName());
+    }
+    return super.isAuthoritative(type);
+  }
   
   @Override
   public void start()
@@ -324,7 +343,9 @@ public class SqlStore
       { 
         
         conn=getContextConnection();
-        log.fine("Connection: "+conn);
+        if (debugLevel.isFine())
+        { log.fine("Connection: "+conn);
+        }
         autoCommit=conn.getAutoCommit();
         if (!branch.is2PC())
         { conn.setAutoCommit(false);
@@ -338,7 +359,9 @@ public class SqlStore
           try
           {
             sqlStatement.executeUpdate(buff.toString());
-            log.fine("Executed "+buff.toString());
+            if (debugLevel.isFine())
+            { log.fine("Executed "+buff.toString());
+            }
           }
           catch (SQLException x)
           { throw new SQLException("Failed to execute DDL: "+buff,x);
@@ -590,17 +613,26 @@ public class SqlStore
             Resource xmlData
               =container.getChild(mapping.getTableName()+".data.xml");
             if (xmlData.exists())
-            { log.fine(xmlData.getURI()+" exists");
+            { 
+              if (debugLevel.isFine())
+              { log.fine(xmlData.getURI()+" exists");
+              }
             }
             else 
             { 
               log.fine(xmlData.getURI()+" not found");            
               xmlData=container.getChild(mapping.getTableName()+".xml");
               if (xmlData.exists())
-              { log.fine(xmlData.getURI()+" exists");
+              { 
+                if (debugLevel.isFine())
+                { log.fine(xmlData.getURI()+" exists");
+                }
               }
               else
-              { log.fine(xmlData.getURI()+" not found");
+              { 
+                if (debugLevel.isFine())
+                { log.fine(xmlData.getURI()+" not found");
+                }
               }
             }
             

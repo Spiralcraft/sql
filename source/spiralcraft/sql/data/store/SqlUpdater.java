@@ -27,11 +27,13 @@ import spiralcraft.data.spi.ArrayJournalTuple;
 
 import spiralcraft.data.access.Updater;
 import spiralcraft.data.access.cache.EntityCache;
+import spiralcraft.data.access.kit.EntityBinding;
 
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.reflect.BeanReflector;
 import spiralcraft.lang.spi.ThreadLocalChannel;
+import spiralcraft.lang.util.LangUtil;
 import spiralcraft.sql.dml.InsertStatement;
 import spiralcraft.sql.dml.DeleteStatement;
 import spiralcraft.sql.dml.UpdateStatement;
@@ -76,6 +78,7 @@ public class SqlUpdater
     =new HashMap<SqlFragment,BoundUpdateStatement>();
   
   private List<Path> derivedStoredFields;
+  private EntityBinding entityBinding;
   
   public SqlUpdater(SqlStore store,TableMapping tableMapping)
   { 
@@ -259,6 +262,7 @@ public class SqlUpdater
       =new ThreadLocalChannel<DeltaTuple>
         (DataReflector.<DeltaTuple>getInstance(tableMapping.getType()));
     paramFocus=focus.chain(tuple);
+    entityBinding=LangUtil.assertInstance(EntityBinding.class,focus);
     return super.bind(focus);
   }
 
@@ -275,14 +279,16 @@ public class SqlUpdater
   @Override
   public void dataFinalize() throws DataException
   {
+    super.dataFinalize();
     
     try
     {
-      super.dataFinalize();
       batch.get().flush();
     }
     finally
-    { batch.pop();
+    { 
+      tuple.pop();
+      batch.pop();
     }
   }
   
@@ -292,19 +298,46 @@ public class SqlUpdater
     throws DataException
   {
     super.dataAvailable(buffer);
+    
     DeltaTuple deltaTuple=checkBuffer(buffer);
     tuple.set(deltaTuple);
     if (!deltaTuple.isDirty())
     { return;
     }
-    if (deltaTuple.getOriginal()==null)
-    { batch.get().execute(getInsertStatement(deltaTuple));
+    
+    localChannel.push(deltaTuple);
+    try
+    {
+      if (deltaTuple.getOriginal()==null)
+      { 
+        deltaTuple=entityBinding.beforeInsert(deltaTuple);
+        if (deltaTuple==null)
+        { return;
+        }      
+        batch.get().execute(getInsertStatement(deltaTuple));
+        entityBinding.afterInsert(deltaTuple);
+      }
+      else if (deltaTuple.isDelete())
+      { 
+        deltaTuple=entityBinding.beforeDelete(deltaTuple);
+        if (deltaTuple==null)
+        { return;
+        }      
+        batch.get().execute(getDeleteStatement());
+        entityBinding.afterDelete(deltaTuple);
+      }
+      else
+      { 
+        deltaTuple=entityBinding.beforeUpdate(deltaTuple);
+        if (deltaTuple==null)
+        { return;
+        }      
+        batch.get().execute(getUpdateStatement(deltaTuple));
+        entityBinding.afterDelete(deltaTuple);
+      }
     }
-    else if (deltaTuple.isDelete())
-    { batch.get().execute(getDeleteStatement());
-    }
-    else
-    { batch.get().execute(getUpdateStatement(deltaTuple));
+    finally
+    { localChannel.pop();
     }
     
     if (cache!=null)
