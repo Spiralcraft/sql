@@ -23,6 +23,7 @@ import spiralcraft.data.reflect.ReflectionField;
 import spiralcraft.data.reflect.ReflectionType;
 
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import spiralcraft.sql.model.MetaData;
 import spiralcraft.sql.model.Schema;
@@ -91,6 +92,7 @@ public class TypeManager
   
   private boolean autoUpgrade;
   private boolean checkSchema=true;
+  private Level logLevel=Level.INFO;
   
   public SchemaMapping[] getSchemaMappings()
   { return schemaMappings;
@@ -106,6 +108,10 @@ public class TypeManager
   
   public void setTableMappings(TableMapping[] tableMappings)
   { this.configuredTableMappings=tableMappings;
+  }
+  
+  public void setLogLevel(Level logLevel)
+  { this.logLevel=logLevel;
   }
 
   /**
@@ -377,7 +383,9 @@ public class TypeManager
       { 
         StringBuilder buff=new StringBuilder();
         statement.write(buff,"", null);
-        log.fine(buff.toString());
+        if (logLevel.isFine())
+        { log.fine(buff.toString());
+        }
       }
       if (!autoUpgrade)
       {

@@ -19,6 +19,7 @@ import spiralcraft.data.FieldSet;
 import spiralcraft.data.Field;
 import spiralcraft.data.Scheme;
 import spiralcraft.log.ClassLog;
+import spiralcraft.log.Level;
 
 import spiralcraft.util.tree.LinkedTree;
 
@@ -38,6 +39,7 @@ public class ResultSetMapping
   final ResultColumnMapping[] map;
   final FieldSet fieldSet;
   int totalColumnCount;
+  private Level logLevel=Level.INFO;
   
   private ResultSetMapping(FieldSet fieldSet)
   {
@@ -78,7 +80,9 @@ public class ResultSetMapping
 
   private void applyFoldTree(LinkedTree<ResultColumnMapping> foldTree)
   {
-    log.fine("Computing ResultSetMapping for "+fieldSet);
+    if (logLevel.isFine())
+    { log.fine("Computing ResultSetMapping for "+fieldSet);
+    }
 
     if (baseExtent!=null)
     { baseExtent.applyFoldTree(foldTree);
@@ -99,7 +103,9 @@ public class ResultSetMapping
       {        
         if (--offset>=0)
         { 
-          log.fine("Skipping base extent field "+node.get());
+          if (logLevel.isFine())
+          { log.fine("Skipping base extent field "+node.get());
+          }
           // Skip base extent nodes
           continue;
         }
@@ -119,7 +125,10 @@ public class ResultSetMapping
               )
         { 
           // Skip fields that are not in the db
-          log.fine("Skipping non-persistent field "+field.getURI()+" map position "+field.getIndex());
+          if (logLevel.isFine())
+          { log.fine("Skipping non-persistent field "+field.getURI()
+              +" map position "+field.getIndex());
+          }
           map[field.getIndex()]=null;
           subs[field.getIndex()]=null;
           if (fieldIterator.hasNext())
@@ -131,19 +140,25 @@ public class ResultSetMapping
         }
         if (field==null)
         { 
-          log.fine("No more fields...done");
+          if (logLevel.isFine())
+          { log.fine("No more fields...done");
+          }
           break;
         }
         
         
         if (node.get()!=null)
         { 
-          log.fine("Mapping["+field.getIndex()+"] "+field+" to "+node.get());
+          if (logLevel.isFine())
+          { log.fine("Mapping["+field.getIndex()+"] "+field+" to "+node.get());
+          }
           map[field.getIndex()]=node.get();
         }
         if (!node.isLeaf())
         { 
-          log.fine("SubMapping["+field.getIndex()+"] "+field);
+          if (logLevel.isFine())
+          { log.fine("SubMapping["+field.getIndex()+"] "+field);
+          }
           subs[field.getIndex()]
             =new ResultSetMapping
               (field.getType().getScheme()
@@ -154,7 +169,9 @@ public class ResultSetMapping
         
       }
       totalColumnCount=baseColumnCount+i;
-      log.fine("Column count is "+totalColumnCount);
+      if (logLevel.isFine())
+      { log.fine("Column count is "+totalColumnCount);
+      }
     }
     else
     { defaultMap();
@@ -171,11 +188,15 @@ public class ResultSetMapping
   
   private void defaultMap()
   {
-    log.fine("Default mapping "+fieldSet);
+    if (logLevel.isFine())
+    { log.fine("Default mapping "+fieldSet);
+    }
     for (Field<?> field: fieldSet.fieldIterable())
     { 
       map[field.getIndex()]=new ResultColumnMapping(field.getIndex()+1);
-      log.fine("Default Mapping["+field.getIndex()+"] "+field+" to "+map[field.getIndex()]);
+      if (logLevel.isFine())
+      { log.fine("Default Mapping["+field.getIndex()+"] "+field+" to "+map[field.getIndex()]);
+      }
     }
     totalColumnCount=fieldSet.getFieldCount();
   }
