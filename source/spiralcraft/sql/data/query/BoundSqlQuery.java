@@ -31,6 +31,7 @@ import spiralcraft.sql.data.store.SqlStore;
 
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
+import spiralcraft.lang.SimpleFocus;
 
 public abstract class BoundSqlQuery<Tq extends Query>
   extends BoundQuery<Tq,Tuple>
@@ -48,10 +49,19 @@ public abstract class BoundSqlQuery<Tq extends Query>
     super(query,parentFocus);
     try
     {
-      focus=parentFocus.telescope
-        (new CursorBinding
-          (new ManualCursor(query.getFieldSet()))
-        );
+      if (parentFocus!=null)
+      {
+        focus=parentFocus.telescope
+          (new CursorBinding
+            (new ManualCursor(query.getFieldSet()))
+          );
+      }
+      else
+      { 
+        focus=
+          new SimpleFocus
+            (new CursorBinding(new ManualCursor(query.getFieldSet())));
+      }
     }
     catch (BindException x)
     { throw new DataException("Error",x);
