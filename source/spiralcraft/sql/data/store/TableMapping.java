@@ -140,8 +140,20 @@ public class TableMapping
   { return cache;
   }
   
+  /**
+   * 
+   * @param entity The schema entity associated with this table
+   */
   public void setEntity(Entity entity)
   { this.entity=entity;
+  }
+  
+  /**
+   * 
+   * @return The schema entity associated with this table
+   */
+  public Entity getEntity()
+  { return entity;
   }
   
   @Override
@@ -233,7 +245,14 @@ public class TableMapping
   }
   
   private BoundScan getBoundScan()
-  { return boundScan;
+    throws DataException
+  { 
+    if (boundScan==null)
+    { 
+      boundScan=new BoundScan(getScan(),focus,this.sqlStore,this);
+      boundScan.resolve();    
+    }
+    return boundScan;
   }
 
   public void setType(Type<?> type)
@@ -354,10 +373,12 @@ public class TableMapping
     throws DataException
   {
     if (this.type==type)
-    { return boundScan;
+    { return getBoundScan();
     }
     else
-    { return null;
+    { 
+      log.fine(this.type.getURI()+" != "+type.getURI());
+      return null;
     }
   }
   
@@ -636,7 +657,11 @@ public class TableMapping
       }
     }
 
-    for (Key<?> key: type.getScheme().keyIterable())
+    if (type.getScheme()==null)
+    { throw new DataException("Type has no scheme "+type);
+    }
+    
+    for (Key<?> key: type.getKeys())
     { 
       KeyConstraint constraint=new KeyConstraint();
       ArrayList<Column> keyCols=new ArrayList<Column>();
