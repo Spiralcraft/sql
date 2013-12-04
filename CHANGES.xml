@@ -23,6 +23,10 @@
           <scm:Note>Fix issue where entity attributes were not being read
             and triggers were not being run.
           </scm:Note>
+          <scm:Note>Fix issue where calculated fields based on external data
+            caused a bind failure on initialization because initial focus did
+            not reference a queryable.
+          </scm:Note>
           
         </notes>
         
@@ -33,6 +37,8 @@
           <URI>SqlStore.java
           </URI>
           <URI>SqlUpdater.java
+          </URI>
+          <URI>TableMapping.java
           </URI>
         </resources>
 
