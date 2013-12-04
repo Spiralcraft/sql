@@ -160,9 +160,7 @@ public class TableMapping
   public Focus<?> bind(Focus<?> context)
     throws ContextualException
   { 
-    this.focus=context;
-    boundScan=new BoundScan(getScan(),focus,this.sqlStore,this);
-    boundScan.resolve();    
+    this.focus=context;   
     return context;
   }
   
@@ -261,6 +259,10 @@ public class TableMapping
   
   public String getTableName()
   { return tableName;
+  }
+  
+  void setFocus(Focus<?> focus)
+  { this.focus=focus;
   }
   
   public String getQualifiedTableName()

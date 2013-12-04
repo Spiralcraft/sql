@@ -241,7 +241,7 @@ public class SqlStore
     TableMapping[] mappings=typeManager.getTableMappings();
     for (TableMapping mapping: mappings) 
     { 
-      
+      mapping.setFocus(focus);
       EntityBinding binding=createEntityBinding
         (mapping.getEntity()!=null
           ?mapping.getEntity()
