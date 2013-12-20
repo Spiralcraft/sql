@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev13
+        </revision>
+        
+        <notes>
+          <scm:Note>Remove extraneous logging
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/query/BoundSelection.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev12
         </revision>
         
