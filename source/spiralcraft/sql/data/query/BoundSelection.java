@@ -83,7 +83,9 @@ public class BoundSelection
   protected BoundQueryStatement composeStatement()
     throws DataException
   {
-    log.fine("Composing "+this+" "+getQuery());
+    if (debugLevel.isFine())
+    { log.fine("Composing "+this+" "+getQuery());
+    }
     BoundQueryStatement statement
       =new BoundQueryStatement(store,mapping.getType().getFieldSet());
 
@@ -99,7 +101,9 @@ public class BoundSelection
     
     if (criteria!=null)
     {
-      log.fine("BoundSelection: Criteria = "+criteria);
+      if (debugLevel.isFine())
+      { log.fine("BoundSelection: Criteria = "+criteria);
+      }
       CriteriaTranslator translator
         =new CriteriaTranslator(criteria,statement);
 
