@@ -175,7 +175,7 @@ public class SqlBranch
         { xar.end(xid,XAResource.TMFAIL); 
         }
         catch (XAException e)
-        { log.log(Level.WARNING,"Error ending transaction "+xid);
+        { log.log(Level.WARNING,"Error ending transaction "+xid,e);
         }
         
         if (logLevel.isFine())
