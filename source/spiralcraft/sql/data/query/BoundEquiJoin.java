@@ -54,7 +54,6 @@ public class BoundEquiJoin
   implements KeyedDataProvider
 {
   
-  private final TableMapping mapping;
   private Projection<Tuple> projection;
   private CacheIndex cacheIndex;
   
@@ -62,9 +61,8 @@ public class BoundEquiJoin
     (EquiJoin query,Focus<?> parentFocus,SqlStore store,TableMapping mapping)
     throws DataException
   { 
-    super(query,parentFocus,store);
+    super(query,parentFocus,store,mapping);
     
-    this.mapping=mapping;
     List<Query> sources=query.getSources();
     if (sources.size()<1)
     { throw new DataException(getClass().getName()+": No source to bind to");
@@ -173,9 +171,10 @@ public class BoundEquiJoin
     }
     else
     {
+      // Return a cache cursor
       SerialResultSetCursor cursor
           =statement.execute(parameterKey); 
-      return cursor;
+      return mapping.getCache().cache(cursor);
     }
   }
   

@@ -40,7 +40,6 @@ public class BoundSelection
   
   private Expression<Boolean> criteria;
   private Expression<Boolean> remainderCriteria;
-  private final TableMapping mapping;
 
   
   public BoundSelection
@@ -51,8 +50,7 @@ public class BoundSelection
     )
     throws DataException
   { 
-    super(selection,parentFocus,store);
-    this.mapping=mapping;
+    super(selection,parentFocus,store,mapping);
     this.criteria=selection.getConstraints();
     List<Query> sources=selection.getSources();
     if (sources.size()<1)

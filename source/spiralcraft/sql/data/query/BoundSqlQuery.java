@@ -16,19 +16,15 @@ package spiralcraft.sql.data.query;
 
 import spiralcraft.data.DataException;
 import spiralcraft.data.Tuple;
-
 import spiralcraft.data.lang.CursorBinding;
-
 import spiralcraft.data.query.BoundQuery;
 import spiralcraft.data.query.Query;
 import spiralcraft.data.spi.ManualCursor;
-
 import spiralcraft.data.access.SerialCursor;
-
 import spiralcraft.sql.data.SerialResultSetCursor;
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.SqlStore;
-
+import spiralcraft.sql.data.store.TableMapping;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.SimpleFocus;
@@ -38,15 +34,18 @@ public abstract class BoundSqlQuery<Tq extends Query>
 {
   protected final Focus<?> focus;
   protected final SqlStore store;
+  protected final TableMapping mapping;
   protected boolean resolved;
   protected BoundQueryStatement statement;
   
   @SuppressWarnings({ "unchecked", "rawtypes"
     })
-  public BoundSqlQuery(Tq query,Focus<?> parentFocus,SqlStore store)
+  public BoundSqlQuery
+    (Tq query,Focus<?> parentFocus,SqlStore store,TableMapping tableMapping)
     throws DataException
   { 
     super(query,parentFocus);
+    this.mapping=tableMapping;
     try
     {
       if (parentFocus!=null)
@@ -73,7 +72,10 @@ public abstract class BoundSqlQuery<Tq extends Query>
   protected abstract BoundQueryStatement composeStatement()
     throws DataException;
 
-
+  
+  public TableMapping getTableMapping()
+  { return mapping;
+  }
   
   @Override
   public void resolve()
@@ -94,8 +96,9 @@ public abstract class BoundSqlQuery<Tq extends Query>
     
     Object[] parameterKey=statement.makeParameterKey();
 
+    // Return a cache cursor
     SerialResultSetCursor cursor
         =statement.execute(parameterKey); 
-    return cursor;
+    return mapping.getCache().cache(cursor);
   }
 }

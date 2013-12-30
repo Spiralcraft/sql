@@ -29,13 +29,12 @@ import spiralcraft.sql.dml.SelectStatement;
 
 
 /**
- * A SQL implementatin of the basic Scan Query. 
+ * A SQL implementation of the basic Scan Query. 
  */
 public class BoundScan
   extends BoundSqlQuery<Scan>
 {
     
-  private final TableMapping tableMapping;
   
   public BoundScan
     (Scan query
@@ -45,20 +44,16 @@ public class BoundScan
     )
     throws DataException
   { 
-    super(query,parentFocus,store);
-    this.tableMapping=table;
+    super(query,parentFocus,store,table);
   }
-  
-  public TableMapping getTableMapping()
-  { return tableMapping;
-  }
+
   
   @Override
   protected BoundQueryStatement composeStatement()
     throws DataException
   {
     BoundQueryStatement statement
-      =new BoundQueryStatement(store,tableMapping.getType().getFieldSet());
+      =new BoundQueryStatement(store,mapping.getType().getFieldSet());
     
     Scan scan=getQuery();
     
@@ -69,15 +64,15 @@ public class BoundScan
         ("Scan Query must specify a Type when executed against a SqlStore");
     }
     
-    statement.setPrimaryTableMapping(tableMapping);
+    statement.setPrimaryTableMapping(mapping);
 
     SelectStatement select=new SelectStatement();
-    select.setFromClause(tableMapping.getFromClause());
+    select.setFromClause(mapping.getFromClause());
 
-    select.setSelectList(tableMapping.getSelectList());
+    select.setSelectList(mapping.getSelectList());
     
     statement.setSqlFragment(select);
-    statement.setResultSetMapping(tableMapping.getResultSetMapping());
+    statement.setResultSetMapping(mapping.getResultSetMapping());
     return statement;
   }
   
