@@ -16,6 +16,34 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev14
+        </revision>
+        
+        <notes>
+          <scm:Note>Ensure that all queries return data that is synchronized
+            with the cache.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data
+        </path>
+        
+        <resources>
+          <URI>SerialResultSetCursor.java
+          </URI>
+          <URI>query/BoundEquiJoin.java
+          </URI>
+          <URI>query/BoundScan.java
+          </URI>
+          <URI>query/BoundSelection.java
+          </URI>
+          <URI>query/BoundSqlQuery.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev13
         </revision>
         
