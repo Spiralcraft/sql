@@ -46,7 +46,7 @@ public class SerialResultSetCursor
   protected final ResultSetTuple tuple;
   protected ResultSet resultSet;
   protected boolean autoClose=true;
-  protected boolean noCopy=true;
+  protected boolean noCopy=false;
   protected Identifier relationId=null;
   private static CursorBinding<Tuple,?> binding;
   protected Statement statement;
