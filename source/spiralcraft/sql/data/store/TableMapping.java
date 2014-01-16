@@ -195,34 +195,38 @@ public class TableMapping
         {
           BoundSelection boundSelection
             =new BoundSelection((Selection) query,focus,this.sqlStore,this);
+          boundSelection.setDebugLevel(logLevel);
+
+          boundSelection.resolve();
           if (logLevel.isFine())
           { 
             log.fine
               ("SqlStore.query: remainder="+boundSelection.getRemainderCriteria());
-          }
-          boundSelection.resolve();
+          }          
           return boundSelection;
         }
-        else if (factor instanceof EquiJoin)
-        { 
-          if (logLevel.isFine())
-          { 
-            log.fine("Factored selection "
-              +((Selection) query).getConstraints().getText()+" to EquiJoin");
-          }
-          BoundEquiJoin boundEquiJoin
-            =new BoundEquiJoin((EquiJoin) factor,focus,this.sqlStore,this);
-          boundEquiJoin.resolve();
-          return boundEquiJoin;
-        }
+// Premature
+//        else if (factor instanceof EquiJoin)
+//        { 
+//          if (logLevel.isFine())
+//          { 
+//            log.fine("Factored selection "
+//              +((Selection) query).getConstraints().getText()+" to EquiJoin");
+//          }
+//          BoundEquiJoin boundEquiJoin
+//            =new BoundEquiJoin((EquiJoin) factor,focus,this.sqlStore,this);
+//          boundEquiJoin.resolve();
+//          
+//          return boundEquiJoin;
+//        }
         else
-        { 
-          if (logLevel.isFine())
-          { 
-            log.fine("Factored selection "
-              +((Selection) query).getConstraints().getText()+" to "+factor);
-          }
-          factor.solve(focus,this);
+        { return null;
+//          if (logLevel.isFine())
+//          { 
+//            log.fine("Factored selection "
+//              +((Selection) query).getConstraints().getText()+" to "+factor);
+//          }
+//          factor.solve(focus,this);
         }
       }
       else if (query instanceof EquiJoin)

@@ -16,19 +16,21 @@ package spiralcraft.sql.data.query;
 
 import java.util.List;
 
+import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.Expression;
-
+import spiralcraft.lang.util.ContextualFilter;
 import spiralcraft.data.DataException;
-
+import spiralcraft.data.Tuple;
+import spiralcraft.data.access.SerialCursor;
+import spiralcraft.data.access.kit.FilteringSerialCursor;
+import spiralcraft.data.lang.DataReflector;
 import spiralcraft.data.query.Selection;
 import spiralcraft.data.query.Query;
-
 import spiralcraft.sql.data.store.BoundQueryStatement;
 import spiralcraft.sql.data.store.CriteriaTranslator;
 import spiralcraft.sql.data.store.SqlStore;
 import spiralcraft.sql.data.store.TableMapping;
-
 import spiralcraft.sql.dml.SelectStatement;
 
 /**
@@ -40,6 +42,7 @@ public class BoundSelection
   
   private Expression<Boolean> criteria;
   private Expression<Boolean> remainderCriteria;
+  private ContextualFilter<Tuple> filter;
 
   
   public BoundSelection
@@ -106,10 +109,31 @@ public class BoundSelection
         =new CriteriaTranslator(criteria,statement);
 
       if (translator.getWhereClause()!=null)
-      { select.setWhereClause(translator.getWhereClause());
+      { 
+        select.setWhereClause(translator.getWhereClause());
+        if (debugLevel.isFine())
+        { log.fine("WHERE clause = "+translator.getWhereClause());
+        }
       }
       remainderCriteria=translator.getFilterExpression();
-
+      if (remainderCriteria!=null)
+      {
+        if (debugLevel.isFine())
+        { log.fine("Post filter = "+remainderCriteria);
+        }
+        try
+        {
+          filter
+            =new ContextualFilter<Tuple>
+              (this.paramFocus
+              ,remainderCriteria
+              ,DataReflector.<Tuple>getInstance(mapping.getType())
+              );
+        }
+        catch (BindException x)
+        { throw new DataException("Error binding filter "+remainderCriteria,x);
+        }
+      }
     }
     
     statement.setSqlFragment(select);
@@ -118,5 +142,18 @@ public class BoundSelection
     
   }
   
+  @Override
+  protected SerialCursor<Tuple> doExecute()
+    throws DataException
+  { 
+    SerialCursor<Tuple> result=super.doExecute();
+    
+    if (filter==null)
+    { return result;
+    }
+    else
+    { return new FilteringSerialCursor<Tuple>(result,filter);
+    }
+  }  
 
 }
