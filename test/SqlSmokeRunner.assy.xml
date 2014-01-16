@@ -426,6 +426,15 @@
           </testX>
         </test:Assertion>        
         
+        <test:Assertion>
+          <name>Non-optimizable select
+          </name>
+          <subjectX>[*dtask:Fetch{[@example:Customer.list],`true==false || .id==105` }].()
+          </subjectX>
+          <testX>.@size()==1
+          </testX>
+      
+        </test:Assertion>
       </sequence>
       
       

@@ -16,6 +16,29 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev15
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix issue where the remainder of select query that could not
+            be further self-factored was ignored, resulting in extra rows
+            being returned.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data
+        </path>
+        
+        <resources>
+          <URI>query/BoundSelection.java
+          </URI>
+          <URI>store/TableMapping.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev14
         </revision>
         
