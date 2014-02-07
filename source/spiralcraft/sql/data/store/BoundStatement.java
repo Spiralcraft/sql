@@ -28,14 +28,12 @@ import java.sql.SQLSyntaxErrorException;
 import spiralcraft.data.DataException;
 import spiralcraft.data.FieldSet;
 import spiralcraft.data.Field;
-
 import spiralcraft.sql.SqlFragment;
-
 import spiralcraft.sql.converters.Converter;
 import spiralcraft.sql.dml.ValueExpression;
 import spiralcraft.sql.dml.IdentifierChain;
-
 import spiralcraft.util.Path;
+import spiralcraft.util.string.StringPool;
 
 import java.util.ArrayList;
 
@@ -98,7 +96,8 @@ public abstract class BoundStatement
   { 
     parameterExpressions.clear();
     this.sqlFragment=sqlFragment;
-    statementText=sqlFragment.generateSQL(parameterExpressions);
+    statementText
+      =StringPool.INSTANCE.get(sqlFragment.generateSQL(parameterExpressions));
     if (logLevel.isFine())
     { log.fine(toString()+": Creating "+statementText);
     }
