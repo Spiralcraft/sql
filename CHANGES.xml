@@ -16,6 +16,22 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev16
+        </revision>
+        
+        <notes>
+          <scm:Note>Pool statementText to keep memory usage down when query
+            is bound multiple times.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/store/BoundStatement.java
+        </path>
+
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev15
         </revision>
         
