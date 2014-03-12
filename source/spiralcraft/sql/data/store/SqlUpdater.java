@@ -20,15 +20,13 @@ import spiralcraft.data.Field;
 import spiralcraft.data.FieldSet;
 
 
+import spiralcraft.data.JournalTuple;
 import spiralcraft.data.lang.DataReflector;
 import spiralcraft.data.session.BufferTuple;
 import spiralcraft.data.spi.ArrayDeltaTuple;
-import spiralcraft.data.spi.ArrayJournalTuple;
-
 import spiralcraft.data.access.Updater;
 import spiralcraft.data.access.cache.EntityCache;
 import spiralcraft.data.access.kit.EntityBinding;
-
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Focus;
 import spiralcraft.lang.reflect.BeanReflector;
@@ -39,15 +37,13 @@ import spiralcraft.sql.dml.DeleteStatement;
 import spiralcraft.sql.dml.UpdateStatement;
 import spiralcraft.sql.dml.TableValueConstructor;
 import spiralcraft.sql.dml.RowValueConstructorElements;
-
 import spiralcraft.sql.SqlFragment;
-
 import spiralcraft.util.Path;
+
 
 
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.ArrayList;
 
 /**
@@ -342,7 +338,7 @@ public class SqlUpdater
     
     if (cache!=null)
     { 
-      ArrayJournalTuple newOriginal=cache.update(deltaTuple);
+      JournalTuple newOriginal=cache.update(deltaTuple);
       if (buffer instanceof BufferTuple)
       { ((BufferTuple) buffer).updateOriginal(newOriginal);
       } 
