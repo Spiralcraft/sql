@@ -1,7 +1,7 @@
 <project name="spiralcraft-sql" default="build" basedir=".">
 
   <property name="module" value="sql"/>
-  <property name="buildVersion" value="0.4.17-dev16"/>
+  <property name="buildVersion" value="0.4.17-dev17"/>
   <property name="build.status" value="milestone"/>
   <property name="classpath" value="lib/spiralcraft-core.jar;lib/spiralcraft-core-test.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>

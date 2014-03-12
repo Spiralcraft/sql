@@ -16,6 +16,21 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev17
+        </revision>
+        
+        <notes>
+          <scm:Note>Account for changed data cache interface in spiralcraft.core
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/store/SqlUpdater.java
+        </path>
+
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev16
         </revision>
         
