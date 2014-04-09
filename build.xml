@@ -1,12 +1,13 @@
 <project name="spiralcraft-sql" default="build" basedir=".">
 
+  <property name="organization" value="spiralcraft"/>
   <property name="module" value="sql"/>
-  <property name="buildVersion" value="0.4.17-dev17"/>
-  <property name="build.status" value="milestone"/>
+  <property name="buildVersion" value="0.4.17-dev18"/>
+  <property name="build.status" value="integration"/>
   <property name="classpath" value="lib/spiralcraft-core.jar;lib/spiralcraft-core-test.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
-
-  <import file="../../build/build-spiralcraft-common.xml"/>
+  <property name="depends.dir" location="../../repo"/>
+  <import file="../../build/build-common.xml"/>
     
         
 </project>
