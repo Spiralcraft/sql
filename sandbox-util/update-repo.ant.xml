@@ -1,0 +1,10 @@
+<project default="update-repo">
+  <property file="../sandbox.local.properties"/>
+	
+  <property name="repo.dir" location="../../../repo"/>
+
+  <property name="ivy-resolver" value="spiralcraft-release"/>
+
+  <import file="../build.xml"/>
+
+</project>
