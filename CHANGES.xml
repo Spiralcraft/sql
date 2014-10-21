@@ -16,6 +16,37 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev19
+        </revision>
+        
+        <notes>
+          <scm:Note>Support redefinition of primary key by dropping and adding
+            the primary key constraint.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>ddl/DDLStatement.java
+          </URI>
+          <URI>ddl/DropPrimaryKeyConstraintDefinition.java
+          </URI>
+          <URI>ddl/DropTableConstraintDefinition.java
+          </URI>
+          <URI>model/KeyConstraint.java
+          </URI>
+          <URI>model/Table.java
+          </URI>
+        </resources>
+
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev17
         </revision>
         
