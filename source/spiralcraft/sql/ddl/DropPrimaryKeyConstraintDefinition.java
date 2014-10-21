@@ -16,21 +16,18 @@ package spiralcraft.sql.ddl;
 
 import java.util.List;
 
-import spiralcraft.sql.SqlFragment;
 
-public abstract class DDLStatement
-    extends SqlFragment
+public class DropPrimaryKeyConstraintDefinition
+    extends AlterTableAction
 {
-  public static final DDLStatement EMPTY
-    =new DDLStatement()
-  {
-
-    @Override
-    public void write(
-      StringBuilder buffer,
-      String indent,
-      List<?> parameterCollector)
-    { }
-  };
-
+  
+  
+  public DropPrimaryKeyConstraintDefinition()
+  { 
+  }
+  
+  @Override
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
+  { buffer.append("DROP PRIMARY KEY");
+  }
 }

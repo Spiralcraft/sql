@@ -16,21 +16,19 @@ package spiralcraft.sql.ddl;
 
 import java.util.List;
 
-import spiralcraft.sql.SqlFragment;
 
-public abstract class DDLStatement
-    extends SqlFragment
+public class DropTableConstraintDefinition
+    extends AlterTableAction
 {
-  public static final DDLStatement EMPTY
-    =new DDLStatement()
-  {
-
-    @Override
-    public void write(
-      StringBuilder buffer,
-      String indent,
-      List<?> parameterCollector)
-    { }
-  };
-
+  
+  private String constraintName;
+  
+  public DropTableConstraintDefinition(String constraintName)
+  { this.constraintName=constraintName;
+  }
+  
+  @Override
+  public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
+  { buffer.append("DROP CONSTRAINT \""+constraintName+"\"");
+  }
 }

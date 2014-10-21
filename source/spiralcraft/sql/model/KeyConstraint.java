@@ -20,11 +20,11 @@ import java.util.List;
 import spiralcraft.log.ClassLog;
 import spiralcraft.log.Level;
 import spiralcraft.sql.Dialect;
-
-
 import spiralcraft.sql.ddl.AddTableConstraintDefinition;
 import spiralcraft.sql.ddl.AlterTableStatement;
 import spiralcraft.sql.ddl.DDLStatement;
+import spiralcraft.sql.ddl.DropPrimaryKeyConstraintDefinition;
+import spiralcraft.sql.ddl.DropTableConstraintDefinition;
 import spiralcraft.sql.ddl.PrimaryKeyConstraint;
 import spiralcraft.sql.ddl.UniqueConstraint;
 import spiralcraft.sql.ddl.TableConstraintDefinition;
@@ -43,16 +43,19 @@ public class KeyConstraint
   private boolean primary;
   private boolean unique;
   private Table table;
+  private String constraintName;
   
   public KeyConstraint()
   {
   }
 
-  public KeyConstraint(Table table,ResultSet rs,boolean primary)
+  public KeyConstraint(String constraintName,Table table,ResultSet rs,boolean primary)
     throws SQLException
   {
+    this.constraintName=constraintName;
     this.table=table;
     List<Column> columns=new ArrayList<Column>();
+    boolean hasConstraintName=rs.getMetaData().getColumnCount()>5;
     while (rs.next())
     {
       String columnName=rs.getString(4);
@@ -65,9 +68,25 @@ public class KeyConstraint
       if (logLevel.isDebug())
       { log.fine("KeyConstraint: "+columnName+" "+columns.get(seq));
       }
+      
+      if (hasConstraintName)
+      {
+        String rsConstraintName=rs.getString(6);
+        if (constraintName==null && rsConstraintName!=null)
+        { 
+          constraintName=rsConstraintName;
+          log.fine("Constraint name is "+constraintName);
+        }
+        
+      }
+      
     }
     this.columns=columns.toArray(new Column[columns.size()]);
     this.primary=primary;
+  }
+  
+  public String getConstraintName()
+  { return constraintName;
   }
   
   public void setTable(Table table)
@@ -142,6 +161,26 @@ public class KeyConstraint
     }
     
     return null;
+  }
+  
+  public DDLStatement generateDropDDL(Dialect dialect)
+  { 
+    if (constraintName!=null)
+    {
+      return table.createAlterTableStatement
+          (new DropTableConstraintDefinition(constraintName)
+          );
+    }
+    else if (primary)
+    {
+      return table.createAlterTableStatement
+          (new DropPrimaryKeyConstraintDefinition());
+    }
+    else
+    { 
+      log.warning("Unable to drop unnamed constraint "+this);
+      return DDLStatement.EMPTY;
+    }
   }
   
   public List<DDLStatement> generateUpdateDDL(Dialect dialect,KeyConstraint storeVersion)

@@ -88,7 +88,7 @@ public class Table
     rs.close();
     
     rs=metadata.getPrimaryKeys(catalogName,schemaName,name);
-    KeyConstraint primaryKey=new KeyConstraint(this,rs,true);
+    KeyConstraint primaryKey=new KeyConstraint(null,this,rs,true);
     rs.close();
     if (primaryKey.getColumns().length>0)
     { this.addKeyConstraint(primaryKey);
@@ -174,6 +174,17 @@ public class Table
     return null;
   }
   
+  public KeyConstraint getPrimaryKeyConstraint()
+  {
+    for (KeyConstraint key: keys)
+    { 
+      if (key.isPrimary())
+      { return key;
+      }
+    }
+    return null;
+  }
+  
   public AlterTableStatement createAlterTableStatement(AlterTableAction action)
   { return new AlterTableStatement(schemaName,name,action);
   }
@@ -206,6 +217,22 @@ public class Table
     }
     else
     {
+      for (KeyConstraint key:keys)
+      { 
+        if (key.isPrimary())
+        {
+          KeyConstraint storePrimary=storeVersion.getPrimaryKeyConstraint();
+          KeyConstraint storePeer=storeVersion.getKey(key);
+          if (storePeer!=null && !storePeer.isPrimary())
+          { ret.add(storePeer.generateDropDDL(dialect));
+          }
+          if (!key.isFieldEquivalent(storePrimary))
+          { ret.add(storePrimary.generateDropDDL(dialect));
+          }
+        }
+      }
+      
+      
       for (Column column: columns)
       { 
         ret.addAll

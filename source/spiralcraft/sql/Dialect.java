@@ -158,7 +158,7 @@ public class Dialect
         +(table.getName()!=null?"A.table_name='"+table.getName()+"' AND ":"")
         +"A.constraint_name='"+constraintName+"'"
         );
-      constraints.add(new KeyConstraint(table,rs,false));
+      constraints.add(new KeyConstraint(constraintName,table,rs,false));
     }
     return constraints.toArray(new KeyConstraint[constraints.size()]);
   }  
