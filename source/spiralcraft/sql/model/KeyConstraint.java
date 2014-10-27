@@ -75,7 +75,9 @@ public class KeyConstraint
         if (constraintName==null && rsConstraintName!=null)
         { 
           constraintName=rsConstraintName;
-          log.fine("Constraint name is "+constraintName);
+          if (logLevel.isDebug())
+          { log.fine("Constraint name is "+constraintName);
+          }
         }
         
       }
