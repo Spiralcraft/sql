@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev20
+        </revision>
+        
+        <notes>
+          <scm:Note>Constrain log message to debug mode.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/model/KeyConstraint.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev19
         </revision>
         
