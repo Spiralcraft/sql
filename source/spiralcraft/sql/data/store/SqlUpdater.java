@@ -110,7 +110,7 @@ public class SqlUpdater
         else
         { 
           // Non-transient derived fields = stored calculated fields- always update
-          if (!field.isTransient() && field.isDerived()) 
+          if (!field.isTransient() && !field.isStatic() && field.isDerived()) 
           { paths.add(subPath);
           }
         }

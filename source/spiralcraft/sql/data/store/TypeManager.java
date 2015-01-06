@@ -57,6 +57,7 @@ public class TypeManager
   public static boolean isPersistent(Type<?> type,Field<?> field)
   {
     return !field.isTransient()
+         && !field.isStatic()
          && !( type instanceof ReflectionType && field.getName().equals("class"))
          && !( field instanceof ReflectionField 
                && ( ((ReflectionField<?>) field).getWriteMethod()==null

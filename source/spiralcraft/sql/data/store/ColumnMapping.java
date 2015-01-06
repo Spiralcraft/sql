@@ -194,6 +194,7 @@ public class ColumnMapping
     }
 
     if (!field.isTransient() 
+        && !field.isStatic()
         && !field.getType().isPrimitive() 
         && (field.getType().getNativeClass()==null 
              || !Type.class.isAssignableFrom(field.getType().getNativeClass())
