@@ -16,6 +16,28 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev21
+        </revision>
+        
+        <notes>
+          <scm:Note>Exclude static fields from persistence
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store
+        </path>
+        
+        <URI>ColumnMapping.java
+        </URI>
+        <URI>SqlUpdater.java
+        </URI>
+        <URI>TypeManager.java
+        </URI>
+      </scm:Change>
+
+
+      <scm:Change>
         <revision>-dev20
         </revision>
         
