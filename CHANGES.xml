@@ -16,6 +16,28 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev22
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix NPE when updating table to add a unique key constraint
+            that didn't exist previously
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/model
+        </path>
+        
+        <resources>
+          <URI>KeyConstraint.java
+          </URI>
+          <URI>Table.java
+          </URI>
+        </resources>
+      </scm:Change>
+      
+      <scm:Change>
         <revision>-dev21
         </revision>
         
