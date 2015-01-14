@@ -126,6 +126,10 @@ public class KeyConstraint
     { return false;
     }
     
+    if (keyConstraint==null)
+    { return false;
+    }
+    
     Column[] otherCols=keyConstraint.getColumns();
     int i=0;
     for (Column col: columns)

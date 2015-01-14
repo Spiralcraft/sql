@@ -226,7 +226,7 @@ public class Table
           if (storePeer!=null && !storePeer.isPrimary())
           { ret.add(storePeer.generateDropDDL(dialect));
           }
-          if (!key.isFieldEquivalent(storePrimary))
+          if (storePrimary!=null && !key.isFieldEquivalent(storePrimary))
           { ret.add(storePrimary.generateDropDDL(dialect));
           }
         }
