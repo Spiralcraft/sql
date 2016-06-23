@@ -49,7 +49,6 @@ import java.util.List;
  */
 public class TypeManager
 {
-  @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(TypeManager.class);
 
@@ -384,7 +383,7 @@ public class TypeManager
       { 
         StringBuilder buff=new StringBuilder();
         statement.write(buff,"", null);
-        if (logLevel.isFine())
+        if (logLevel.isDebug())
         { log.fine(buff.toString());
         }
       }

@@ -38,7 +38,6 @@ import java.sql.Statement;
 public class SerialResultSetCursor
   implements SerialCursor<Tuple>
 {
-  @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(SerialResultSetCursor.class);
   
@@ -103,7 +102,6 @@ public class SerialResultSetCursor
     }
   }
   
-  @SuppressWarnings("rawtypes")
   public SerialResultSetCursor
     (FieldSet fieldSet
     ,ResultSet resultSet
