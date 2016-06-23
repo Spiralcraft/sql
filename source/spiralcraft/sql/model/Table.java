@@ -39,7 +39,6 @@ import java.util.HashMap;
 public class Table
 {
 
-  @SuppressWarnings("unused")
   private static final ClassLog log
     =ClassLog.getInstance(Table.class);
   private static final Level logLevel
@@ -83,7 +82,7 @@ public class Table
     ResultSet rs=metadata.getColumns(catalogName,schemaName,name,"%");
 
     while (rs.next())
-    {  addColumn(new Column(rs));
+    {  addColumn(new Column(rs,dialect));
     }
     rs.close();
     

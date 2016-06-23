@@ -156,4 +156,8 @@ public abstract class SqlType<T>
   { return new DataType(dialect,ddl,length,decimals);
   }
   
+  public boolean canAssignTo(SqlType<?> type)
+  { return type==this || type.getTypeId()==this.getTypeId();
+  }
+  
 }

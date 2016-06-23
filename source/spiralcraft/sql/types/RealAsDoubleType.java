@@ -28,5 +28,8 @@ public class RealAsDoubleType
     converter=new FloatToSqlDoubleConverter();
   }
   
-  
+  @Override
+  public boolean canAssignTo(SqlType<?> type)
+  { return super.canAssignTo(type) || type==SqlType.getSqlType(Types.DOUBLE);
+  }  
 }

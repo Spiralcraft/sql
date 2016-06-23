@@ -14,6 +14,7 @@
 //
 package spiralcraft.sql.vendor.hsqldb;
 
+
 import spiralcraft.sql.Dialect;
 import spiralcraft.sql.SqlType;
 import spiralcraft.sql.types.RealAsDoubleType;
@@ -22,7 +23,8 @@ public class HsqldbDialect
   extends Dialect
 {
 
-  { setExtendedTypes(new SqlType<?>[] { new RealAsDoubleType() });
+  { 
+    setExtendedTypes(new SqlType<?>[] { new RealAsDoubleType() });
   }
   
   /**
@@ -35,6 +37,17 @@ public class HsqldbDialect
   public String getDefaultSchemaName()
   { return "PUBLIC";
   }
+  
+  @Override
+  public void writeAlterColumnTypeDDL(String columnName,StringBuilder buffer)
+  {
+    buffer
+      .append("ALTER COLUMN ")
+      .append("\"")
+      .append(columnName)
+      .append("\"")
+      .append(" SET DATA TYPE ");
 
+  }
 
 }

@@ -16,25 +16,24 @@ package spiralcraft.sql.ddl;
 
 import java.util.List;
 
+import spiralcraft.sql.Dialect;
+
 
 public class AlterColumnType
     extends AlterColumnDefinition
 {
 
   
-  public AlterColumnType(ColumnDefinition columnDefinition)
-  { super(columnDefinition);
+  public AlterColumnType(ColumnDefinition columnDefinition,Dialect dialect)
+  { 
+    super(columnDefinition);
+    this.dialect=dialect;
   }
   
   @Override
   public void write(StringBuilder buffer,String indent, List<?> parameterCollector)
   {
-    buffer
-      .append("ALTER ")
-      .append("\"")
-      .append(columnDefinition.getColumnName())
-      .append("\"")
-      .append(" TYPE ");
+    dialect.writeAlterColumnTypeDDL(columnDefinition.getColumnName(),buffer);
     columnDefinition.getDataType().write(buffer, indent, parameterCollector);
   }
 

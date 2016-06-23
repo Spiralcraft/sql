@@ -45,6 +45,8 @@ public class Dialect
   
   private final HashMap<Integer,SqlType<?>> typeMap
     =new HashMap<Integer,SqlType<?>>();
+  private final HashMap<Integer,SqlType<?>> reverseTypeMap
+    =new HashMap<Integer,SqlType<?>>();
     
   /**
    * Specify a set of extended types that will override the basic JDBC type mappings
@@ -101,6 +103,35 @@ public class Dialect
     { log.fine(this+" mapped "+sqlTypeId+" to "+type);
     }
     return type;
+  }
+  
+  /**
+   * Map the type from database metadata to the approrate SqlType for the
+   *   dialect
+   * 
+   * @param metadataTypeId
+   * @return
+   */
+  public SqlType<?> mapMetadataType(int metadataTypeId)
+  { return SqlType.getSqlType(metadataTypeId);
+  }
+  
+  /**
+   * Write the part of the DDL statement which comes after the table name and
+   *   before the column type a column type change
+   *   
+   * @param columnName
+   * @param buffer
+   */
+  public void writeAlterColumnTypeDDL(String columnName,StringBuilder buffer)
+  {
+    buffer
+      .append("ALTER ")
+      .append("\"")
+      .append(columnName)
+      .append("\"")
+      .append(" TYPE ");
+
   }
   
   /**

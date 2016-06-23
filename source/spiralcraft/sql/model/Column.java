@@ -58,7 +58,7 @@ public class Column
   /**
    * Create a Column from a row in the ResultSet returned by DatabaseMetaData.getColumns()
    */
-  public Column(ResultSet rs)
+  public Column(ResultSet rs,Dialect dialect)
     throws SQLException
   {
     if (logLevel.isDebug())
@@ -66,7 +66,7 @@ public class Column
     }
     
     name=rs.getString(4);
-    type=SqlType.getSqlType(rs.getInt(5));
+    type=dialect.mapMetadataType(rs.getInt(5));
     if (rs.getObject(7)!=null)
     { length=rs.getInt(7);
     }
@@ -203,13 +203,18 @@ public class Column
     }
     else if (length!=null && storeVersion.getLength()!=length
              || decimalDigits!=null && storeVersion.getDecimalDigits()!=decimalDigits
+             || !getType().canAssignTo(storeVersion.getType())
              )
     {
+      if (getType().getTypeId() != storeVersion.getType().getTypeId())
+      { log.fine("Type change from "+storeVersion.getType()+" to "+dialect.getSqlType(getType().getTypeId()));
+      }
       // Alter column here
       AlterTableStatement statement
       =table.createAlterTableStatement
         (new AlterColumnType
           (generateColumnDefinition(dialect)
+          ,dialect
           )
         );
       ret.add(statement);
