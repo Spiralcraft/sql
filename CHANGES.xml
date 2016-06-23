@@ -16,6 +16,38 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev23
+        </revision>
+        
+        <notes>
+          <scm:Note>Support some corner cases reverse mapping column types.
+            Support changing column types in DB.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>Dialect.java
+          </URI>
+          <URI>SqlType.java
+          </URI>
+          <URI>ddl/AlterColumnType.java
+          </URI>
+          <URI>model/Table.java
+          </URI>
+          <URI>model/Column.java
+          </URI>
+          <URI>types/RealAsDoubleType.java
+          </URI>
+          <URI>vendor/hsqldb/HsqldbDialect.java
+          </URI>
+        </resources>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev22
         </revision>
         
