@@ -16,6 +16,25 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev24
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix regression- restore support for ad-hoc SQL queries in
+            QueryTool (SQL result driven type information)
+          </scm:Note>
+          
+        </notes>
+        
+        <resources>
+          <URI>source/spiralcraft/sql/data/ResultSetTuple.java
+          </URI>
+        </resources>
+        
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev23
         </revision>
         
