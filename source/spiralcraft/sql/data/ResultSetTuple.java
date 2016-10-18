@@ -52,8 +52,8 @@ public class ResultSetTuple
         { baseExtent=createBaseExtent(baseScheme);
         }
       }
-    }    
-
+    }
+    applyMapping(new ResultSetMapping(fieldSet,null));
   }
   
   public ResultSetTuple(FieldSet fieldSet,ResultSetMapping mapping)
@@ -99,10 +99,16 @@ public class ResultSetTuple
   public void setResultSet(ResultSet resultSet)
   { 
     this.resultSet=resultSet;
-    for (ResultSetTuple tuple : subs)
-    { 
-      if (tuple!=null)
-      { tuple.setResultSet(resultSet);
+    if (mapping==null)
+    { mapping=new ResultSetMapping(fieldSet,null);
+    }
+    if (subs!=null)
+    {
+      for (ResultSetTuple tuple : subs)
+      { 
+        if (tuple!=null)
+        { tuple.setResultSet(resultSet);
+        }
       }
     }
     if (baseExtent!=null)
@@ -115,7 +121,7 @@ public class ResultSetTuple
   public Object get(int index)
     throws DataException
   {
-    if (subs[index]!=null)
+    if (subs!=null && subs[index]!=null)
     { return subs[index];
     }
     
