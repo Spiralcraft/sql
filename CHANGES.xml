@@ -20,6 +20,25 @@
         </revision>
         
         <notes>
+          <scm:Note>Fix ClassCast exception in SqlStore.snapshot() when
+            base/multi-type accessors are returned as primaryQueryables.
+          </scm:Note>
+          
+        </notes>
+        
+        <resources>
+          <URI>source/spiralcraft/sql/data/store/SqlStore.java
+          </URI>
+        </resources>
+        
+        
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev24
+        </revision>
+        
+        <notes>
           <scm:Note>Fix regression- restore support for ad-hoc SQL queries in
             QueryTool (SQL result driven type information)
           </scm:Note>
