@@ -554,12 +554,15 @@ public class SqlStore
           );
       for (Queryable<?> queryable:getPrimaryQueryables())
       {
-        TableMapping table
-          =(TableMapping) queryable;
-        if (transactionId==0
-            || table.getLastTransactionId()>transactionId
-            )
-        { data.add(table.snapshot());
+        if (queryable instanceof TableMapping)
+        {
+          TableMapping table
+            =(TableMapping) queryable;
+          if (transactionId==0
+              || table.getLastTransactionId()>transactionId
+              )
+          { data.add(table.snapshot());
+          }
         }
       }
       snapshot.set("data",data);
