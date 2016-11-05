@@ -21,7 +21,6 @@ import spiralcraft.sql.Dialect;
 
 import spiralcraft.sql.ddl.TableElement;
 import spiralcraft.sql.ddl.TableElementList;
-import spiralcraft.sql.util.SQLUtil;
 import spiralcraft.sql.ddl.CreateTableStatement;
 import spiralcraft.sql.ddl.AlterTableStatement;
 import spiralcraft.sql.ddl.AlterTableAction;
@@ -110,7 +109,9 @@ public class Table
     {
       if (index.getColumns().length>0 && !index.isUnique())
       { 
-        log.fine("Read SQL index "+index);
+        if (logLevel.isDebug())
+        { log.fine("Read SQL index "+index);
+        }
         this.indices.add(index);        
       }
     }
@@ -293,7 +294,9 @@ public class Table
       { 
         Index storeIndex=storeVersion.getIndex(index);
         
-        log.fine("Checking index "+index.getName()+" against store: "+index);
+        if (logLevel.isDebug())
+        { log.fine("Checking index "+index.getName()+" against store: "+index);
+        }
         ret.addAll
           (index.generateUpdateDDL
             (dialect,storeIndex)
