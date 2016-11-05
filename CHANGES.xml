@@ -16,6 +16,35 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev25
+        </revision>
+        
+        <notes>
+          <scm:Note>Auto-manage non-unique SQL indexes
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>model/Index.java
+          </URI>
+          <URI>model/Table.java
+          </URI>
+          <URI>data/store/TableMapping.java
+          </URI>
+          <URI>ddl/CreateIndexStatement.java
+          </URI>
+          <URI>ddl/IndexDefinition.java
+          </URI>
+        </resources>
+        
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev24
         </revision>
         
