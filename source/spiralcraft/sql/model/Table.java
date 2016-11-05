@@ -21,6 +21,7 @@ import spiralcraft.sql.Dialect;
 
 import spiralcraft.sql.ddl.TableElement;
 import spiralcraft.sql.ddl.TableElementList;
+import spiralcraft.sql.util.SQLUtil;
 import spiralcraft.sql.ddl.CreateTableStatement;
 import spiralcraft.sql.ddl.AlterTableStatement;
 import spiralcraft.sql.ddl.AlterTableAction;
@@ -102,6 +103,18 @@ public class Table
       }
     }
     
+    rs=metadata.getIndexInfo(catalogName, schemaName, name, false, false);
+    Index[] indices=Index.readIndexMetaData(this, rs);
+    rs.close();
+    for (Index index:indices)
+    {
+      if (index.getColumns().length>0 && !index.isUnique())
+      { 
+        log.fine("Read SQL index "+index);
+        this.indices.add(index);        
+      }
+    }
+
     
   }
   
@@ -111,6 +124,12 @@ public class Table
     keys.add(constraint);
   }
   
+  public void addIndex(Index index)
+  { 
+    index.setTable(this);
+    indices.add(index);
+  }
+
   public void addForeignKeyConstraint(ForeignKeyConstraint constraint)
   { foreignKeys.add(constraint);
   }
@@ -152,6 +171,18 @@ public class Table
   
   public Index[] getIndices()
   { return indices.toArray(new Index[indices.size()]);
+  }
+  
+  public Index getIndex(Index peer)
+  {
+    for (Index index: indices)
+    {
+      if (peer.isFieldEquivalent(index))
+      { return index;
+      }
+    }
+    return null;
+    
   }
   
   public ForeignKeyConstraint[] getForeignKeys()
@@ -213,6 +244,14 @@ public class Table
       CreateTableStatement statement
         =new CreateTableStatement(schemaName,name,elements);
       ret.add(statement);
+      
+      for (Index index: indices)
+      { 
+        ret.addAll
+          (index.generateUpdateDDL
+            (dialect,null)
+          );
+      }      
     }
     else
     {
@@ -249,7 +288,17 @@ public class Table
             )
           );
       }
-
+      
+      for (Index index: indices)
+      { 
+        Index storeIndex=storeVersion.getIndex(index);
+        
+        log.fine("Checking index "+index.getName()+" against store: "+index);
+        ret.addAll
+          (index.generateUpdateDDL
+            (dialect,storeIndex)
+          );
+      }
     }
     return ret;
   }

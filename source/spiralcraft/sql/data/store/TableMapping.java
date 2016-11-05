@@ -63,6 +63,7 @@ import spiralcraft.log.Level;
 
 import spiralcraft.sql.model.Table;
 import spiralcraft.sql.model.Column;
+import spiralcraft.sql.model.Index;
 import spiralcraft.sql.model.KeyConstraint;
 
 import spiralcraft.util.Path;
@@ -699,9 +700,30 @@ public class TableMapping
         constraint.setPrimary(key.isPrimary());
         constraint.setUnique(key.isUnique());
 
-        tableModel.addKeyConstraint(constraint);
+        if (constraint.isPrimary() || constraint.isUnique())
+        { tableModel.addKeyConstraint(constraint);
+        }
+
+        if (!key.isPrimary() && !key.isUnique() && tableModel.getKey(constraint)==null)
+        {
+          Index index=new Index();
+          index.setTable(tableModel);
+          index.setColumns(constraint.getColumns());
+          index.generateUniqueName();
+          if (tableModel.getIndex(index)==null)
+          { 
+            tableModel.addIndex(index);
+            log.fine("Added index "+index.getName()+" for key "+key);
+          }
+          else
+          {
+            log.fine("Skipping duplicate index "+index.getName());
+          }
+        }
+
       }
       
+       
       
     }
     tableNameSqlFragment=new TableName(schemaName,tableName);
