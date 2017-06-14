@@ -199,7 +199,10 @@ public class ColumnMapping
         && (field.getType().getNativeClass()==null 
              || !Type.class.isAssignableFrom(field.getType().getNativeClass())
            )
-       
+        && !(field.getType().isAggregate() 
+              && field.getType().getContentType()!=null
+              && field.getType().getContentType().isPrimitive()
+            ) // Aggregate of primitives should not be flattened
         )
     { 
       if (field.getType().getScheme()!=null)
