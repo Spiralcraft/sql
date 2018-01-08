@@ -16,6 +16,22 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev26
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix regression where arrays of primitives would not be
+            mapped to db fields.
+          </scm:Note>
+          
+        </notes>
+        
+        <path>source/spiralcraft/sql/data/store/ColumnMapping.java
+        </path>
+
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev25
         </revision>
         
