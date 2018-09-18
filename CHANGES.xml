@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev27
+        </revision>
+        
+        <notes>
+          <scm:Note>Add hooks for pre and post connection pool initialization
+          </scm:Note>
+          
+        </notes>
+
+        <path>source/spiralcraft/sql/data/store/SqlStore.java
+        </path>
+      </scm:Change>
+      
+      <scm:Change>
         <revision>-dev26
         </revision>
         
