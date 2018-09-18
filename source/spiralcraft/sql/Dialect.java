@@ -45,8 +45,8 @@ public class Dialect
   
   private final HashMap<Integer,SqlType<?>> typeMap
     =new HashMap<Integer,SqlType<?>>();
-  private final HashMap<Integer,SqlType<?>> reverseTypeMap
-    =new HashMap<Integer,SqlType<?>>();
+//  private final HashMap<Integer,SqlType<?>> reverseTypeMap
+//    =new HashMap<Integer,SqlType<?>>();
     
   /**
    * Specify a set of extended types that will override the basic JDBC type mappings
