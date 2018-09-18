@@ -120,6 +120,8 @@ public class SqlStore
   private boolean autoUpgrade;
   private boolean checkSchema=true;
   private Level statementLogLevel=Level.INFO;
+  private Binding<Void> onPoolStart;
+  private Binding<Void> beforePoolStart;
   
   public SqlStore()
     throws DataException
@@ -168,6 +170,24 @@ public class SqlStore
   
   public void setCheckSchema(boolean checkSchema)
   { this.checkSchema=checkSchema;
+  }
+  
+  /**
+   * Called immediately before the connection pool is initialized
+   * 
+   * @param onPoolStart
+   */
+  public void setBeforePoolStart(Binding<Void> beforePoolStart)
+  { this.beforePoolStart=beforePoolStart;
+  }  
+  
+  /**
+   * Called immediately after the connection pool is initialized
+   * 
+   * @param onPoolStart
+   */
+  public void setOnPoolStart(Binding<Void> onPoolStart)
+  { this.onPoolStart=onPoolStart;
   }
   
   /**
@@ -261,6 +281,12 @@ public class SqlStore
     if (dataSourceX!=null)
     { dataSourceX.bind(focus);
     }
+    if (beforePoolStart!=null)
+    { beforePoolStart.bind(focus);
+    }
+    if (onPoolStart!=null)
+    { onPoolStart.bind(focus);
+    }
     return focus;
   }
   
@@ -287,9 +313,15 @@ public class SqlStore
     log.info("Serving SQL data from "+this.getLocalResourceURI());
     if (dataSource!=null)
     { 
+      if (beforePoolStart!=null)
+      { beforePoolStart.get();
+      }
       connectionPool.setDataSource(dataSource);
       connectionPool.setDialect(dialect);
       connectionPool.start();
+      if (onPoolStart!=null)
+      { onPoolStart.get();
+      }
     }
     try
     { onAttach(); // XXX Waiting for auto-recovery implementation
