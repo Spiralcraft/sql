@@ -4,6 +4,7 @@
   xmlns:example="class:/spiralcraft/data/test/example/"  
   xmlns:stest="class:/spiralcraft/sql/test/"
   xmlns:config="context:/"
+  xmlns:jul="class:/java/util/logging/"
   >
   <stores>
   
@@ -32,6 +33,9 @@
       
       <statementLogLevel>FINE
       </statementLogLevel>
+
+      <onPoolStart>[@jul:Logger].@getLogger("hsqldb.db").@log("logger"+.).setLevel([@jul:Level].@WARNING)
+      </onPoolStart>        
       
       <debugLevel>FINE
       </debugLevel>

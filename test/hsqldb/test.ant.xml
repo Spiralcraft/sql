@@ -7,7 +7,7 @@
         
     <devtask
       codebase="../.." 
-      vmargs="-Dspiralcraft.sql.data.store.TableMapping.logLevel=FINE"
+      vmargs="-Dspiralcraft.sql.data.store.TableMapping.logLevel=FINE -Dhsqldb.reconfig_logging=false"
       exec ="--log out/spiralcraft --consoleLog ../SqlSmokeRunner"
     />   
   	
