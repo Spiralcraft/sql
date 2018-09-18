@@ -38,7 +38,7 @@ public class ByteConverter
     { return (Byte) value;
     }
     else if (value instanceof Number)
-    { return new Byte(((Number) value).byteValue());
+    { return Byte.valueOf(((Number) value).byteValue());
     }
 		else if (value instanceof String)
 		{ return Byte.valueOf((String) value);

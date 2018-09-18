@@ -39,7 +39,7 @@ public class DoubleConverter
     { return (Double) value;
     }
     else if (value instanceof Number)
-    { return new Double(((Number) value).intValue());
+    { return Double.valueOf(((Number) value).doubleValue());
     }
 		else if (value instanceof String)
 		{ return Double.valueOf((String) value);

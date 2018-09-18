@@ -18,7 +18,7 @@ package spiralcraft.sql.converters;
 import java.sql.SQLException;
 
 /**
- * Convert an object to a Float
+ * Convert an object to a Long
  */
 public class LongConverter
 	extends Converter<Long,Object>
@@ -38,7 +38,7 @@ public class LongConverter
     { return (Long) value;
     }
     else if (value instanceof Number)
-    { return new Long(((Number) value).intValue());
+    { return Long.valueOf(((Number) value).longValue());
     }
 		else if (value instanceof String)
 		{ return Long.valueOf((String) value);

@@ -39,7 +39,7 @@ public class IntegerConverter
     { return (Integer) value;
     }
     else if (value instanceof Number)
-    { return new Integer(((Number) value).intValue());
+    { return Integer.valueOf(((Number) value).intValue());
     }
 		else if (value instanceof String)
 		{ return Integer.valueOf((String) value);

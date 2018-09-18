@@ -38,7 +38,7 @@ public class ShortConverter
     { return (Short) value;
     }
     else if (value instanceof Number)
-    { return new Short(((Number) value).shortValue());
+    { return Short.valueOf(((Number) value).shortValue());
     }
 		else if (value instanceof String)
 		{ return Short.valueOf((String) value);
