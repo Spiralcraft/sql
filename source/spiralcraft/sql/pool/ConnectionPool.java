@@ -19,9 +19,11 @@ import spiralcraft.sql.jdbc.StatementCachingConnection;
 
 
 /**
- * Provides a means for dispatching Runnables on their
- *   own Threads with support for Thread recycling to
- *   conserve resources.
+ * A Pool which manages sql database connectionss
+ *
+ * @author mike
+ *
+ * @param <T>
  */
 public class ConnectionPool<T extends Connection>
   extends Pool<ConnectionPool<T>.PooledConnection>
