@@ -507,7 +507,7 @@ public class TableMapping
         { updater.dataAvailable(dt);
         }
         catch (Exception x)
-        { log.warning("Error updating \r\n"+tuple+" : \r\n"+dt);
+        { log.log(Level.WARNING,"Error updating \r\n"+tuple+" : \r\n"+dt,x);
         }
       }
 
