@@ -1,0 +1,6 @@
+<hsqlj:JDBCXADataSource
+  xmlns:hsqlj="class:/org/hsqldb/jdbc/pool/"
+  >
+  <url>jdbc:hsqldb:file:out/hsqldb/data;sql.enforce_size=false;shutdown=true
+  </url>
+</hsqlj:JDBCXADataSource>		

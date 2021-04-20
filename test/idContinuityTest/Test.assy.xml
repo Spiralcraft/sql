@@ -1,0 +1,42 @@
+<t:TaskRunner
+  xmlns:t="class:/spiralcraft/task/"
+  xmlns:stest="class:/spiralcraft/sql/test/"
+  xmlns:test="class:/spiralcraft/test/"
+  xmlns:query="class:/spiralcraft/data/query/"
+  xmlns:dt="class:/spiralcraft/data/task/"
+  xmlns:du="class:/spiralcraft/data/util"
+  xmlns:ex="class:/spiralcraft/data/test/example/"
+  xmlns:tx="class:/spiralcraft/data/transaction/"
+  xmlns:json="class:/spiralcraft/json"
+  xmlns:fn="class:/spiralcraft/lang/functions"
+  >
+  <service>
+    <stest:TestSpace>
+    </stest:TestSpace>
+  </service>
+  <chain>
+    <t:Eval>
+      <x>[*dt:Fetch{ [@ex:Customer.list] }].().[*json:ToJson].@log(.)
+      </x>    
+    
+    </t:Eval>
+    <dt:Session>
+      <transactional>true
+      </transactional>
+      <chain>
+        <t:Eval>
+          <contextX>[#c] 
+            { count:=0 
+            , idGen:=[@du:TimestampIdGenerator].(2,7,0)
+            }
+          </contextX>
+          <x>
+            [@ex:Customer.buffer]
+              .(displayName:="Customer "+[c].idGen.nextId())
+              .@tuple.save().[*fn:Repeat{ `([c].count=[c].count+1) == 100` }]
+          </x>
+        </t:Eval>
+      </chain>
+    </dt:Session>
+  </chain>
+</t:TaskRunner>

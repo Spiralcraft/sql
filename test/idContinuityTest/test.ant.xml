@@ -1,0 +1,37 @@
+<project name="spiralcraft-sql-test" basedir="." default="cleanAndTest">
+
+  <import file="../../build.xml"/>
+  
+  <target name="cleanAndTest" depends="clean,clean-db,test">
+	        
+        
+  </target>
+	
+	
+  <target name="clean">
+    <mkdir dir="out"/>
+    <delete>
+      <fileset dir="out" includes="**/*"/>
+    </delete>   
+  </target>
+  	
+  <target name="clean-db" depends="clean">
+    <delete dir="out/hsqldb"/>
+    <mkdir dir="out/hsqldb"/>
+      
+    <devtask
+      codebase="../.."
+      exec = "--log out/spiralcraft --consoleLog ../LoadDDL"
+    />
+      	
+  </target>
+	
+  <target name="test">
+
+    <devtask
+      codebase="../.." 
+      exec ="--log out/spiralcraft --consoleLog ./Test"
+    />   
+  </target>
+	
+</project>

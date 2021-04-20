@@ -6,6 +6,10 @@
   <property name="classpath" value="lib/spiralcraft-core.jar;lib/spiralcraft-core-test.jar"/>
   <property name="manifest.class.path" value="spiralcraft-core.jar"/>
   <property name="depends.dir" location="../../repo"/>
+  
+  <property name="spiralcraft.javac.target" value="13"/>
+  <property name="spiralcraft.javac.source" value="13"/>
+  
   <import file="../../build/build-common.xml"/>
     
         
