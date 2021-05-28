@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev30
+        </revision>
+        
+        <notes>
+          <scm:Note>Add metering support
+          </scm:Note>
+          
+        </notes>
+
+        <path>source/spiralcraft/sql/data/store/SqlStore.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev27
         </revision>
         
