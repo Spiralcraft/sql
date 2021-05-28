@@ -18,8 +18,9 @@ package spiralcraft.sql.data.store;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Binding;
 import spiralcraft.lang.Focus;
+import spiralcraft.lang.util.LangUtil;
 import spiralcraft.log.Level;
-
+import spiralcraft.meter.MeterContext;
 import spiralcraft.data.DataConsumer;
 import spiralcraft.data.access.Entity;
 import spiralcraft.data.access.Snapshot;
@@ -244,7 +245,7 @@ public class SqlStore
     { throw new SQLException("Timed out waiting for connection pool");
     }
   }
-  
+    
   @Override
   public Focus<?> bind(Focus<?> focus)
     throws ContextualException
@@ -257,6 +258,7 @@ public class SqlStore
     { throw new BindException("Error resolving data model",x);
     }
     
+
     typeManager.setLogLevel(debugLevel);
     TableMapping[] mappings=typeManager.getTableMappings();
     for (TableMapping mapping: mappings) 
@@ -301,6 +303,10 @@ public class SqlStore
     { log.fine(super.isAuthoritative(type)+" "+type+" "+getName());
     }
     return super.isAuthoritative(type);
+  }
+
+  protected void installMeter(MeterContext meterContext)
+  { connectionPool.installMeter(meterContext);
   }
   
   @Override
