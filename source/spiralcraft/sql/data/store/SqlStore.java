@@ -18,7 +18,6 @@ package spiralcraft.sql.data.store;
 import spiralcraft.lang.BindException;
 import spiralcraft.lang.Binding;
 import spiralcraft.lang.Focus;
-import spiralcraft.lang.util.LangUtil;
 import spiralcraft.log.Level;
 import spiralcraft.meter.MeterContext;
 import spiralcraft.data.DataConsumer;
