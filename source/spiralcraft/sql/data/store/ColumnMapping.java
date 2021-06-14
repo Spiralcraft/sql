@@ -203,6 +203,9 @@ public class ColumnMapping
               && field.getType().getContentType()!=null
               && field.getType().getContentType().isPrimitive()
             ) // Aggregate of primitives should not be flattened
+        && !(field.getFieldSet().getType()==field.getType()
+            ) // Don't try to flatten a cycle
+          
         )
     { 
       if (field.getType().getScheme()!=null)
