@@ -16,6 +16,21 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev31
+        </revision>
+        
+        <notes>
+          <scm:Note>Don't auto-flatten a field that references the same type as
+            the containing type.
+          </scm:Note>
+          
+        </notes>
+
+        <path>source/spiralcraft/sql/data/store/ColumnMapping.java
+        </path>
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev30
         </revision>
         
