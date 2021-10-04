@@ -14,10 +14,19 @@
 //
 package spiralcraft.sql.util;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Wrapper;
+
+import spiralcraft.json.ArrayNode;
+import spiralcraft.json.Node;
+import spiralcraft.json.NullNode;
+import spiralcraft.json.NumberNode;
+import spiralcraft.json.ObjectNode;
+import spiralcraft.json.StringNode;
 
 public class SQLUtil
 {
@@ -65,4 +74,65 @@ public class SQLUtil
     { return null;
     }
   }
+  
+  public static String queryToJSON(Connection conn,String sql)
+    throws SQLException
+  {
+    Statement st=null;
+    ObjectNode json = new ObjectNode(null);
+    try
+    {
+      st=conn.createStatement();
+      boolean res = st.execute(sql);
+      if (!res)
+      { json.addChild(new NumberNode("updateCount",st.getUpdateCount()));
+      }
+      else
+      {
+        ArrayNode rsArray = new ArrayNode("results");
+        json.addChild(rsArray);
+        do
+        {
+          ArrayNode data = new ArrayNode(null);
+          rsArray.addChild(data);
+          
+          ResultSet rs=st.getResultSet();
+          ResultSetMetaData rsmd = rs.getMetaData();
+          int numColumns = rsmd.getColumnCount();
+          
+          while (rs.next())
+          { 
+            ObjectNode row=new ObjectNode(null);
+            data.addChild(row);
+            for (int i=1; i<numColumns; i++)
+            {
+              String colname=rsmd.getColumnName(i);
+              Object value=rs.getObject(colname);
+              Node cell;
+              if (value==null)
+              { cell=new NullNode(colname);
+              }
+              else
+              { cell=new StringNode(colname,value.toString());
+              }
+              row.addChild(cell);
+            }
+          }
+          rs.close();
+        }
+        while (st.getMoreResults());
+      }
+    }
+    catch (Exception x)
+    { json.addChild(new StringNode("Exception",x.toString()));
+    }
+    finally
+    { 
+      if (st!=null)
+      { st.close();
+      }
+    }
+    return Node.formatToString(json);
+  }
+
 }

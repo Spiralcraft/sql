@@ -49,6 +49,7 @@ import spiralcraft.sql.Dialect;
 import spiralcraft.sql.ddl.DDLStatement;
 import spiralcraft.sql.pool.ConnectionFactory;
 import spiralcraft.sql.pool.ConnectionPool;
+import spiralcraft.sql.util.SQLUtil;
 import spiralcraft.util.Path;
 import spiralcraft.vfs.Container;
 import spiralcraft.vfs.Resolver;
@@ -71,7 +72,6 @@ import java.util.List;
 
 import spiralcraft.common.ContextualException;
 import spiralcraft.common.LifecycleException;
-
 
 /**
  * A Store backed by a SQL database
@@ -581,7 +581,7 @@ public class SqlStore
     if (transactionId==0 || lastTransactionId>transactionId)
     {
       EditableArrayTuple snapshot=new EditableArrayTuple(Snapshot.TYPE);
-      
+           
       // Note- do not set to 0 here or entire dataset will be sent repeatedly
       snapshot.set("transactionId",(lastTransactionId!=0)?lastTransactionId:1);
       
@@ -695,6 +695,23 @@ public class SqlStore
   @Override
   public URI getLocalResourceURI()
   { return localResourceURI;
+  }
+  
+  public String queryToJSON(String sql)
+    throws SQLException
+  {
+    Connection conn=null;
+    try
+    { 
+      conn=checkoutConnection();
+      return SQLUtil.queryToJSON(conn, sql);
+    }
+    finally
+    {
+      if (conn!=null)
+      { conn.close();
+      }
+    }
   }
 
   @Override
