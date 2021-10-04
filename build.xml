@@ -3,8 +3,15 @@
   <property name="organization" value="spiralcraft"/>
   <property name="module" value="sql"/>
   <property file="version.properties"/>
-  <property name="classpath" value="lib/spiralcraft-core.jar;lib/spiralcraft-core-test.jar"/>
-  <property name="manifest.class.path" value="spiralcraft-core.jar"/>
+
+  <path id="classpath">
+    <pathelement location="lib/spiralcraft-core.jar"/>
+    <pathelement location="lib/spiralcraft-core-test.jar"/>
+    <pathelement location="lib/spiralcraft-json.jar"/>
+  </path>
+  <property name="classpath" refid="classpath"/>
+
+  <property name="manifest.class.path" value="spiralcraft-core.jar spiralcraft-json.jar"/>
   <property name="depends.dir" location="../../repo"/>
   
   <property name="spiralcraft.javac.target" value="13"/>

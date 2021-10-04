@@ -15,7 +15,7 @@
   </publications> 
   <dependencies>
     <dependency org="spiralcraft" name="distrib-common" rev="[0.4.17-dev1,0.5-dev[" conf="*"/>
-    <dependency org="spiralcraft" name="json" rev="[0.4.17-dev,0.5-dev[" conf="test->default"/>
+    <dependency org="spiralcraft" name="json" rev="[0.4.17-dev,0.5-dev[" conf="*"/>
     <dependency org="hsqldb" name="hsqldb" rev="[2.2.8,)" conf="*"/>
     <dependency org="postgresql" name="jdbc4" rev="latest.integration" conf="all->default"/>
     <dependency org="mysql" name="connector-java" rev="latest.integration" conf="all->default"/>
