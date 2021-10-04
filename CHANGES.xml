@@ -20,6 +20,28 @@
         </revision>
         
         <notes>
+          <scm:Note>Maintenance utility to run SQL statements and return JSON.
+          </scm:Note>
+          
+        </notes>
+
+        <path>source/spiralcraft/sql
+        </path>
+        
+        <resources>
+          <URI>data/store/SQLStore.java
+          </URI>
+          <URI>util/SQLUtil.java
+          </URI>
+        </resources>
+        
+      </scm:Change>
+
+      <scm:Change>
+        <revision>-dev31
+        </revision>
+        
+        <notes>
           <scm:Note>Don't auto-flatten a field that references the same type as
             the containing type.
           </scm:Note>
