@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev32
+        </revision>
+        
+        <notes>
+          <scm:Note>Fix exclusion of last field from ad-hoc SQL-to-JSON conversion
+          </scm:Note>
+        </notes>
+
+        <path>source/spiralcraft/sql/SQLUtil.java
+        </path>
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev31
         </revision>
         
