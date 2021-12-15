@@ -22,6 +22,7 @@ import java.sql.Statement;
 import java.sql.Wrapper;
 
 import spiralcraft.json.ArrayNode;
+import spiralcraft.json.BooleanNode;
 import spiralcraft.json.Node;
 import spiralcraft.json.NullNode;
 import spiralcraft.json.NumberNode;
@@ -104,13 +105,16 @@ public class SQLUtil
           { 
             ObjectNode row=new ObjectNode(null);
             data.addChild(row);
-            for (int i=1; i<numColumns; i++)
+            for (int i=1; i<=numColumns; i++)
             {
               String colname=rsmd.getColumnName(i);
               Object value=rs.getObject(colname);
               Node cell;
               if (value==null)
               { cell=new NullNode(colname);
+              }
+              else if (value instanceof Boolean)
+              { cell=new BooleanNode(colname,(Boolean) value);
               }
               else
               { cell=new StringNode(colname,value.toString());
