@@ -94,7 +94,7 @@ public class SqlStore
           public SqlStoreConnection newConnection(Connection delegate)
             throws SQLException
           { 
-            log.fine("Creating connection from "+delegate);
+            log.fine(schema.getName()+": Creating connection from "+delegate);
             return new SqlStoreConnection(delegate);
           }
           
@@ -102,7 +102,7 @@ public class SqlStore
           public SqlStoreConnection newConnection(Connection delegate,XAConnection xa)
             throws SQLException
           { 
-            log.fine("Creating XA connection from "+delegate);
+            log.fine(schema.getName()+"Creating XA connection from "+delegate);
             return new SqlStoreConnection(delegate,xa);
           }          
         }
