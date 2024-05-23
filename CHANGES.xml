@@ -16,6 +16,17 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev34
+        </revision>
+        
+        <notes>
+          <scm:Note>Upgrade HSQLDB to 2.7.2
+          </scm:Note>
+        </notes>
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev32
         </revision>
         
