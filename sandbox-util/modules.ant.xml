@@ -1,7 +1,7 @@
 <project name="repo-modules" basedir=".">
   <repo-inst org="spiralcraft" module="core" rev="[0.4.17-dev,0.4.18-dev["/>
   <repo-inst org="spiralcraft" module="distrib-common" rev="[0.4.17-dev,0.4.18-dev["/>
-  <repo-inst org="hsqldb" module="hsqldb" rev="[2.3.3,)" />
+  <repo-inst org="org.hsqldb" module="hsqldb" rev="[2.7.2,)" />
   <repo-inst org="postgresql" module="jdbc4" rev="latest.integration" />
   <repo-inst org="mysql" module="connector-java" rev="latest.integration" />
   
