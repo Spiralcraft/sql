@@ -16,6 +16,20 @@
     <detail>
 
       <scm:Change>
+        <revision>-dev35
+        </revision>
+        
+        <notes>
+          <scm:Note>Provide store identifier to pool for logging
+          </scm:Note>
+          
+          <path>source/spiralcraft/sql/data/store/SqlStore.java
+          </path>
+        </notes>
+        
+      </scm:Change>
+
+      <scm:Change>
         <revision>-dev34
         </revision>
         
