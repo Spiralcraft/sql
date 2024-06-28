@@ -333,6 +333,7 @@ public class SqlStore
       connectionPool.setDataSource(dataSource);
       connectionPool.setDialect(dialect);
       connectionPool.start();
+      connectionPool.setIdentifier(getEffectiveName());
       if (onPoolStart!=null)
       { onPoolStart.get();
       }
